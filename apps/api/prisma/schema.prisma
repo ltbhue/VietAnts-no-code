@@ -1,0 +1,131 @@
+enum Role {
+  ADMIN
+  TESTER
+  VIEWER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  fullName  String
+  role      Role     @default(TESTER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects        Project[]       @relation("ProjectOwner")
+  testRuns        TestRun[]
+  createdScripts  TestScript[]    @relation("ScriptCreator")
+}
+
+model Project {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  ownerId String
+  owner   User          @relation("ProjectOwner", fields: [ownerId], references: [id])
+
+  scripts      TestScript[]
+  uiObjects    UiObject[]
+  dataSets     DataSet[]
+}
+
+model TestScript {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id])
+
+  createdById String
+  createdBy   User      @relation("ScriptCreator", fields: [createdById], references: [id])
+
+  steps   TestStep[]
+  runs    TestRun[]
+}
+
+model TestStep {
+  id          String      @id @default(cuid())
+  order       Int
+  keyword     String
+  targetId    String?
+  target      UiObject?   @relation(fields: [targetId], references: [id])
+  parameters  Json?
+
+  scriptId String
+  script   TestScript @relation(fields: [scriptId], references: [id])
+}
+
+model UiObject {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  locator     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  steps     TestStep[]
+}
+
+model DataSet {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  rows        Json
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  runs     TestRun[]
+}
+
+model TestRun {
+  id          String    @id @default(cuid())
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+  status      String
+  browser     String?
+
+  scriptId String
+  script   TestScript @relation(fields: [scriptId], references: [id])
+
+  userId  String
+  user    User     @relation(fields: [userId], references: [id])
+
+  dataSetId String?
+  dataSet   DataSet? @relation(fields: [dataSetId], references: [id])
+
+  results TestResult[]
+}
+
+model TestResult {
+  id          String    @id @default(cuid())
+  stepOrder   Int
+  status      String
+  message     String?
+  screenshot  String?
+  log         String?
+  createdAt   DateTime  @default(now())
+
+  runId   String
+  run     TestRun  @relation(fields: [runId], references: [id])
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
