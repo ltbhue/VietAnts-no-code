@@ -16,7 +16,8 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 const app = express();
-const port = process.env.PORT || 4000;
+// Render sẽ gán biến PORT cho service (FE). API chạy cổng riêng để không xung đột.
+const port = process.env.API_PORT || 4000;
 
 app.use(cors());
 app.use(express.json());

@@ -10,6 +10,7 @@
     "start": "node dist/index.js",
     "prisma:migrate": "prisma migrate dev --name init",
     "prisma:generate": "prisma generate",
+    "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "ts-node-dev --transpile-only prisma/seed.ts",
     "test": "playwright test",
     "test:auth": "playwright test tests/auth-login.spec.ts"
