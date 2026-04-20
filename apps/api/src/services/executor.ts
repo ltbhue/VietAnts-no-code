@@ -1,6 +1,6 @@
 import { PrismaClient } from "../generated/prisma/client";
 import fs from "node:fs";
-import { chromium } from "playwright";
+import { chromium, firefox, webkit } from "playwright";
 import { notifyTelegramOnFailure } from "./telegram";
 import { createLinearIssueOnFailure } from "./linear";
 
@@ -9,7 +9,7 @@ export async function executeScriptRun(opts: {
   scriptId: string;
   userId: string;
   dataSetId?: string | null;
-  browserName?: "chromium";
+  browserName?: "chromium" | "firefox" | "webkit";
 }) {
   const { prisma, scriptId, userId, dataSetId, browserName = "chromium" } = opts;
 
@@ -34,7 +34,8 @@ export async function executeScriptRun(opts: {
   });
 
   try {
-    const browser = await chromium.launch();
+    const launcher = browserName === "firefox" ? firefox : browserName === "webkit" ? webkit : chromium;
+    const browser = await launcher.launch();
     const page = await browser.newPage();
 
     const rows: any[] = dataSet ? ((dataSet.rows as any[]) ?? []) : [null];
