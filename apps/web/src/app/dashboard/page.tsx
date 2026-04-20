@@ -10,9 +10,22 @@ interface Project {
   name: string;
   description?: string | null;
 }
+interface RunSummary {
+  id: string;
+  status: string;
+}
+interface AnalyticsSummary {
+  total: number;
+  passed: number;
+  failed: number;
+  passRate: number;
+  commonErrors: Array<{ message: string; count: number }>;
+}
 
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [runs, setRuns] = useState<RunSummary[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -40,6 +53,14 @@ export default function DashboardPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProjects(res.data);
+      const runRes = await axios.get<RunSummary[]>(`${apiBase}/runs`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRuns(runRes.data);
+      const analyticsRes = await axios.get<AnalyticsSummary>(`${apiBase}/runs/analytics`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAnalytics(analyticsRes.data);
     } catch (err: unknown) {
       const e = err as { response?: { data?: { error?: string } } };
       setError(e?.response?.data?.error ?? "Không tải được danh sách project");
@@ -159,6 +180,48 @@ export default function DashboardPage() {
             {saving ? "Đang lưu..." : "Tạo project"}
           </button>
         </form>
+      </section>
+
+      <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 mb-8">
+        <h2 className="text-sm font-medium text-slate-200 mb-3">Thống kê kiểm thử</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+          <div className="rounded border border-slate-800 bg-slate-950 p-3">
+            <div className="text-slate-400">Tổng số run</div>
+            <div className="text-xl font-semibold">{runs.length}</div>
+          </div>
+          <div className="rounded border border-slate-800 bg-slate-950 p-3">
+            <div className="text-slate-400">Pass</div>
+            <div className="text-xl font-semibold text-emerald-400">
+              {analytics?.passed ?? runs.filter((r) => r.status === "passed" || r.status === "completed").length}
+            </div>
+          </div>
+          <div className="rounded border border-slate-800 bg-slate-950 p-3">
+            <div className="text-slate-400">Fail</div>
+            <div className="text-xl font-semibold text-red-400">
+              {analytics?.failed ?? runs.filter((r) => r.status === "failed").length}
+            </div>
+          </div>
+        </div>
+        <div className="mt-4">
+          <div className="text-xs text-slate-400 mb-2">
+            Tỉ lệ pass: <span className="text-emerald-300">{analytics?.passRate ?? 0}%</span>
+          </div>
+          <div className="rounded border border-slate-800 bg-slate-950 p-3">
+            <div className="text-sm font-medium mb-2">Các lỗi phổ biến</div>
+            {(analytics?.commonErrors ?? []).length === 0 ? (
+              <div className="text-xs text-slate-400">Chưa có lỗi.</div>
+            ) : (
+              <ul className="space-y-1 text-xs">
+                {(analytics?.commonErrors ?? []).map((item) => (
+                  <li key={item.message} className="flex justify-between gap-3">
+                    <span className="text-slate-300 truncate">{item.message}</span>
+                    <span className="text-red-300">x{item.count}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
       </section>
 
       {loading && <p className="text-sm text-slate-300">Đang tải...</p>}
