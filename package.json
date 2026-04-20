@@ -2,14 +2,16 @@
   "name": "vietants-nocode-test",
   "private": true,
   "version": "0.1.0",
-  "workspaces": [
-    "apps/*"
-  ],
+  "packageManager": "pnpm@10.17.1",
   "scripts": {
-    "dev": "npm run dev --workspace web & npm run dev --workspace api",
-    "dev:web": "npm run dev --workspace web",
-    "dev:api": "npm run dev --workspace api",
-    "build": "npm run build --workspace web",
-    "lint": "npm run lint --workspace web"
+    "dev": "pnpm --filter web dev & pnpm --filter api dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api dev",
+    "build": "pnpm --filter web build",
+    "lint": "pnpm --filter web lint",
+    "test:domain": "pnpm --filter @vietants/domain test"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6"
   }
 }

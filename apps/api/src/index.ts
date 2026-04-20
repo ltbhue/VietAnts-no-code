@@ -1,14 +1,20 @@
 import dotenv from "dotenv";
 import { buildServer } from "./server";
+import { prisma } from "./prisma";
 
 dotenv.config();
 
-const app = buildServer();
-// Render sẽ gán biến PORT cho service (FE). API chạy cổng riêng để không xung đột.
-const port = process.env.API_PORT || 4000;
+const app = buildServer({ prisma });
+const parsedPort = Number(process.env.API_PORT ?? 4000);
+const port = Number.isInteger(parsedPort) && parsedPort > 0 ? parsedPort : 4000;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`API server listening on http://localhost:${port}`);
+});
+
+server.on("error", (error) => {
+  console.error("Failed to start API server:", error);
+  process.exit(1);
 });
 
 

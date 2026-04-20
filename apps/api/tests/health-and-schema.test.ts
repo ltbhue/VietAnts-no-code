@@ -1,6 +1,8 @@
 import { afterAll, beforeAll, expect, test } from "@playwright/test";
 import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { buildServer } from "../src/server";
 
 let server: Server;
@@ -37,4 +39,14 @@ test("GET /health returns minimal ok payload", async () => {
 
   expect(response.status).toBe(200);
   await expect(response.json()).resolves.toEqual({ status: "ok" });
+});
+
+test("schema keeps core baseline entities", async () => {
+  const schemaPath = path.resolve(process.cwd(), "prisma", "schema.prisma");
+  const schema = readFileSync(schemaPath, "utf8");
+
+  expect(schema).toContain("model Workspace");
+  expect(schema).toContain("model Project");
+  expect(schema).toContain("model TestCase");
+  expect(schema).toContain("model TestCaseVersion");
 });

@@ -5,6 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 
 const links = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/recorder", label: "Recorder" },
+  { href: "/editor", label: "Biên tập" },
+  { href: "/suite-runs", label: "Suite" },
+  { href: "/admin/roles", label: "Vai trò" },
   { href: "/scripts", label: "Kịch bản" },
   { href: "/objects", label: "Đối tượng UI" },
   { href: "/datasets", label: "Bộ dữ liệu" },

@@ -18,4 +18,8 @@ yarn-error.log*
 
 # Runtime generated files
 screenshots
+.worktrees/
+
+# Playwright / test output
+apps/api/test-results/
 
