@@ -1,6 +1,12 @@
 import express from "express";
 import cors from "cors";
 import type { PrismaClient } from "./generated/prisma/client";
+import authRouter from "./routes/auth";
+import projectsRouter from "./routes/projects";
+import scriptsRouter from "./routes/scripts";
+import objectsRouter from "./routes/objects";
+import datasetsRouter from "./routes/datasets";
+import runsRouter from "./routes/runs";
 import testsRouter from "./routes/tests";
 import suitesRouter from "./routes/suites";
 import suiteRunsRouter from "./routes/suiteRuns";
@@ -22,6 +28,12 @@ export function buildServer(options?: BuildServerOptions) {
 
   if (options?.prisma) {
     const prisma = options.prisma;
+    app.use("/auth", authRouter(prisma));
+    app.use("/projects", projectsRouter(prisma));
+    app.use("/scripts", scriptsRouter(prisma));
+    app.use("/objects", objectsRouter(prisma));
+    app.use("/datasets", datasetsRouter(prisma));
+    app.use("/runs", runsRouter(prisma));
     app.use("/projects", testsRouter(prisma));
     app.use("/projects", suitesRouter(prisma));
     app.use("/suites", suiteRunsRouter(prisma));

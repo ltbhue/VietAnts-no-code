@@ -3,12 +3,18 @@ import type { PrismaClient } from "../generated/prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
+import { authMiddleware, requireRole } from "../middleware/auth";
 
 const registerSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z
+    .string()
+    .min(8)
+    .regex(/[A-Z]/, "Password must include at least one uppercase letter")
+    .regex(/[a-z]/, "Password must include at least one lowercase letter")
+    .regex(/[0-9]/, "Password must include at least one number"),
   fullName: z.string().min(1),
-  role: z.enum(["ADMIN", "TESTER", "VIEWER"]).optional(),
+  role: z.enum(["TESTER", "VIEWER"]).optional(),
 });
 
 const loginSchema = z.object({
@@ -52,6 +58,36 @@ export default function authRouter(prisma: PrismaClient) {
     return res.status(201).json(user);
   });
 
+  router.post("/admin/create-user", authMiddleware, requireRole(["ADMIN"]), async (req, res) => {
+    const parse = z
+      .object({
+        email: z.string().email(),
+        password: z
+          .string()
+          .min(8)
+          .regex(/[A-Z]/, "Password must include at least one uppercase letter")
+          .regex(/[a-z]/, "Password must include at least one lowercase letter")
+          .regex(/[0-9]/, "Password must include at least one number"),
+        fullName: z.string().min(1),
+        role: z.enum(["ADMIN", "TESTER", "VIEWER"]),
+      })
+      .safeParse(req.body);
+    if (!parse.success) {
+      return res.status(400).json({ error: "Invalid payload", details: parse.error.flatten() });
+    }
+    const { email, password, fullName, role } = parse.data;
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      return res.status(409).json({ error: "Email already registered" });
+    }
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: { email, password: passwordHash, fullName, role },
+      select: { id: true, email: true, fullName: true, role: true, createdAt: true },
+    });
+    return res.status(201).json(user);
+  });
+
   router.post("/login", async (req, res) => {
     const parse = loginSchema.safeParse(req.body);
     if (!parse.success) {
@@ -88,6 +124,17 @@ export default function authRouter(prisma: PrismaClient) {
         role: user.role,
       },
     });
+  });
+
+  router.get("/me", authMiddleware, async (req, res) => {
+    const current = await prisma.user.findUnique({
+      where: { id: req.user!.id },
+      select: { id: true, email: true, fullName: true, role: true, createdAt: true },
+    });
+    if (!current) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    return res.json(current);
   });
 
   return router;

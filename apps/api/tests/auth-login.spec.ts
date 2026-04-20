@@ -72,5 +72,37 @@ test.describe("Auth API - /auth/login", () => {
     expect(body).toHaveProperty("error", "Invalid payload");
     expect(body).toHaveProperty("details");
   });
+
+  test("weak password is rejected on register", async ({ request, baseURL }) => {
+    const res = await request.post(`${baseURL}/auth/register`, {
+      data: { email: randomEmail(), password: "weakpass", fullName: "Weak Password" },
+    });
+    expect(res.status()).toBe(400);
+    const body = await res.json();
+    expect(body).toHaveProperty("error", "Invalid payload");
+  });
+
+  test("me endpoint returns current profile", async ({ request, baseURL }) => {
+    const email = randomEmail();
+    const password = "StrongPass123";
+    const registerRes = await request.post(`${baseURL}/auth/register`, {
+      data: { email, password, fullName: "Current User" },
+    });
+    expect(registerRes.status()).toBe(201);
+
+    const loginRes = await request.post(`${baseURL}/auth/login`, {
+      data: { email, password },
+    });
+    expect(loginRes.status()).toBe(200);
+    const loginBody = await loginRes.json();
+
+    const meRes = await request.get(`${baseURL}/auth/me`, {
+      headers: { Authorization: `Bearer ${loginBody.token as string}` },
+    });
+    expect(meRes.status()).toBe(200);
+    const meBody = await meRes.json();
+    expect(meBody).toMatchObject({ email, fullName: "Current User" });
+    expect(meBody).not.toHaveProperty("password");
+  });
 });
 
