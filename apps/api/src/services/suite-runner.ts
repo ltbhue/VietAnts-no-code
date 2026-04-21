@@ -19,7 +19,7 @@ export async function executeSuiteRun(prisma: PrismaClient, runId: string): Prom
   });
 
   if (!run) {
-    throw new Error("SuiteRun not found");
+    throw new Error("Không tìm thấy lần chạy suite");
   }
 
   const results: Array<{
@@ -35,7 +35,7 @@ export async function executeSuiteRun(prisma: PrismaClient, runId: string): Prom
     const steps = Array.isArray(content?.steps) ? content!.steps! : [];
     const stepLog = steps.map((_, i) => ({
       step: i + 1,
-      message: "ok",
+      message: "Thành công",
     }));
 
     results.push({

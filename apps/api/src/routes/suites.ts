@@ -24,7 +24,7 @@ export default function suitesRouter(prisma: PrismaClient) {
       where: { id: req.params.projectId as string, ownerId: req.user!.id },
     });
     if (!project) {
-      return res.status(404).json({ error: "Project not found" });
+      return res.status(404).json({ error: "Không tìm thấy project" });
     }
     const suites = await prisma.testSuite.findMany({
       where: { projectId: project.id },
@@ -37,7 +37,7 @@ export default function suitesRouter(prisma: PrismaClient) {
   router.post("/:projectId/suites", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parsed = createSuiteSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parsed.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parsed.error.flatten() });
     }
 
     const projectId = req.params.projectId as string;
@@ -45,7 +45,7 @@ export default function suitesRouter(prisma: PrismaClient) {
       where: { id: projectId, ownerId: req.user!.id },
     });
     if (!project) {
-      return res.status(404).json({ error: "Project not found" });
+      return res.status(404).json({ error: "Không tìm thấy project" });
     }
 
     for (const item of parsed.data.items) {
@@ -56,7 +56,7 @@ export default function suitesRouter(prisma: PrismaClient) {
         },
       });
       if (!ver) {
-        return res.status(400).json({ error: `Invalid testCaseVersionId: ${item.testCaseVersionId}` });
+        return res.status(400).json({ error: `testCaseVersionId không hợp lệ: ${item.testCaseVersionId}` });
       }
     }
 

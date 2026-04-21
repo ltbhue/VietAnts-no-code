@@ -52,7 +52,7 @@ test.describe("Auth API - /auth/login", () => {
       data: { email, password: "wrong" },
     });
     expect(loginRes.status()).toBe(401);
-    await expect(loginRes.json()).resolves.toMatchObject({ error: "Invalid credentials" });
+    await expect(loginRes.json()).resolves.toMatchObject({ error: "Sai email hoặc mật khẩu" });
   });
 
   test("non-existent user returns 401 with generic error", async ({ request, baseURL }) => {
@@ -60,7 +60,7 @@ test.describe("Auth API - /auth/login", () => {
       data: { email: randomEmail(), password: "anything" },
     });
     expect(loginRes.status()).toBe(401);
-    await expect(loginRes.json()).resolves.toMatchObject({ error: "Invalid credentials" });
+    await expect(loginRes.json()).resolves.toMatchObject({ error: "Sai email hoặc mật khẩu" });
   });
 
   test("invalid payload returns 400 and includes details", async ({ request, baseURL }) => {
@@ -69,7 +69,7 @@ test.describe("Auth API - /auth/login", () => {
     });
     expect(res.status()).toBe(400);
     const body = await res.json();
-    expect(body).toHaveProperty("error", "Invalid payload");
+    expect(body).toHaveProperty("error", "Dữ liệu không hợp lệ");
     expect(body).toHaveProperty("details");
   });
 
@@ -79,7 +79,7 @@ test.describe("Auth API - /auth/login", () => {
     });
     expect(res.status()).toBe(400);
     const body = await res.json();
-    expect(body).toHaveProperty("error", "Invalid payload");
+    expect(body).toHaveProperty("error", "Dữ liệu không hợp lệ");
   });
 
   test("me endpoint returns current profile", async ({ request, baseURL }) => {

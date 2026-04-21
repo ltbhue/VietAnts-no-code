@@ -34,7 +34,7 @@ export default function testsRouter(prisma: PrismaClient) {
       where: { id: projectId, ownerId: req.user!.id },
     });
     if (!project) {
-      return res.status(404).json({ error: "Project not found" });
+      return res.status(404).json({ error: "Không tìm thấy project" });
     }
     const cases = await prisma.testCase.findMany({
       where: { projectId },
@@ -49,7 +49,7 @@ export default function testsRouter(prisma: PrismaClient) {
   router.post("/:projectId/tests", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parsed = createRecordedTestSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parsed.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parsed.error.flatten() });
     }
 
     const projectId = req.params.projectId as string;
@@ -57,14 +57,14 @@ export default function testsRouter(prisma: PrismaClient) {
       where: { id: projectId, ownerId: req.user!.id },
     });
     if (!project) {
-      return res.status(404).json({ error: "Project not found" });
+      return res.status(404).json({ error: "Không tìm thấy project" });
     }
 
     let validatedSteps: ReturnType<typeof parseStep>[];
     try {
       validatedSteps = parsed.data.steps.map((s) => parseStep(s));
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Invalid step";
+      const message = e instanceof Error ? e.message : "Bước test không hợp lệ";
       return res.status(400).json({ error: message });
     }
 
@@ -90,7 +90,7 @@ export default function testsRouter(prisma: PrismaClient) {
 
     const v = created.versions[0];
     if (!v) {
-      return res.status(500).json({ error: "Version not created" });
+      return res.status(500).json({ error: "Không tạo được phiên bản test" });
     }
 
     const lifecycle = (v.content as { lifecycle?: string }).lifecycle ?? "Draft";
@@ -106,14 +106,14 @@ export default function testsRouter(prisma: PrismaClient) {
   router.post("/:projectId/tests/smart-record", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parsed = smartRecordSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parsed.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parsed.error.flatten() });
     }
     const projectId = req.params.projectId as string;
     const project = await prisma.project.findFirst({
       where: { id: projectId, ownerId: req.user!.id },
     });
     if (!project) {
-      return res.status(404).json({ error: "Project not found" });
+      return res.status(404).json({ error: "Không tìm thấy project" });
     }
 
     const suggestions: string[] = [];
@@ -177,7 +177,7 @@ export default function testsRouter(prisma: PrismaClient) {
         where: { id: projectId, ownerId: req.user!.id },
       });
       if (!project) {
-        return res.status(404).json({ error: "Project not found" });
+        return res.status(404).json({ error: "Không tìm thấy project" });
       }
 
       const tc = await prisma.testCase.findFirst({
@@ -185,12 +185,12 @@ export default function testsRouter(prisma: PrismaClient) {
         include: { versions: { orderBy: { version: "desc" }, take: 1 } },
       });
       if (!tc) {
-        return res.status(404).json({ error: "Test case not found" });
+        return res.status(404).json({ error: "Không tìm thấy test case" });
       }
 
       const latest = tc.versions[0];
       if (!latest) {
-        return res.status(404).json({ error: "No version" });
+        return res.status(404).json({ error: "Test case chưa có phiên bản" });
       }
 
       const raw = latest.content as Record<string, unknown>;
@@ -200,7 +200,7 @@ export default function testsRouter(prisma: PrismaClient) {
         platform: raw.platform as string | undefined,
       });
       if (!validation.ok) {
-        return res.status(400).json({ error: "Validation failed", errors: validation.errors });
+        return res.status(400).json({ error: "Kiểm tra dữ liệu thất bại", errors: validation.errors });
       }
 
       const nextContent = { ...raw, lifecycle: "Published" };

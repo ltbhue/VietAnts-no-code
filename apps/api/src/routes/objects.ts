@@ -25,7 +25,7 @@ export default function objectsRouter(prisma: PrismaClient) {
       return res.json([]);
     }
     if (projectId && !ownedIds.includes(projectId)) {
-      return res.status(403).json({ error: "No access to this project" });
+      return res.status(403).json({ error: "Không có quyền truy cập project này" });
     }
 
     const objects = await prisma.uiObject.findMany({
@@ -38,12 +38,12 @@ export default function objectsRouter(prisma: PrismaClient) {
   router.post("/", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parse = objectSchema.safeParse(req.body);
     if (!parse.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parse.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
     const project = await prisma.project.findFirst({
       where: { id: parse.data.projectId, ownerId: req.user!.id },
     });
-    if (!project) return res.status(403).json({ error: "No access to project" });
+    if (!project) return res.status(403).json({ error: "Không có quyền truy cập project" });
 
     const obj = await prisma.uiObject.create({ data: parse.data });
     res.status(201).json(obj);
@@ -55,17 +55,17 @@ export default function objectsRouter(prisma: PrismaClient) {
       include: { project: true },
     });
     if (!existing || existing.project.ownerId !== req.user!.id) {
-      return res.status(404).json({ error: "Not found" });
+      return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
     }
     const parse = objectSchema.partial().safeParse(req.body);
     if (!parse.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parse.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
     if (parse.data.projectId && parse.data.projectId !== existing.projectId) {
       const p = await prisma.project.findFirst({
         where: { id: parse.data.projectId, ownerId: req.user!.id },
       });
-      if (!p) return res.status(403).json({ error: "No access to project" });
+      if (!p) return res.status(403).json({ error: "Không có quyền truy cập project" });
     }
     const updated = await prisma.uiObject.update({
       where: { id: existing.id },
@@ -80,7 +80,7 @@ export default function objectsRouter(prisma: PrismaClient) {
       include: { project: true },
     });
     if (!existing || existing.project.ownerId !== req.user!.id) {
-      return res.status(404).json({ error: "Not found" });
+      return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
     }
     await prisma.uiObject.delete({ where: { id: existing.id } });
     res.status(204).end();

@@ -18,7 +18,7 @@ declare global {
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
   const header = req.headers.authorization;
   if (!header?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Missing authorization header" });
+    return res.status(401).json({ error: "Thiếu header xác thực" });
   }
   const token = header.slice("Bearer ".length);
   const jwtSecret = process.env.JWT_SECRET || "CHANGE_ME_IN_PRODUCTION";
@@ -32,14 +32,14 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     };
     next();
   } catch {
-    return res.status(401).json({ error: "Invalid token" });
+    return res.status(401).json({ error: "Token không hợp lệ" });
   }
 }
 
 export function requireRole(roles: AuthUser["role"][]) {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) return res.status(401).json({ error: "Unauthorized" });
-    if (!roles.includes(req.user.role)) return res.status(403).json({ error: "Forbidden" });
+    if (!req.user) return res.status(401).json({ error: "Chưa đăng nhập" });
+    if (!roles.includes(req.user.role)) return res.status(403).json({ error: "Không đủ quyền" });
     next();
   };
 }

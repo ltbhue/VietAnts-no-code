@@ -17,7 +17,7 @@ export async function executeScriptRun(opts: {
     where: { id: scriptId },
     include: { steps: { orderBy: { order: "asc" } } },
   });
-  if (!script) throw new Error("Script not found");
+  if (!script) throw new Error("Không tìm thấy kịch bản kiểm thử");
 
   const dataSet = dataSetId
     ? await prisma.dataSet.findUnique({ where: { id: dataSetId } })
@@ -50,7 +50,7 @@ export async function executeScriptRun(opts: {
               runId: run.id,
               stepOrder,
               status: "passed",
-              message: `Row ${rowIndex + 1}`,
+              message: `Dòng dữ liệu ${rowIndex + 1}`,
             },
           });
         } catch (err: any) {
@@ -75,12 +75,12 @@ export async function executeScriptRun(opts: {
           // Gửi thông báo Telegram khi bước fail
           const errorMessage = String(err?.message ?? err);
           const text = [
-            `❌ *Test run failed*`,
+            `❌ *Lần chạy test bị lỗi*`,
             ``,
-            `*Script*: ${script.name}`,
+            `*Kịch bản*: ${script.name}`,
             `*Run ID*: ${run.id}`,
-            `*Step order*: ${stepOrder}`,
-            `*Error*: ${errorMessage}`,
+            `*Thứ tự bước*: ${stepOrder}`,
+            `*Lỗi*: ${errorMessage}`,
           ].join("\n");
           await notifyTelegramOnFailure(text);
 
@@ -138,7 +138,7 @@ async function runKeywordStep(
       if (typeof params.url !== "string" || !params.url.trim()) {
         const url = params.url ?? dataRow.url;
         if (typeof url !== "string" || !url.trim()) {
-          throw new Error("navigate: missing parameters.url");
+          throw new Error("navigate: thiếu parameters.url");
         }
         await page.goto(url);
       } else {
@@ -147,32 +147,32 @@ async function runKeywordStep(
       break;
     case "click":
       if (typeof params.selector !== "string" || !params.selector.trim()) {
-        throw new Error("click: missing parameters.selector");
+        throw new Error("click: thiếu parameters.selector");
       }
       await page.click(params.selector);
       break;
     case "fill":
       if (typeof params.selector !== "string" || !params.selector.trim()) {
-        throw new Error("fill: missing parameters.selector");
+        throw new Error("fill: thiếu parameters.selector");
       }
       await page.fill(params.selector, params.value ?? dataRow[params.dataKey]);
       break;
     case "assertText":
       if (typeof params.selector !== "string" || !params.selector.trim()) {
-        throw new Error("assertText: missing parameters.selector");
+        throw new Error("assertText: thiếu parameters.selector");
       }
       await page.waitForSelector(params.selector);
       const text = await page.textContent(params.selector);
       const expected = params.expected ?? dataRow[params.dataKey];
       if (typeof expected !== "string" || !expected.trim()) {
-        throw new Error("assertText: missing parameters.expected or parameters.dataKey");
+        throw new Error("assertText: thiếu parameters.expected hoặc parameters.dataKey");
       }
       if (!text?.includes(expected)) {
-        throw new Error("Text assertion failed");
+        throw new Error("Kiểm tra nội dung văn bản thất bại");
       }
       break;
     default:
-      throw new Error(`Unknown keyword: ${keyword}`);
+      throw new Error(`Từ khóa không được hỗ trợ: ${keyword}`);
   }
 }
 

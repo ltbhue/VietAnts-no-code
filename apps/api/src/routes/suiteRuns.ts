@@ -16,7 +16,7 @@ export default function suiteRunsRouter(prisma: PrismaClient) {
   router.post("/:suiteId/runs", authMiddleware, requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parsed = startRunSchema.safeParse(req.body ?? {});
     if (!parsed.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parsed.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parsed.error.flatten() });
     }
 
     const suite = await prisma.testSuite.findFirst({
@@ -26,7 +26,7 @@ export default function suiteRunsRouter(prisma: PrismaClient) {
       },
     });
     if (!suite) {
-      return res.status(404).json({ error: "Suite not found" });
+      return res.status(404).json({ error: "Không tìm thấy suite" });
     }
 
     const run = await prisma.suiteRun.create({
@@ -43,7 +43,7 @@ export default function suiteRunsRouter(prisma: PrismaClient) {
     try {
       await executeSuiteRun(prisma, run.id);
     } catch (e) {
-      const message = e instanceof Error ? e.message : "run failed";
+      const message = e instanceof Error ? e.message : "Chạy suite thất bại";
       await prisma.suiteRun.update({
         where: { id: run.id },
         data: { status: "failed", finishedAt: new Date(), results: { error: message } as object },
@@ -68,7 +68,7 @@ export default function suiteRunsRouter(prisma: PrismaClient) {
       },
     });
     if (!run) {
-      return res.status(404).json({ error: "Not found" });
+      return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
     }
     res.json(run);
   });

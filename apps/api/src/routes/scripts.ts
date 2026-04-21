@@ -36,14 +36,14 @@ export default function scriptsRouter(prisma: PrismaClient) {
   router.post("/", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parse = scriptSchema.safeParse(req.body);
     if (!parse.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parse.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
     const { projectId, name, description } = parse.data;
 
     const project = await prisma.project.findFirst({
       where: { id: projectId, ownerId: req.user!.id },
     });
-    if (!project) return res.status(403).json({ error: "No access to project" });
+    if (!project) return res.status(403).json({ error: "Không có quyền truy cập project" });
 
     const script = await prisma.testScript.create({
       data: {
@@ -61,20 +61,20 @@ export default function scriptsRouter(prisma: PrismaClient) {
       where: { id: req.params.id as any, createdById: req.user!.id },
       include: { steps: { orderBy: { order: "asc" } } },
     });
-    if (!script) return res.status(404).json({ error: "Not found" });
+    if (!script) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
     res.json(script);
   });
 
   router.put("/:id", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parseMeta = scriptSchema.partial().safeParse(req.body);
     if (!parseMeta.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parseMeta.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parseMeta.error.flatten() });
     }
     const updated = await prisma.testScript.updateMany({
       where: { id: req.params.id as any, createdById: req.user!.id },
       data: parseMeta.data,
     });
-    if (updated.count === 0) return res.status(404).json({ error: "Not found" });
+    if (updated.count === 0) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
     const script = await prisma.testScript.findUnique({ where: { id: req.params.id as any } });
     res.json(script);
   });
@@ -82,7 +82,7 @@ export default function scriptsRouter(prisma: PrismaClient) {
   router.put("/:id/steps", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const stepsParse = z.array(stepSchema).safeParse(req.body.steps);
     if (!stepsParse.success) {
-      return res.status(400).json({ error: "Invalid steps", details: stepsParse.error.flatten() });
+      return res.status(400).json({ error: "Danh sách bước test không hợp lệ", details: stepsParse.error.flatten() });
     }
 
     // Validate required parameters so executor can run reliably.
@@ -149,14 +149,14 @@ export default function scriptsRouter(prisma: PrismaClient) {
 
     if (validationErrors.length > 0) {
       return res.status(400).json({
-        error: "Invalid steps",
+        error: "Danh sách bước test không hợp lệ",
         details: { errors: validationErrors },
       });
     }
     const script = await prisma.testScript.findFirst({
       where: { id: req.params.id as any, createdById: req.user!.id },
     });
-    if (!script) return res.status(404).json({ error: "Not found" });
+    if (!script) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
 
     await prisma.$transaction(async (tx: any) => {
       await tx.testStep.deleteMany({ where: { scriptId: script.id } });

@@ -24,7 +24,7 @@ export default function projectsRouter(prisma: PrismaClient) {
   router.post("/", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parse = projectSchema.safeParse(req.body);
     if (!parse.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parse.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
     const project = await prisma.project.create({
       data: {
@@ -39,20 +39,20 @@ export default function projectsRouter(prisma: PrismaClient) {
     const project = await prisma.project.findFirst({
       where: { id: req.params.id as any, ownerId: req.user!.id },
     });
-    if (!project) return res.status(404).json({ error: "Not found" });
+    if (!project) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
     res.json(project);
   });
 
   router.put("/:id", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parse = projectSchema.partial().safeParse(req.body);
     if (!parse.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parse.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
     const updated = await prisma.project.updateMany({
       where: { id: req.params.id as any, ownerId: req.user!.id },
       data: parse.data,
     });
-    if (updated.count === 0) return res.status(404).json({ error: "Not found" });
+    if (updated.count === 0) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
     const project = await prisma.project.findUnique({ where: { id: req.params.id as any } });
     res.json(project);
   });

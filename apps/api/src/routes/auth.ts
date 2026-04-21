@@ -29,13 +29,13 @@ export default function authRouter(prisma: PrismaClient) {
   router.post("/register", async (req, res) => {
     const parse = registerSchema.safeParse(req.body);
     if (!parse.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parse.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
     const { email, password, fullName, role } = parse.data;
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-      return res.status(409).json({ error: "Email already registered" });
+      return res.status(409).json({ error: "Email đã được đăng ký" });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -73,12 +73,12 @@ export default function authRouter(prisma: PrismaClient) {
       })
       .safeParse(req.body);
     if (!parse.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parse.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
     const { email, password, fullName, role } = parse.data;
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-      return res.status(409).json({ error: "Email already registered" });
+      return res.status(409).json({ error: "Email đã được đăng ký" });
     }
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
@@ -91,18 +91,18 @@ export default function authRouter(prisma: PrismaClient) {
   router.post("/login", async (req, res) => {
     const parse = loginSchema.safeParse(req.body);
     if (!parse.success) {
-      return res.status(400).json({ error: "Invalid payload", details: parse.error.flatten() });
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
     const { email, password } = parse.data;
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ error: "Sai email hoặc mật khẩu" });
     }
 
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ error: "Sai email hoặc mật khẩu" });
     }
 
     const token = jwt.sign(
@@ -132,7 +132,7 @@ export default function authRouter(prisma: PrismaClient) {
       select: { id: true, email: true, fullName: true, role: true, createdAt: true },
     });
     if (!current) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: "Không tìm thấy người dùng" });
     }
     return res.json(current);
   });
