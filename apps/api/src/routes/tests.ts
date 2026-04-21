@@ -9,6 +9,19 @@ const createRecordedTestSchema = z.object({
   platform: z.enum(["desktop-web", "mobile-web"]).optional(),
   steps: z.array(z.unknown()).min(1),
 });
+const smartRecordSchema = z.object({
+  url: z.string().url(),
+  actions: z
+    .array(
+      z.object({
+        type: z.enum(["navigate", "click", "fill", "assertText"]),
+        selector: z.string().optional(),
+        value: z.string().optional(),
+        expected: z.string().optional(),
+      }),
+    )
+    .min(1),
+});
 
 export default function testsRouter(prisma: PrismaClient) {
   const router = Router();
@@ -87,6 +100,69 @@ export default function testsRouter(prisma: PrismaClient) {
       lifecycle,
       version: v.version,
       name: created.title,
+    });
+  });
+
+  router.post("/:projectId/tests/smart-record", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
+    const parsed = smartRecordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid payload", details: parsed.error.flatten() });
+    }
+    const projectId = req.params.projectId as string;
+    const project = await prisma.project.findFirst({
+      where: { id: projectId, ownerId: req.user!.id },
+    });
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    const suggestions: string[] = [];
+    const smartSteps = parsed.data.actions.map((action, index) => {
+      let selectorScore = 0;
+      if (action.selector) {
+        if (action.selector.includes("data-test")) selectorScore = 95;
+        else if (action.selector.includes("#")) selectorScore = 80;
+        else selectorScore = 55;
+      }
+
+      if (action.type === "click" && action.selector && selectorScore < 70) {
+        suggestions.push(`Step ${index + 1}: selector may be flaky, prefer data-test attribute.`);
+      }
+      if (action.type === "fill" && !action.value) {
+        suggestions.push(`Step ${index + 1}: fill action has no value.`);
+      }
+
+      if (action.type === "click") {
+        return { kind: "recorded.click", selector: action.selector ?? "body", meta: { selectorScore } };
+      }
+      if (action.type === "fill") {
+        return {
+          kind: "keyword.fill",
+          selector: action.selector ?? "input",
+          value: action.value ?? "",
+          meta: { selectorScore },
+        };
+      }
+      if (action.type === "assertText") {
+        return {
+          kind: "keyword.assertText",
+          selector: action.selector ?? "body",
+          expected: action.expected ?? "",
+          meta: { selectorScore },
+        };
+      }
+      return { kind: "keyword.navigate", url: parsed.data.url, meta: { selectorScore: 100 } };
+    });
+
+    if (!smartSteps.some((s) => s.kind === "keyword.assertText")) {
+      suggestions.push("Suggestion: add an assertText step after critical actions.");
+    }
+
+    return res.json({
+      ok: true,
+      url: parsed.data.url,
+      smartSteps,
+      suggestions,
     });
   });
 

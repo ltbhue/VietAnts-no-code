@@ -2,27 +2,66 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import {
+  FiBarChart2,
+  FiBookOpen,
+  FiBox,
+  FiChevronLeft,
+  FiChevronRight,
+  FiClipboard,
+  FiDatabase,
+  FiEdit3,
+  FiFileText,
+  FiLayers,
+  FiLogOut,
+  FiMenu,
+  FiShield,
+  FiX,
+} from "react-icons/fi";
 
-const links = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/recorder", label: "Recorder" },
-  { href: "/editor", label: "Biên tập" },
-  { href: "/suite-runs", label: "Suite" },
-  { href: "/admin/roles", label: "Vai trò" },
-  { href: "/scripts", label: "Kịch bản" },
-  { href: "/objects", label: "Đối tượng UI" },
-  { href: "/datasets", label: "Bộ dữ liệu" },
-  { href: "/reports", label: "Báo cáo" },
+type MenuLink = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
+
+const menuGroups = [
+  {
+    title: "Tổng quan",
+    links: [{ href: "/dashboard", label: "Dashboard", icon: FiBarChart2 }],
+  },
+  {
+    title: "No-code mới",
+    links: [
+      { href: "/recorder", label: "Recorder", icon: FiClipboard },
+      { href: "/editor", label: "Biên tập", icon: FiEdit3 },
+      { href: "/suite-runs", label: "Suite", icon: FiLayers },
+    ],
+  },
+  {
+    title: "Nghiệp vụ cũ",
+    links: [
+      { href: "/scripts", label: "Kịch bản", icon: FiBookOpen },
+      { href: "/objects", label: "Đối tượng UI", icon: FiBox },
+      { href: "/datasets", label: "Bộ dữ liệu", icon: FiDatabase },
+      { href: "/reports", label: "Báo cáo", icon: FiFileText },
+    ],
+  },
+  {
+    title: "Hệ thống",
+    links: [{ href: "/admin/roles", label: "Vai trò", icon: FiShield }],
+  },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const bare = pathname === "/login" || pathname === "/";
-  if (bare) {
-    return <>{children}</>;
-  }
+
+  if (bare) return <>{children}</>;
 
   function logout() {
     localStorage.removeItem("authToken");
@@ -31,37 +70,93 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur px-4 py-3 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard" className="font-semibold text-emerald-400 text-sm">
-            Vietants Testing
+    <div className="min-h-screen flex">
+      <button
+        type="button"
+        onClick={() => setMobileOpen(true)}
+        className="md:hidden fixed top-3 left-3 z-50 rounded-lg bg-slate-800 px-3 py-2 text-sm text-slate-100 shadow-lg border border-slate-700"
+      >
+        <span className="inline-flex items-center gap-2">
+          <FiMenu className="h-4 w-4" />
+          Menu
+        </span>
+      </button>
+
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      <aside
+        className={`${collapsed ? "w-20" : "w-64"} ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        } fixed md:static left-0 top-0 h-full shrink-0 border-r border-slate-800 bg-slate-900/95 backdrop-blur px-3 py-4 flex flex-col gap-3 z-50 transition-all duration-300 ease-out`}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <Link href="/dashboard" className="font-semibold text-emerald-400 text-sm px-2 truncate transition-all duration-200">
+            {collapsed ? "VT" : "Vietants Testing"}
           </Link>
-          <nav className="flex flex-wrap gap-1">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={`px-3 py-1.5 rounded-md text-sm transition ${
-                  pathname === l.href || pathname.startsWith(l.href + "/")
-                    ? "bg-emerald-600 text-slate-950 font-medium"
-                    : "text-slate-300 hover:bg-slate-800"
-                }`}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </nav>
+          <button
+            type="button"
+            onClick={() =>
+              setCollapsed((v) => {
+                const next = !v;
+                localStorage.setItem("sidebar-collapsed", next ? "1" : "0");
+                return next;
+              })
+            }
+            className="hidden md:flex items-center justify-center rounded-md text-slate-300 hover:text-white hover:bg-slate-800 px-2 py-1 transition-colors"
+          >
+            {collapsed ? <FiChevronRight className="h-4 w-4" /> : <FiChevronLeft className="h-4 w-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileOpen(false)}
+            className="md:hidden text-xs text-slate-300 hover:text-white px-2 py-1"
+          >
+            <FiX className="h-4 w-4" />
+          </button>
         </div>
+
+        <nav className="flex-1 overflow-auto space-y-3">
+          {menuGroups.map((group) => (
+            <div key={group.title} className="space-y-1">
+              {!collapsed && <div className="px-2 text-[11px] uppercase tracking-wide text-slate-500">{group.title}</div>}
+              {group.links.map((l: MenuLink) => {
+                const Icon = l.icon;
+                return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`group flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                    pathname === l.href || pathname.startsWith(l.href + "/")
+                      ? "bg-emerald-600 text-slate-950 font-medium shadow-sm"
+                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                  }`}
+                  title={l.label}
+                >
+                  <Icon className={`h-4 w-4 shrink-0 ${collapsed ? "mx-auto" : ""}`} />
+                  {!collapsed && <span className="truncate">{l.label}</span>}
+                </Link>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
+
         <button
           type="button"
           onClick={logout}
-          className="text-sm text-slate-400 hover:text-white px-2"
+          className="text-sm text-slate-400 hover:text-white px-2 py-2 text-left rounded-md hover:bg-slate-800 transition-colors flex items-center gap-2"
         >
-          Đăng xuất
+          <FiLogOut className="h-4 w-4 shrink-0" />
+          {!collapsed && "Đăng xuất"}
         </button>
-      </header>
-      <div className="flex-1">{children}</div>
+      </aside>
+      <main className="flex-1 min-w-0 md:ml-0 transition-all duration-300 ease-out">{children}</main>
     </div>
   );
 }

@@ -202,6 +202,49 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="rounded border border-slate-800 bg-slate-950 p-4">
+            <div className="text-sm font-medium mb-3">Biểu đồ Pass/Fail</div>
+            {(() => {
+              const pass = analytics?.passed ?? runs.filter((r) => r.status === "passed" || r.status === "completed").length;
+              const fail = analytics?.failed ?? runs.filter((r) => r.status === "failed").length;
+              const max = Math.max(pass, fail, 1);
+              const passHeight = Math.max((pass / max) * 140, pass > 0 ? 8 : 0);
+              const failHeight = Math.max((fail / max) * 140, fail > 0 ? 8 : 0);
+              return (
+                <div className="h-48 flex items-end gap-8 px-4">
+                  <div className="flex flex-col items-center gap-2">
+                    <div
+                      className="w-16 rounded-t bg-emerald-500/80 transition-all duration-500"
+                      style={{ height: `${passHeight}px` }}
+                    />
+                    <div className="text-xs text-slate-300">Pass ({pass})</div>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <div
+                      className="w-16 rounded-t bg-red-500/80 transition-all duration-500"
+                      style={{ height: `${failHeight}px` }}
+                    />
+                    <div className="text-xs text-slate-300">Fail ({fail})</div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+          <div className="rounded border border-slate-800 bg-slate-950 p-4">
+            <div className="text-sm font-medium mb-3">Tỉ lệ pass</div>
+            <div className="w-full h-5 rounded-full bg-slate-800 overflow-hidden">
+              <div
+                className="h-full bg-emerald-500 transition-all duration-500"
+                style={{ width: `${Math.max(0, Math.min(analytics?.passRate ?? 0, 100))}%` }}
+              />
+            </div>
+            <div className="mt-2 text-sm text-emerald-300 font-medium">{analytics?.passRate ?? 0}%</div>
+            <p className="mt-3 text-xs text-slate-400">
+              Biểu đồ cập nhật theo dữ liệu API `runs/analytics`.
+            </p>
+          </div>
+        </div>
         <div className="mt-4">
           <div className="text-xs text-slate-400 mb-2">
             Tỉ lệ pass: <span className="text-emerald-300">{analytics?.passRate ?? 0}%</span>
