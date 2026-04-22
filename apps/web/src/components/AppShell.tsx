@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { getUserRole } from "@/lib/api";
 import {
   FiBarChart2,
   FiBookOpen,
@@ -13,6 +14,7 @@ import {
   FiDatabase,
   FiEdit3,
   FiFileText,
+  FiFolder,
   FiLayers,
   FiLogOut,
   FiMenu,
@@ -24,33 +26,37 @@ type MenuLink = {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  roles?: Array<"ADMIN" | "TESTER" | "VIEWER">;
 };
 
 const menuGroups = [
   {
     title: "Tổng quan",
-    links: [{ href: "/dashboard", label: "Dashboard", icon: FiBarChart2 }],
+    links: [
+      { href: "/dashboard", label: "Dashboard", icon: FiBarChart2 },
+      { href: "/projects", label: "Project", icon: FiFolder, roles: ["ADMIN", "TESTER", "VIEWER"] },
+    ],
   },
   {
     title: "No-code mới",
     links: [
-      { href: "/recorder", label: "Recorder", icon: FiClipboard },
-      { href: "/editor", label: "Biên tập", icon: FiEdit3 },
-      { href: "/suite-runs", label: "Suite", icon: FiLayers },
+      { href: "/recorder", label: "Recorder", icon: FiClipboard, roles: ["ADMIN", "TESTER"] },
+      { href: "/editor", label: "Biên tập", icon: FiEdit3, roles: ["ADMIN", "TESTER"] },
+      { href: "/suite-runs", label: "Suite", icon: FiLayers, roles: ["ADMIN", "TESTER"] },
     ],
   },
   {
     title: "Nghiệp vụ cũ",
     links: [
-      { href: "/scripts", label: "Kịch bản", icon: FiBookOpen },
-      { href: "/objects", label: "Đối tượng UI", icon: FiBox },
-      { href: "/datasets", label: "Bộ dữ liệu", icon: FiDatabase },
-      { href: "/reports", label: "Báo cáo", icon: FiFileText },
+      { href: "/scripts", label: "Kịch bản", icon: FiBookOpen, roles: ["ADMIN", "TESTER", "VIEWER"] },
+      { href: "/objects", label: "Đối tượng UI", icon: FiBox, roles: ["ADMIN", "TESTER", "VIEWER"] },
+      { href: "/datasets", label: "Bộ dữ liệu", icon: FiDatabase, roles: ["ADMIN", "TESTER", "VIEWER"] },
+      { href: "/reports", label: "Báo cáo", icon: FiFileText, roles: ["ADMIN", "TESTER", "VIEWER"] },
     ],
   },
   {
     title: "Hệ thống",
-    links: [{ href: "/admin/roles", label: "Vai trò", icon: FiShield }],
+    links: [{ href: "/admin/roles", label: "Vai trò", icon: FiShield, roles: ["ADMIN"] }],
   },
 ];
 
@@ -59,7 +65,23 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [role, setRole] = useState<"ADMIN" | "TESTER" | "VIEWER" | null>(null);
   const bare = pathname === "/login" || pathname === "/";
+
+  useEffect(() => {
+    setRole(getUserRole());
+  }, [pathname]);
+
+  const visibleMenuGroups = useMemo(
+    () =>
+      menuGroups
+        .map((group) => ({
+          ...group,
+          links: group.links.filter((link) => !link.roles || (role && link.roles.includes(role))),
+        }))
+        .filter((group) => group.links.length > 0),
+    [role],
+  );
 
   if (bare) return <>{children}</>;
 
@@ -121,7 +143,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <nav className="flex-1 overflow-auto space-y-3">
-          {menuGroups.map((group) => (
+          {visibleMenuGroups.map((group) => (
             <div key={group.title} className="space-y-1">
               {!collapsed && <div className="px-2 text-[11px] uppercase tracking-wide text-slate-500">{group.title}</div>}
               {group.links.map((l: MenuLink) => {

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import { getApiBase, getUserRole } from "@/lib/api";
+import { getApiBase } from "@/lib/api";
 
 interface Project {
   id: string;
@@ -14,32 +14,31 @@ interface RunSummary {
   id: string;
   status: string;
 }
+interface SuiteSummary {
+  id: string;
+  name: string;
+}
 interface AnalyticsSummary {
   total: number;
   passed: number;
   failed: number;
   passRate: number;
   commonErrors: Array<{ message: string; count: number }>;
+  timeSeries?: Array<{ date: string; passed: number; failed: number }>;
+  statusBreakdown?: Array<{ label: string; value: number }>;
 }
 
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [runs, setRuns] = useState<RunSummary[]>([]);
+  const [suites, setSuites] = useState<SuiteSummary[]>([]);
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
+  const [rangeDays, setRangeDays] = useState<7 | 30>(7);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+  const [selectedSuiteId, setSelectedSuiteId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [editing, setEditing] = useState<Project | null>(null);
-  const [editName, setEditName] = useState("");
-  const [editDesc, setEditDesc] = useState("");
   const apiBase = getApiBase();
-  const [role, setRole] = useState<ReturnType<typeof getUserRole>>(null);
-
-  useEffect(() => {
-    setRole(getUserRole());
-  }, []);
 
   const load = useCallback(async () => {
     const token = localStorage.getItem("authToken");
@@ -53,137 +52,117 @@ export default function DashboardPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProjects(res.data);
+      const defaultProjectId = selectedProjectId || res.data[0]?.id || "";
+      if (!selectedProjectId && defaultProjectId) {
+        setSelectedProjectId(defaultProjectId);
+      }
       const runRes = await axios.get<RunSummary[]>(`${apiBase}/runs`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setRuns(runRes.data);
-      const analyticsRes = await axios.get<AnalyticsSummary>(`${apiBase}/runs/analytics`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setAnalytics(analyticsRes.data);
+      if (defaultProjectId) {
+        const suiteRes = await axios.get<SuiteSummary[]>(`${apiBase}/projects/${defaultProjectId}/suites`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setSuites(suiteRes.data);
+        if (selectedSuiteId && !suiteRes.data.some((s) => s.id === selectedSuiteId)) {
+          setSelectedSuiteId("");
+        }
+      } else {
+        setSuites([]);
+      }
     } catch (err: unknown) {
       const e = err as { response?: { data?: { error?: string } } };
       setError(e?.response?.data?.error ?? "Không tải được danh sách project");
     } finally {
       setLoading(false);
     }
-  }, [apiBase]);
+  }, [apiBase, selectedProjectId, selectedSuiteId]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  async function handleCreate(e: React.FormEvent) {
-    e.preventDefault();
+  useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
-    setSaving(true);
-    setError(null);
-    try {
-      await axios.post(
-        `${apiBase}/projects`,
-        { name, description: description || undefined },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
-      setName("");
-      setDescription("");
-      await load();
-    } catch (err: unknown) {
-      const e = err as { response?: { data?: { error?: string } } };
-      setError(e?.response?.data?.error ?? "Không tạo được project");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  function startEdit(p: Project) {
-    setEditing(p);
-    setEditName(p.name);
-    setEditDesc(p.description ?? "");
-  }
-
-  async function saveEdit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!editing) return;
-    const token = localStorage.getItem("authToken");
-    if (!token) return;
-    setSaving(true);
-    setError(null);
-    try {
-      await axios.put(
-        `${apiBase}/projects/${editing.id}`,
-        { name: editName, description: editDesc || undefined },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
-      setEditing(null);
-      await load();
-    } catch (err: unknown) {
-      const e = err as { response?: { data?: { error?: string } } };
-      setError(e?.response?.data?.error ?? "Không cập nhật được");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function removeProject(id: string) {
-    if (!confirm("Xóa project này? Các kịch bản liên quan có thể bị ảnh hưởng (tuỳ ràng buộc DB).")) return;
-    const token = localStorage.getItem("authToken");
-    if (!token) return;
-    setError(null);
-    try {
-      await axios.delete(`${apiBase}/projects/${id}`, {
+    const params = new URLSearchParams();
+    params.set("days", String(rangeDays));
+    if (selectedProjectId) params.set("projectId", selectedProjectId);
+    if (selectedSuiteId) params.set("suiteId", selectedSuiteId);
+    axios
+      .get<AnalyticsSummary>(`${apiBase}/runs/analytics?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      await load();
-    } catch (err: unknown) {
-      const e = err as { response?: { data?: { error?: string } } };
-      setError(e?.response?.data?.error ?? "Chỉ ADMIN mới xóa được project hoặc có lỗi server");
-    }
-  }
+      })
+      .then((res) => setAnalytics(res.data))
+      .catch(() => setAnalytics(null));
+  }, [apiBase, rangeDays, selectedProjectId, selectedSuiteId]);
 
   return (
     <main className="min-h-screen p-6 md:p-8 max-w-6xl mx-auto">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-sm text-slate-300 mt-1">
-          Quản lý project, sau đó tạo kịch bản, đối tượng UI và bộ dữ liệu.
+          Theo dõi số liệu kiểm thử tổng quan theo project và suite.
         </p>
+        <Link
+          href="/projects"
+          className="inline-flex mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-500"
+        >
+          Đi tới module Project
+        </Link>
       </div>
 
       <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 mb-8">
-        <h2 className="text-sm font-medium text-slate-200 mb-3">Tạo project mới</h2>
-        <form onSubmit={handleCreate} className="flex flex-col md:flex-row gap-3 md:items-end">
-          <div className="flex-1 space-y-2">
-            <label className="block text-xs text-slate-400">Tên</label>
-            <input
-              className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              placeholder="Ví dụ: Web bán hàng"
-            />
-          </div>
-          <div className="flex-[2] space-y-2">
-            <label className="block text-xs text-slate-400">Mô tả (tuỳ chọn)</label>
-            <input
-              className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Mô tả ngắn"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-500 disabled:opacity-50"
-          >
-            {saving ? "Đang lưu..." : "Tạo project"}
-          </button>
-        </form>
-      </section>
-
-      <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 mb-8">
         <h2 className="text-sm font-medium text-slate-200 mb-3">Thống kê kiểm thử</h2>
+        <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+          <select
+            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+            value={rangeDays}
+            onChange={(e) => setRangeDays(Number(e.target.value) as 7 | 30)}
+          >
+            <option value={7}>7 ngày gần nhất</option>
+            <option value={30}>30 ngày gần nhất</option>
+          </select>
+          <select
+            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+            value={selectedProjectId}
+            onChange={(e) => {
+              setSelectedProjectId(e.target.value);
+              setSelectedSuiteId("");
+            }}
+          >
+            <option value="">Tất cả project</option>
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+          <select
+            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+            value={selectedSuiteId}
+            onChange={(e) => setSelectedSuiteId(e.target.value)}
+          >
+            <option value="">Tất cả suite</option>
+            {suites.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => {
+              setRangeDays(7);
+              setSelectedProjectId("");
+              setSelectedSuiteId("");
+            }}
+            className="rounded bg-slate-800 hover:bg-slate-700 px-3 py-2 text-sm"
+          >
+            Reset filter
+          </button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
           <div className="rounded border border-slate-800 bg-slate-950 p-3">
             <div className="text-slate-400">Tổng số run</div>
@@ -245,6 +224,68 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="rounded border border-slate-800 bg-slate-950 p-4">
+            <div className="text-sm font-medium mb-3">Biểu đồ đường theo thời gian</div>
+            {(() => {
+              const points = analytics?.timeSeries ?? [];
+              if (points.length === 0) {
+                return <div className="text-xs text-slate-400">Chưa có dữ liệu trong khoảng thời gian đã chọn.</div>;
+              }
+              const maxY = Math.max(
+                1,
+                ...points.map((p) => Math.max(p.passed, p.failed)),
+              );
+              const w = 360;
+              const h = 180;
+              const pad = 20;
+              const toX = (i: number) =>
+                pad + (i * (w - pad * 2)) / Math.max(1, points.length - 1);
+              const toY = (v: number) => h - pad - (v * (h - pad * 2)) / maxY;
+              const passPath = points
+                .map((p, i) => `${i === 0 ? "M" : "L"} ${toX(i)} ${toY(p.passed)}`)
+                .join(" ");
+              const failPath = points
+                .map((p, i) => `${i === 0 ? "M" : "L"} ${toX(i)} ${toY(p.failed)}`)
+                .join(" ");
+              return (
+                <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-52">
+                  <path d={passPath} fill="none" stroke="#10b981" strokeWidth="3" />
+                  <path d={failPath} fill="none" stroke="#ef4444" strokeWidth="3" />
+                </svg>
+              );
+            })()}
+            <div className="mt-2 text-xs text-slate-400">Xanh: Pass, Đỏ: Fail</div>
+          </div>
+          <div className="rounded border border-slate-800 bg-slate-950 p-4">
+            <div className="text-sm font-medium mb-3">Donut chart Pass/Fail</div>
+            {(() => {
+              const pass = analytics?.passed ?? 0;
+              const fail = analytics?.failed ?? 0;
+              const total = Math.max(pass + fail, 1);
+              const passDeg = (pass / total) * 360;
+              return (
+                <div className="flex items-center gap-6">
+                  <div
+                    className="w-36 h-36 rounded-full"
+                    style={{
+                      background: `conic-gradient(#10b981 0deg ${passDeg}deg, #ef4444 ${passDeg}deg 360deg)`,
+                    }}
+                  >
+                    <div className="w-20 h-20 rounded-full bg-slate-950 m-auto mt-8 flex items-center justify-center text-xs text-slate-300">
+                      {analytics?.passRate ?? 0}%
+                    </div>
+                  </div>
+                  <div className="text-sm space-y-2">
+                    <div className="text-emerald-300">Pass: {pass}</div>
+                    <div className="text-red-300">Fail: {fail}</div>
+                    <div className="text-slate-400">Tổng: {pass + fail}</div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
         <div className="mt-4">
           <div className="text-xs text-slate-400 mb-2">
             Tỉ lệ pass: <span className="text-emerald-300">{analytics?.passRate ?? 0}%</span>
@@ -269,96 +310,6 @@ export default function DashboardPage() {
 
       {loading && <p className="text-sm text-slate-300">Đang tải...</p>}
       {error && <p className="text-sm text-red-400 mb-4">{error}</p>}
-
-      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((p) => (
-          <div key={p.id} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col">
-            <h2 className="font-medium mb-1">{p.name}</h2>
-            <p className="text-xs text-slate-300 mb-4 flex-1">{p.description ?? "—"}</p>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <Link
-                href={`/scripts?projectId=${p.id}`}
-                className="text-emerald-400 hover:underline"
-              >
-                Kịch bản
-              </Link>
-              <span className="text-slate-600">|</span>
-              <Link href={`/objects?projectId=${p.id}`} className="text-emerald-400 hover:underline">
-                Đối tượng
-              </Link>
-              <span className="text-slate-600">|</span>
-              <Link href={`/datasets?projectId=${p.id}`} className="text-emerald-400 hover:underline">
-                Dữ liệu
-              </Link>
-            </div>
-            <div className="mt-3 flex gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={() => startEdit(p)}
-                className="rounded-md bg-slate-800 px-2 py-1 text-xs hover:bg-slate-700"
-              >
-                Sửa
-              </button>
-              {role === "ADMIN" && (
-                <button
-                  type="button"
-                  onClick={() => removeProject(p.id)}
-                  className="rounded-md bg-red-900/50 px-2 py-1 text-xs text-red-300 hover:bg-red-900"
-                >
-                  Xóa
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {projects.length === 0 && !loading && !error && (
-        <p className="text-sm text-slate-300 mt-4">Chưa có project. Tạo project phía trên.</p>
-      )}
-
-      {editing && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[100]">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 max-w-md w-full shadow-xl">
-            <h3 className="font-medium mb-3">Sửa project</h3>
-            <form onSubmit={saveEdit} className="space-y-3">
-              <div>
-                <label className="text-xs text-slate-400">Tên</label>
-                <input
-                  className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-xs text-slate-400">Mô tả</label>
-                <input
-                  className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
-                  value={editDesc}
-                  onChange={(e) => setEditDesc(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-2 justify-end pt-2">
-                <button
-                  type="button"
-                  onClick={() => setEditing(null)}
-                  className="px-3 py-1.5 text-sm rounded-md bg-slate-800"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="px-3 py-1.5 text-sm rounded-md bg-emerald-600 text-slate-950"
-                >
-                  Lưu
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </main>
   );
 }

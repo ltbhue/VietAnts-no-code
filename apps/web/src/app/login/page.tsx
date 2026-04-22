@@ -4,6 +4,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
+const DEFAULT_TEXTBOX_MAX_LENGTH = 255;
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -49,7 +51,8 @@ export default function LoginPage() {
               type="email"
               className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-emerald-500"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+              maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
               required
             />
           </div>
@@ -59,7 +62,8 @@ export default function LoginPage() {
               type="password"
               className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-emerald-500"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+              maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
               required
             />
           </div>

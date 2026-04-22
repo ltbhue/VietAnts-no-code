@@ -32,6 +32,8 @@ interface DataSet {
   projectId: string;
 }
 
+const DEFAULT_TEXTBOX_MAX_LENGTH = 255;
+
 function ScriptsPageInner() {
   const searchParams = useSearchParams();
   const projectIdFilter = searchParams.get("projectId");
@@ -444,7 +446,8 @@ function ScriptsPageInner() {
                         <input
                           className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
                           value={draftUrl}
-                          onChange={(e) => setDraftUrl(e.target.value)}
+                          onChange={(e) => setDraftUrl(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+                          maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
                           placeholder="https://example.com"
                         />
                       </div>
@@ -456,7 +459,8 @@ function ScriptsPageInner() {
                         <input
                           className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
                           value={draftSelector}
-                          onChange={(e) => setDraftSelector(e.target.value)}
+                          onChange={(e) => setDraftSelector(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+                          maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
                           placeholder="ví dụ: text=Submit hoặc #login-button"
                         />
                       </div>
@@ -471,7 +475,8 @@ function ScriptsPageInner() {
                           <input
                             className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
                             value={draftValue}
-                            onChange={(e) => setDraftValue(e.target.value)}
+                            onChange={(e) => setDraftValue(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+                            maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
                             placeholder="chuỗi cần điền"
                           />
                         </div>
@@ -480,7 +485,8 @@ function ScriptsPageInner() {
                           <input
                             className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
                             value={draftDataKey}
-                            onChange={(e) => setDraftDataKey(e.target.value)}
+                            onChange={(e) => setDraftDataKey(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+                            maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
                             placeholder="key trong rows (ví dụ: email)"
                           />
                         </div>
@@ -494,7 +500,8 @@ function ScriptsPageInner() {
                           <input
                             className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
                             value={draftExpected}
-                            onChange={(e) => setDraftExpected(e.target.value)}
+                            onChange={(e) => setDraftExpected(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+                            maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
                             placeholder="văn bản mong đợi"
                           />
                         </div>
@@ -503,7 +510,8 @@ function ScriptsPageInner() {
                           <input
                             className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
                             value={draftDataKey}
-                            onChange={(e) => setDraftDataKey(e.target.value)}
+                            onChange={(e) => setDraftDataKey(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+                            maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
                             placeholder="key trong rows (ví dụ: expectedText)"
                           />
                         </div>
@@ -609,16 +617,19 @@ function ScriptsPageInner() {
               <input
                 className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
                 value={newName}
-                onChange={(e) => setNewName(e.target.value)}
+                onChange={(e) => setNewName(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+                maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
                 required
               />
             </div>
             <div>
               <label className="text-xs text-slate-400">Mô tả</label>
-              <input
+              <textarea
                 className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
                 value={newDesc}
-                onChange={(e) => setNewDesc(e.target.value)}
+                onChange={(e) => setNewDesc(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+                maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
+                rows={4}
               />
             </div>
             <div className="flex justify-end gap-2 pt-2">

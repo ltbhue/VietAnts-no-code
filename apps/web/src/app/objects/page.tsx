@@ -18,6 +18,8 @@ interface UiObject {
   projectId: string;
 }
 
+const DEFAULT_TEXTBOX_MAX_LENGTH = 255;
+
 function ObjectsPageInner() {
   const searchParams = useSearchParams();
   const qp = searchParams.get("projectId");
@@ -172,7 +174,8 @@ function ObjectsPageInner() {
             <input
               className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+              maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
               required
             />
           </div>
@@ -181,7 +184,8 @@ function ObjectsPageInner() {
             <input
               className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
               value={locator}
-              onChange={(e) => setLocator(e.target.value)}
+              onChange={(e) => setLocator(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+              maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
               required
               placeholder="#login-button"
             />
@@ -189,10 +193,12 @@ function ObjectsPageInner() {
         </div>
         <div>
           <label className="text-xs text-slate-400">Mô tả</label>
-          <input
+          <textarea
             className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => setDescription(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
+            maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
+            rows={4}
           />
         </div>
         <button
