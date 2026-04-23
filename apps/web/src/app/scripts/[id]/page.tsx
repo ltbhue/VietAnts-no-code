@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import { getApiBase } from "@/lib/api";
+import { canMutateNoCode, getApiBase, getUserRole } from "@/lib/api";
 
 interface ScriptDetail {
   id: string;
@@ -54,6 +54,7 @@ export default function ScriptDetailPage() {
   const [draftDataKey, setDraftDataKey] = useState("");
 
   const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+  const canMutate = canMutateNoCode(getUserRole());
 
   const loadScript = useCallback(async () => {
     if (!token || !scriptId) return;
@@ -245,7 +246,7 @@ export default function ScriptDetailPage() {
               </div>
               <button
                 type="button"
-                disabled={running}
+                disabled={running || !canMutate}
                 onClick={runScript}
                 className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950 disabled:opacity-50"
               >
@@ -253,8 +254,13 @@ export default function ScriptDetailPage() {
               </button>
             </div>
 
-            <div>
-              <h3 className="text-sm font-medium mb-2">Thêm bước kiểm thử</h3>
+            {!canMutate && (
+              <p className="text-xs text-slate-500">Bạn đang ở chế độ chỉ xem, không thể chỉnh sửa hoặc chạy kịch bản.</p>
+            )}
+
+            {canMutate && (
+              <div>
+                <h3 className="text-sm font-medium mb-2">Thêm bước kiểm thử</h3>
               <div className="grid md:grid-cols-2 gap-3">
                 <div className="md:col-span-2">
                   <label className="text-xs text-slate-400 block mb-1">Keyword</label>
@@ -358,7 +364,8 @@ export default function ScriptDetailPage() {
                   Làm mới
                 </button>
               </div>
-            </div>
+              </div>
+            )}
 
             <div className="border-t border-slate-800 pt-3">
               <h3 className="text-sm font-medium mb-2">Danh sách bước</h3>
@@ -383,27 +390,33 @@ export default function ScriptDetailPage() {
                             `selector=${getParam(st, "selector")}, expected=${getParam(st, "expected")}`}
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeStep(idx)}
-                        className="text-xs text-red-400 hover:underline shrink-0 mt-0.5"
-                      >
-                        Xóa
-                      </button>
+                      {canMutate ? (
+                        <button
+                          type="button"
+                          onClick={() => removeStep(idx)}
+                          className="text-xs text-red-400 hover:underline shrink-0 mt-0.5"
+                        >
+                          Xóa
+                        </button>
+                      ) : (
+                        <span className="text-xs text-slate-500 shrink-0 mt-0.5">Chỉ xem</span>
+                      )}
                     </div>
                   ))}
                 </div>
               )}
-              <div className="flex gap-2 mt-3">
-                <button
-                  type="button"
-                  disabled={steps.length === 0}
-                  onClick={saveSteps}
-                  className="rounded-md bg-slate-700 px-3 py-1.5 text-sm hover:bg-slate-600 disabled:opacity-50"
-                >
-                  Lưu các bước
-                </button>
-              </div>
+              {canMutate && (
+                <div className="flex gap-2 mt-3">
+                  <button
+                    type="button"
+                    disabled={steps.length === 0}
+                    onClick={saveSteps}
+                    className="rounded-md bg-slate-700 px-3 py-1.5 text-sm hover:bg-slate-600 disabled:opacity-50"
+                  >
+                    Lưu các bước
+                  </button>
+                </div>
+              )}
             </div>
           </section>
         </>

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import { getApiBase } from "@/lib/api";
+import { canAccessProjects, getApiBase, getUserRole } from "@/lib/api";
 
 interface Project {
   id: string;
@@ -39,6 +39,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const apiBase = getApiBase();
+  const canOpenProjects = canAccessProjects(getUserRole());
 
   const load = useCallback(async () => {
     const token = localStorage.getItem("authToken");
@@ -105,12 +106,14 @@ export default function DashboardPage() {
         <p className="text-sm text-slate-300 mt-1">
           Theo dõi số liệu kiểm thử tổng quan theo project và suite.
         </p>
-        <Link
-          href="/projects"
-          className="inline-flex mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-500"
-        >
-          Đi tới module Project
-        </Link>
+        {canOpenProjects && (
+          <Link
+            href="/projects"
+            className="inline-flex mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-500"
+          >
+            Đi tới module Project
+          </Link>
+        )}
       </div>
 
       <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 mb-8">

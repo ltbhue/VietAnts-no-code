@@ -85,8 +85,8 @@ export default function ProjectsPage() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (role === "VIEWER") {
-      setError("Bạn đang ở quyền Viewer nên không thể tạo project.");
+    if (role !== "ADMIN") {
+      setError("Chỉ ADMIN mới có thể tạo project.");
       return;
     }
     const normalizedName = name.trim().slice(0, PROJECT_NAME_MAX_LENGTH);
@@ -127,8 +127,8 @@ export default function ProjectsPage() {
 
   async function saveEdit(e: React.FormEvent) {
     e.preventDefault();
-    if (role === "VIEWER") {
-      setError("Bạn đang ở quyền Viewer nên không thể chỉnh sửa project.");
+    if (role !== "ADMIN") {
+      setError("Chỉ ADMIN mới có thể chỉnh sửa project.");
       return;
     }
     if (!editing) return;
@@ -186,7 +186,7 @@ export default function ProjectsPage() {
               Quyền hiện tại: <span className="text-slate-200 font-medium">{role ?? "Chưa xác định"}</span>
             </p>
           </div>
-          {role !== "VIEWER" && (
+          {role === "ADMIN" && (
             <button
               type="button"
               onClick={() => {
@@ -249,7 +249,7 @@ export default function ProjectsPage() {
                 <td className="px-4 py-3 text-slate-300">{currentUserName}</td>
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-2">
-                    {role !== "VIEWER" && (
+                    {role === "ADMIN" && (
                       <button
                         type="button"
                         onClick={() => startEdit(project)}

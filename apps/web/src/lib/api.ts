@@ -1,3 +1,5 @@
+export type UserRole = "ADMIN" | "TESTER" | "VIEWER";
+
 /** Base URL API (backend Express) */
 export function getApiBase(): string {
   return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -22,7 +24,7 @@ export function authHeaders(): HeadersInit {
   return h;
 }
 
-export function getUserRole(): "ADMIN" | "TESTER" | "VIEWER" | null {
+export function getUserRole(): UserRole | null {
   try {
     const raw = localStorage.getItem("authUser");
     if (!raw) return null;
@@ -33,6 +35,14 @@ export function getUserRole(): "ADMIN" | "TESTER" | "VIEWER" | null {
   } catch {
     return null;
   }
+}
+
+export function canAccessProjects(role: UserRole | null): boolean {
+  return role === "ADMIN";
+}
+
+export function canMutateNoCode(role: UserRole | null): boolean {
+  return role === "ADMIN" || role === "TESTER";
 }
 
 /** Tải PDF có Bearer (trình duyệt không gửi header khi mở URL trần) */

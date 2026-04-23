@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { getApiBase } from "@/lib/api";
+import { canMutateNoCode, getApiBase, getUserRole } from "@/lib/api";
 
 interface Project {
   id: string;
@@ -38,6 +38,7 @@ function ScriptsPageInner() {
   const [newProjectId, setNewProjectId] = useState("");
 
   const apiBase = getApiBase();
+  const canMutate = canMutateNoCode(getUserRole());
 
   const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
   const filteredScripts = scripts.filter((s) => {
@@ -147,13 +148,15 @@ function ScriptsPageInner() {
             <code className="text-emerald-400">assertText</code>.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowCreate(true)}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-500"
-        >
-          + Tạo kịch bản
-        </button>
+        {canMutate && (
+          <button
+            type="button"
+            onClick={() => setShowCreate(true)}
+            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-500"
+          >
+            + Tạo kịch bản
+          </button>
+        )}
       </div>
 
       {loading && <p className="text-sm text-slate-300">Đang tải...</p>}
@@ -192,13 +195,17 @@ function ScriptsPageInner() {
                   <td className="px-3 py-2 text-slate-300">{s.project?.name ?? s.projectId}</td>
                   <td className="px-3 py-2 text-slate-400">{s.description || "—"}</td>
                   <td className="px-3 py-2">
-                    <button
-                      type="button"
-                      onClick={() => deleteScript(s.id)}
-                      className="text-xs text-red-400 hover:underline"
-                    >
-                      Xóa
-                    </button>
+                    {canMutate ? (
+                      <button
+                        type="button"
+                        onClick={() => deleteScript(s.id)}
+                        className="text-xs text-red-400 hover:underline"
+                      >
+                        Xóa
+                      </button>
+                    ) : (
+                      <span className="text-xs text-slate-500">Chỉ xem</span>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -210,7 +217,7 @@ function ScriptsPageInner() {
         )}
       </section>
 
-      {showCreate && (
+      {showCreate && canMutate && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[100]">
           <form
             onSubmit={createScript}

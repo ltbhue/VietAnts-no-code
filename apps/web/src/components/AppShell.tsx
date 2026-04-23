@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { getUserRole } from "@/lib/api";
+import { getUserRole, type UserRole } from "@/lib/api";
 import {
   FiBarChart2,
   FiBookOpen,
@@ -26,7 +26,7 @@ type MenuLink = {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  roles?: Array<"ADMIN" | "TESTER" | "VIEWER">;
+  roles?: UserRole[];
 };
 
 const menuGroups = [
@@ -34,7 +34,7 @@ const menuGroups = [
     title: "Tổng quan",
     links: [
       { href: "/dashboard", label: "Dashboard", icon: FiBarChart2 },
-      { href: "/projects", label: "Project", icon: FiFolder, roles: ["ADMIN", "TESTER", "VIEWER"] },
+      { href: "/projects", label: "Project", icon: FiFolder, roles: ["ADMIN"] },
     ],
   },
   {
@@ -65,12 +65,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [role, setRole] = useState<"ADMIN" | "TESTER" | "VIEWER" | null>(null);
+  const role = getUserRole();
   const bare = pathname === "/login" || pathname === "/";
-
-  useEffect(() => {
-    setRole(getUserRole());
-  }, [pathname]);
 
   const visibleMenuGroups = useMemo(
     () =>
@@ -82,6 +78,27 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         .filter((group) => group.links.length > 0),
     [role],
   );
+
+  const canAccessCurrentPath = useMemo(() => {
+    if (bare) return true;
+    const allLinks = menuGroups.flatMap((g) => g.links);
+    const matched = allLinks.find((l) => pathname === l.href || pathname.startsWith(`${l.href}/`));
+    if (!matched) return true;
+    if (!matched.roles) return true;
+    return !!role && matched.roles.includes(role);
+  }, [bare, pathname, role]);
+
+  useEffect(() => {
+    if (bare) return;
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    if (!canAccessCurrentPath) {
+      router.replace("/dashboard");
+    }
+  }, [bare, canAccessCurrentPath, router]);
 
   if (bare) return <>{children}</>;
 

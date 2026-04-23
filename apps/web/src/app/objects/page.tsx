@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
-import { getApiBase } from "@/lib/api";
+import { canMutateNoCode, getApiBase, getUserRole } from "@/lib/api";
 
 interface Project {
   id: string;
@@ -36,6 +36,7 @@ function ObjectsPageInner() {
   const [locator, setLocator] = useState("");
 
   const apiBase = getApiBase();
+  const canMutate = canMutateNoCode(getUserRole());
 
   const loadProjects = useCallback(async () => {
     const token = localStorage.getItem("authToken");
@@ -163,11 +164,12 @@ function ObjectsPageInner() {
         </select>
       </div>
 
-      <form
-        onSubmit={handleCreate}
-        className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 mb-8 space-y-3"
-      >
-        <h2 className="text-sm font-medium">Thêm đối tượng</h2>
+      {canMutate && (
+        <form
+          onSubmit={handleCreate}
+          className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 mb-8 space-y-3"
+        >
+          <h2 className="text-sm font-medium">Thêm đối tượng</h2>
         <div className="grid md:grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-slate-400">Tên</label>
@@ -201,13 +203,14 @@ function ObjectsPageInner() {
             rows={4}
           />
         </div>
-        <button
-          type="submit"
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950"
-        >
-          Thêm
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950"
+          >
+            Thêm
+          </button>
+        </form>
+      )}
 
       <section className="space-y-2">
         <h2 className="text-sm font-medium mb-2">Danh sách</h2>
@@ -221,13 +224,17 @@ function ObjectsPageInner() {
               <div className="text-xs text-slate-400 font-mono">{o.locator}</div>
               <div className="text-[10px] text-slate-500 mt-1">id: {o.id}</div>
             </div>
-            <button
-              type="button"
-              onClick={() => remove(o.id)}
-              className="text-xs text-red-400 hover:underline"
-            >
-              Xóa
-            </button>
+            {canMutate ? (
+              <button
+                type="button"
+                onClick={() => remove(o.id)}
+                className="text-xs text-red-400 hover:underline"
+              >
+                Xóa
+              </button>
+            ) : (
+              <span className="text-xs text-slate-500">Chỉ xem</span>
+            )}
           </div>
         ))}
         {objects.length === 0 && !loading && projectId && (
