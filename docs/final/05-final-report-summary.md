@@ -57,3 +57,4 @@
 - `docs/final/03-test-plan.md`
 - `docs/final/04-user-manual.md`
 - `docs/final/05-final-report-summary.md`
+- `docs/final/06-system-architecture-diagrams.md`

@@ -126,6 +126,8 @@ Trong thư mục `docs/`:
 - `design/sequence-diagrams.md`: Mô tả sequence diagram.
 - `design/class-diagram-notes.md`: Ghi chú sơ đồ lớp.
 - `manual/user-manual.md`: Hướng dẫn sử dụng cho người dùng.
+- `README.md`: Mục lục tài liệu và thứ tự đọc khuyến nghị.
+- `final/06-system-architecture-diagrams.md`: Bộ sơ đồ tổng hợp mới nhất (Mermaid) cho báo cáo.
 
 Bạn có thể dùng các file này để copy/chuyển sang Word, vẽ sơ đồ UML, bổ sung hình ảnh để hoàn thiện báo cáo tốt nghiệp.
 

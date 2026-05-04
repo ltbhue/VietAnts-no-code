@@ -19,6 +19,7 @@ He thong su dung kien truc 3 lop:
 
 ## 3. Mo hinh du lieu chinh
 - Identity: `User(Role)`.
+- Phan quyen project: `ProjectMember` (owner + member) cho phep ADMIN gan TESTER/VIEWER vao project.
 - Nghiep vu script cu: `Project`, `TestScript`, `TestStep`, `UiObject`, `DataSet`, `TestRun`, `TestResult`.
 - Nghiep vu suite moi: `TestCase`, `TestCaseVersion`, `TestSuite`, `TestSuiteItem`, `SuiteRun`.
 
@@ -57,3 +58,7 @@ He thong su dung kien truc 3 lop:
 ## 7. Trade-off hien tai
 - Suite runner moi dang o muc MVP, can nang cap de chay Playwright chi tiet nhu script runner.
 - Analytics hien tai o muc aggregate co ban, chua co trend theo khung thoi gian.
+
+## 8. Bo so do tong hop
+- Xem bo so do day du (context/container/component/use case/activity/sequence/state/ERD/class/deployment/DFD) tai:
+  - `docs/final/06-system-architecture-diagrams.md`
