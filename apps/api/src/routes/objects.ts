@@ -2,6 +2,7 @@ import { Router } from "express";
 import type { PrismaClient } from "../generated/prisma/client";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/auth";
+import { projectAccessibleWhere } from "../lib/projectAccess";
 
 const objectSchema = z.object({
   projectId: z.string().cuid(),
@@ -16,20 +17,20 @@ export default function objectsRouter(prisma: PrismaClient) {
 
   router.get("/", async (req, res) => {
     const projectId = req.query.projectId as string | undefined;
-    const owned = await prisma.project.findMany({
-      where: { ownerId: req.user!.id },
+    const accessible = await prisma.project.findMany({
+      where: projectAccessibleWhere(req.user!.id),
       select: { id: true },
     });
-    const ownedIds = owned.map((p) => p.id);
-    if (ownedIds.length === 0) {
+    const accessibleIds = accessible.map((p) => p.id);
+    if (accessibleIds.length === 0) {
       return res.json([]);
     }
-    if (projectId && !ownedIds.includes(projectId)) {
+    if (projectId && !accessibleIds.includes(projectId)) {
       return res.status(403).json({ error: "Không có quyền truy cập project này" });
     }
 
     const objects = await prisma.uiObject.findMany({
-      where: projectId ? { projectId } : { projectId: { in: ownedIds } },
+      where: projectId ? { projectId } : { projectId: { in: accessibleIds } },
       orderBy: { createdAt: "desc" },
     });
     res.json(objects);
@@ -41,7 +42,7 @@ export default function objectsRouter(prisma: PrismaClient) {
       return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
     const project = await prisma.project.findFirst({
-      where: { id: parse.data.projectId, ownerId: req.user!.id },
+      where: projectAccessibleWhere(req.user!.id, parse.data.projectId),
     });
     if (!project) return res.status(403).json({ error: "Không có quyền truy cập project" });
 
@@ -54,7 +55,11 @@ export default function objectsRouter(prisma: PrismaClient) {
       where: { id: req.params.id as string },
       include: { project: true },
     });
-    if (!existing || existing.project.ownerId !== req.user!.id) {
+    const canAccessExisting = !!(existing && (existing.project.ownerId === req.user!.id || (await prisma.projectMember.findFirst({
+      where: { projectId: existing.projectId, userId: req.user!.id },
+      select: { id: true },
+    }))));
+    if (!canAccessExisting) {
       return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
     }
     const parse = objectSchema.partial().safeParse(req.body);
@@ -63,7 +68,7 @@ export default function objectsRouter(prisma: PrismaClient) {
     }
     if (parse.data.projectId && parse.data.projectId !== existing.projectId) {
       const p = await prisma.project.findFirst({
-        where: { id: parse.data.projectId, ownerId: req.user!.id },
+        where: projectAccessibleWhere(req.user!.id, parse.data.projectId),
       });
       if (!p) return res.status(403).json({ error: "Không có quyền truy cập project" });
     }
@@ -79,7 +84,11 @@ export default function objectsRouter(prisma: PrismaClient) {
       where: { id: req.params.id as string },
       include: { project: true },
     });
-    if (!existing || existing.project.ownerId !== req.user!.id) {
+    const canAccessExisting = !!(existing && (existing.project.ownerId === req.user!.id || (await prisma.projectMember.findFirst({
+      where: { projectId: existing.projectId, userId: req.user!.id },
+      select: { id: true },
+    }))));
+    if (!canAccessExisting) {
       return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
     }
     await prisma.uiObject.delete({ where: { id: existing.id } });

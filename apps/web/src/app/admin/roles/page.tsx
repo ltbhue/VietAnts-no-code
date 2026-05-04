@@ -1,22 +1,35 @@
 "use client";
 
 import { getUserRole } from "@/lib/api";
+import { PageHeader } from "@/components/PageHeader";
+import { ui } from "@/lib/ui";
+import { FiShield } from "react-icons/fi";
 
 export default function AdminRolesPage() {
   const role = getUserRole();
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-4">
-      <h1 className="text-xl font-semibold text-emerald-400">Vai trò (RBAC)</h1>
-      <p className="text-slate-400 text-sm">
-        MVP: Admin / Editor (TESTER+ADMIN) / Viewer được áp dụng ở API. Trang này chỉ hiển thị role hiện tại từ localStorage sau đăng nhập.
-      </p>
-      <div className="rounded border border-slate-800 bg-slate-900/80 p-4 text-sm">
-        <p>
-          Role hiện tại:{" "}
-          <strong className="text-emerald-300">{role ?? "chưa đăng nhập"}</strong>
-        </p>
+    <main className={ui.content}>
+      <div className={ui.narrow}>
+        <PageHeader
+          title="Vai trò & quyền"
+          subtitle="MVP: Admin / Tester / Viewer được kiểm tra ở API. Dưới đây là role đang lưu sau đăng nhập."
+        />
+        <section className={`${ui.card} flex gap-4 items-start`}>
+          <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-600/15 border border-emerald-500/25 text-emerald-400">
+            <FiShield className="h-5 w-5" aria-hidden />
+          </span>
+          <div className="space-y-2 text-sm text-slate-300">
+            <p>
+              Role hiện tại:{" "}
+              <strong className="text-white font-semibold">{role ?? "chưa đăng nhập"}</strong>
+            </p>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Đổi quyền thực tế trên tài khoản người dùng phải thực hiện từ phía quản trị hệ thống / seed dữ liệu.
+            </p>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

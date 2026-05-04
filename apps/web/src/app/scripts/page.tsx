@@ -3,8 +3,10 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { canMutateNoCode, getApiBase, getUserRole } from "@/lib/api";
+import { PageHeader } from "@/components/PageHeader";
+import { ui } from "@/lib/ui";
 
 interface Project {
   id: string;
@@ -22,6 +24,7 @@ interface Script {
 const DEFAULT_TEXTBOX_MAX_LENGTH = 255;
 
 function ScriptsPageInner() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const projectIdFilter = searchParams.get("projectId");
 
@@ -61,10 +64,12 @@ function ScriptsPageInner() {
 
   useEffect(() => {
     if (projects.length === 0) return;
-    setNewProjectId((prev) => {
-      if (prev && projects.some((p) => p.id === prev)) return prev;
-      if (projectIdFilter && projects.some((p) => p.id === projectIdFilter)) return projectIdFilter;
-      return projects[0].id;
+    queueMicrotask(() => {
+      setNewProjectId((prev) => {
+        if (prev && projects.some((p) => p.id === prev)) return prev;
+        if (projectIdFilter && projects.some((p) => p.id === projectIdFilter)) return projectIdFilter;
+        return projects[0].id;
+      });
     });
   }, [projects, projectIdFilter]);
 
@@ -105,7 +110,7 @@ function ScriptsPageInner() {
     if (!token || !newProjectId) return;
     setError(null);
     try {
-      await axios.post(
+      const res = await axios.post<{ id: string }>(
         `${apiBase}/scripts`,
         { name: newName, description: newDesc || undefined, projectId: newProjectId },
         { headers: { Authorization: `Bearer ${token}` } },
@@ -115,6 +120,7 @@ function ScriptsPageInner() {
       setShowCreate(false);
       await loadScripts();
       setMsg("Đã tạo kịch bản.");
+      router.push(`/scripts/${res.data.id}`);
     } catch (err: unknown) {
       const e = err as { response?: { data?: { error?: string } } };
       setError(e?.response?.data?.error ?? "Không tạo được");
@@ -138,57 +144,50 @@ function ScriptsPageInner() {
   }
 
   return (
-    <main className="min-h-screen p-6 md:p-8 max-w-6xl mx-auto">
-      <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold">Kịch bản kiểm thử</h1>
-          <p className="text-sm text-slate-300 mt-1">
-            Keywords: <code className="text-emerald-400">navigate</code>,{" "}
-            <code className="text-emerald-400">click</code>, <code className="text-emerald-400">fill</code>,{" "}
-            <code className="text-emerald-400">assertText</code>.
-          </p>
-        </div>
-        {canMutate && (
-          <button
-            type="button"
-            onClick={() => setShowCreate(true)}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-500"
-          >
-            + Tạo kịch bản
-          </button>
-        )}
-      </div>
+    <main className={ui.content}>
+      <div className={ui.wide}>
+        <PageHeader
+          title="Kịch bản kiểm thử"
+          subtitle="Keywords: navigate, click, fill, assertText — mở từng kịch bản để thêm bước và chạy thử."
+          actions={
+            canMutate ? (
+              <button type="button" onClick={() => setShowCreate(true)} className={ui.btnPrimary}>
+                + Tạo kịch bản
+              </button>
+            ) : undefined
+          }
+        />
 
-      {loading && <p className="text-sm text-slate-300">Đang tải...</p>}
-      {error && <p className="text-sm text-red-400 mb-2">{error}</p>}
-      {msg && <p className="text-sm text-emerald-400 mb-2">{msg}</p>}
+      {loading && <p className="text-sm text-slate-400">Đang tải…</p>}
+      {error && <p className={`${ui.alertError} mb-3`}>{error}</p>}
+      {msg && <p className={`${ui.alertOk} mb-3`}>{msg}</p>}
 
-      <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
-        <h2 className="text-sm font-medium mb-3">Danh sách</h2>
+      <section className={ui.card}>
+        <p className={`${ui.sectionTitle} mb-4`}>Danh sách</p>
         <input
-          className="mb-3 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+          className={`mb-4 ${ui.input}`}
           value={scriptSearch}
           onChange={(e) => setScriptSearch(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
           maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
           placeholder="Tìm theo tên, mô tả hoặc project..."
         />
-        <div className="overflow-x-auto rounded-lg border border-slate-800">
-          <table className="min-w-full text-sm">
-            <thead className="bg-slate-900/80 text-slate-300">
+        <div className={ui.tableWrap}>
+          <table className={ui.table}>
+            <thead className={ui.thead}>
               <tr>
-                <th className="px-3 py-2 text-left">STT</th>
-                <th className="px-3 py-2 text-left">Tên kịch bản</th>
-                <th className="px-3 py-2 text-left">Project</th>
-                <th className="px-3 py-2 text-left">Mô tả</th>
-                <th className="px-3 py-2 text-left">Hành động</th>
+                <th className={ui.th}>STT</th>
+                <th className={ui.th}>Tên kịch bản</th>
+                <th className={ui.th}>Project</th>
+                <th className={ui.th}>Mô tả</th>
+                <th className={ui.th}>Hành động</th>
               </tr>
             </thead>
             <tbody>
               {filteredScripts.map((s, idx) => (
-                <tr key={s.id} className="border-t border-slate-800">
-                  <td className="px-3 py-2 text-slate-300">{idx + 1}</td>
-                  <td className="px-3 py-2">
-                    <Link href={`/scripts/${s.id}`} className="text-left text-emerald-300 hover:underline">
+                <tr key={s.id} className={ui.tr}>
+                  <td className={`${ui.td} text-slate-400`}>{idx + 1}</td>
+                  <td className={ui.td}>
+                    <Link href={`/scripts/${s.id}`} className="font-medium text-emerald-400 hover:text-emerald-300 hover:underline">
                       {s.name}
                     </Link>
                   </td>
@@ -218,16 +217,28 @@ function ScriptsPageInner() {
       </section>
 
       {showCreate && canMutate && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[100]">
+        <div
+          className={ui.modalOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="create-script-title"
+        >
           <form
             onSubmit={createScript}
-            className="bg-slate-900 border border-slate-700 rounded-xl p-6 max-w-md w-full space-y-3"
+            className={`${ui.modalBoxMd} space-y-4`}
           >
-            <h3 className="font-medium">Tạo kịch bản</h3>
             <div>
-              <label className="text-xs text-slate-400">Project</label>
+              <h3 id="create-script-title" className="text-lg font-semibold text-white">
+                Tạo kịch bản mới
+              </h3>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                Sau khi tạo, bạn sẽ thêm từng bước (mở trang, điền form, bấm nút…) trên trang chi tiết kịch bản.
+              </p>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-slate-300">Thuộc project</label>
               <select
-                className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/40"
                 value={newProjectId}
                 onChange={(e) => setNewProjectId(e.target.value)}
                 required
@@ -240,40 +251,46 @@ function ScriptsPageInner() {
               </select>
             </div>
             <div>
-              <label className="text-xs text-slate-400">Tên</label>
+              <label className="text-xs font-medium text-slate-300">Tên kịch bản</label>
               <input
-                className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/40"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
                 maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
+                placeholder="Ví dụ: Đăng nhập admin thành công"
                 required
               />
             </div>
             <div>
-              <label className="text-xs text-slate-400">Mô tả</label>
+              <label className="text-xs font-medium text-slate-300">Mô tả (tuỳ chọn)</label>
               <textarea
-                className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                className="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/40 resize-y min-h-[88px]"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
                 maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
                 rows={4}
+                placeholder="Ghi chú ngắn cho team QA…"
               />
             </div>
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex justify-end gap-2 pt-1">
               <button
                 type="button"
                 onClick={() => setShowCreate(false)}
-                className="px-3 py-1.5 text-sm rounded-md bg-slate-800"
+                className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700"
               >
                 Hủy
               </button>
-              <button type="submit" className="px-3 py-1.5 text-sm rounded-md bg-emerald-600 text-slate-950">
-                Tạo
+              <button
+                type="submit"
+                className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-500"
+              >
+                Tạo và mở chỉnh sửa
               </button>
             </div>
           </form>
         </div>
       )}
+      </div>
     </main>
   );
 }

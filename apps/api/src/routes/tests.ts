@@ -3,6 +3,7 @@ import type { PrismaClient } from "../generated/prisma/client";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/auth";
 import { parseStep, validateForPublish } from "@vietants/domain";
+import { projectAccessibleWhere } from "../lib/projectAccess";
 
 const createRecordedTestSchema = z.object({
   name: z.string().min(1),
@@ -31,7 +32,7 @@ export default function testsRouter(prisma: PrismaClient) {
   router.get("/:projectId/tests", async (req, res) => {
     const projectId = req.params.projectId as string;
     const project = await prisma.project.findFirst({
-      where: { id: projectId, ownerId: req.user!.id },
+      where: projectAccessibleWhere(req.user!.id, projectId),
     });
     if (!project) {
       return res.status(404).json({ error: "Không tìm thấy project" });
@@ -54,7 +55,7 @@ export default function testsRouter(prisma: PrismaClient) {
 
     const projectId = req.params.projectId as string;
     const project = await prisma.project.findFirst({
-      where: { id: projectId, ownerId: req.user!.id },
+      where: projectAccessibleWhere(req.user!.id, projectId),
     });
     if (!project) {
       return res.status(404).json({ error: "Không tìm thấy project" });
@@ -110,7 +111,7 @@ export default function testsRouter(prisma: PrismaClient) {
     }
     const projectId = req.params.projectId as string;
     const project = await prisma.project.findFirst({
-      where: { id: projectId, ownerId: req.user!.id },
+      where: projectAccessibleWhere(req.user!.id, projectId),
     });
     if (!project) {
       return res.status(404).json({ error: "Không tìm thấy project" });
@@ -174,7 +175,7 @@ export default function testsRouter(prisma: PrismaClient) {
       const testCaseId = req.params.testCaseId as string;
 
       const project = await prisma.project.findFirst({
-        where: { id: projectId, ownerId: req.user!.id },
+        where: projectAccessibleWhere(req.user!.id, projectId),
       });
       if (!project) {
         return res.status(404).json({ error: "Không tìm thấy project" });

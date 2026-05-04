@@ -2,6 +2,7 @@ import { Router } from "express";
 import type { PrismaClient } from "../generated/prisma/client";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/auth";
+import { projectAccessibleWhere } from "../lib/projectAccess";
 
 const scriptSchema = z.object({
   projectId: z.string().cuid(),
@@ -19,6 +20,26 @@ const stepSchema = z.object({
   parameters: z.any().optional(),
 });
 
+/** Thời gian chờ một bước (ms): giới hạn an toàn để tránh chờ vô hạn. */
+const STEP_TIMEOUT_MS_MIN = 1000;
+const STEP_TIMEOUT_MS_MAX = 180_000;
+
+function validateOptionalStepTimeoutMs(
+  p: Record<string, unknown> | null | undefined,
+  stepLabel: string,
+  validationErrors: string[],
+): void {
+  if (!p) return;
+  const raw = p.timeoutMs;
+  if (raw === undefined || raw === null || raw === "") return;
+  const n = typeof raw === "number" ? raw : typeof raw === "string" ? Number(raw.trim()) : Number.NaN;
+  if (!Number.isFinite(n) || Math.floor(n) !== n || n < STEP_TIMEOUT_MS_MIN || n > STEP_TIMEOUT_MS_MAX) {
+    validationErrors.push(
+      `${stepLabel}: timeoutMs (tuỳ chọn) phải là số nguyên ${STEP_TIMEOUT_MS_MIN}–${STEP_TIMEOUT_MS_MAX} ms; để trống = Playwright mặc định (~30s).`,
+    );
+  }
+}
+
 export default function scriptsRouter(prisma: PrismaClient) {
   const router = Router();
 
@@ -26,7 +47,7 @@ export default function scriptsRouter(prisma: PrismaClient) {
 
   router.get("/", async (req, res) => {
     const scripts = await prisma.testScript.findMany({
-      where: { createdById: req.user!.id },
+      where: { project: projectAccessibleWhere(req.user!.id) },
       include: { project: true },
       orderBy: { createdAt: "desc" },
     });
@@ -41,7 +62,7 @@ export default function scriptsRouter(prisma: PrismaClient) {
     const { projectId, name, description } = parse.data;
 
     const project = await prisma.project.findFirst({
-      where: { id: projectId, ownerId: req.user!.id },
+      where: projectAccessibleWhere(req.user!.id, projectId),
     });
     if (!project) return res.status(403).json({ error: "Không có quyền truy cập project" });
 
@@ -58,7 +79,7 @@ export default function scriptsRouter(prisma: PrismaClient) {
 
   router.get("/:id", async (req, res) => {
     const script = await prisma.testScript.findFirst({
-      where: { id: req.params.id as any, createdById: req.user!.id },
+      where: { id: req.params.id as any, project: projectAccessibleWhere(req.user!.id) },
       include: { steps: { orderBy: { order: "asc" } } },
     });
     if (!script) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
@@ -71,7 +92,7 @@ export default function scriptsRouter(prisma: PrismaClient) {
       return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parseMeta.error.flatten() });
     }
     const updated = await prisma.testScript.updateMany({
-      where: { id: req.params.id as any, createdById: req.user!.id },
+      where: { id: req.params.id as any, project: projectAccessibleWhere(req.user!.id) },
       data: parseMeta.data,
     });
     if (updated.count === 0) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
@@ -103,18 +124,20 @@ export default function scriptsRouter(prisma: PrismaClient) {
     for (const st of stepsParse.data) {
       const p = normalizeParams(st.parameters);
       const kw = st.keyword;
+      /** Trùng số thứ tự với UI (Bước 1, 2, …); `order` trong DB là 0-based. */
+      const stepLabel = `Bước ${st.order + 1}`;
 
       if (kw === "navigate") {
         const url = p?.url;
         if (typeof url !== "string" || !url.trim()) {
-          validationErrors.push(`Step ${st.order}: navigate requires parameters.url`);
+          validationErrors.push(`${stepLabel}: navigate cần parameters.url (URL đầy đủ, ví dụ https://…)`);
         }
       }
 
       if (kw === "click") {
         const selector = p?.selector;
         if (typeof selector !== "string" || !selector.trim()) {
-          validationErrors.push(`Step ${st.order}: click requires parameters.selector`);
+          validationErrors.push(`${stepLabel}: click cần parameters.selector (CSS selector của nút/vùng cần bấm)`);
         }
       }
 
@@ -123,12 +146,14 @@ export default function scriptsRouter(prisma: PrismaClient) {
         const value = p?.value;
         const dataKey = p?.dataKey;
         if (typeof selector !== "string" || !selector.trim()) {
-          validationErrors.push(`Step ${st.order}: fill requires parameters.selector`);
+          validationErrors.push(`${stepLabel}: fill cần parameters.selector (ô input)`);
         }
         const hasValue = typeof value === "string" && !!value.trim();
         const hasDataKey = typeof dataKey === "string" && !!dataKey.trim();
         if (!hasValue && !hasDataKey) {
-          validationErrors.push(`Step ${st.order}: fill requires parameters.value or parameters.dataKey`);
+          validationErrors.push(
+            `${stepLabel}: fill cần parameters.value (ghi tay) hoặc parameters.dataKey (trùng tên cột trong bộ dữ liệu khi chạy)`,
+          );
         }
       }
 
@@ -137,14 +162,18 @@ export default function scriptsRouter(prisma: PrismaClient) {
         const expected = p?.expected;
         const dataKey = p?.dataKey;
         if (typeof selector !== "string" || !selector.trim()) {
-          validationErrors.push(`Step ${st.order}: assertText requires parameters.selector`);
+          validationErrors.push(`${stepLabel}: assertText cần parameters.selector (vùng cần đọc chữ)`);
         }
         const hasExpected = typeof expected === "string" && !!expected.trim();
         const hasDataKey = typeof dataKey === "string" && !!dataKey.trim();
         if (!hasExpected && !hasDataKey) {
-          validationErrors.push(`Step ${st.order}: assertText requires parameters.expected or parameters.dataKey`);
+          validationErrors.push(
+            `${stepLabel}: assertText cần parameters.expected (chuỗi con mong đợi) hoặc parameters.dataKey (lấy từ dataset)`,
+          );
         }
       }
+
+      validateOptionalStepTimeoutMs(p, stepLabel, validationErrors);
     }
 
     if (validationErrors.length > 0) {
@@ -154,7 +183,7 @@ export default function scriptsRouter(prisma: PrismaClient) {
       });
     }
     const script = await prisma.testScript.findFirst({
-      where: { id: req.params.id as any, createdById: req.user!.id },
+      where: { id: req.params.id as any, project: projectAccessibleWhere(req.user!.id) },
     });
     if (!script) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
 
@@ -182,7 +211,7 @@ export default function scriptsRouter(prisma: PrismaClient) {
 
   router.delete("/:id", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     await prisma.testScript.deleteMany({
-      where: { id: req.params.id as any, createdById: req.user!.id },
+      where: { id: req.params.id as any, project: projectAccessibleWhere(req.user!.id) },
     });
     res.status(204).end();
   });

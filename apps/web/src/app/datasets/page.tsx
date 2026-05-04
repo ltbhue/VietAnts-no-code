@@ -4,6 +4,8 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { canMutateNoCode, getApiBase, getUserRole } from "@/lib/api";
+import { PageHeader } from "@/components/PageHeader";
+import { ui } from "@/lib/ui";
 
 interface Project {
   id: string;
@@ -81,10 +83,12 @@ function DatasetsPageInner() {
 
   useEffect(() => {
     if (projects.length === 0) return;
-    setProjectId((prev) => {
-      if (qp && projects.some((p) => p.id === qp)) return qp;
-      if (prev && projects.some((p) => p.id === prev)) return prev;
-      return projects[0].id;
+    queueMicrotask(() => {
+      setProjectId((prev) => {
+        if (qp && projects.some((p) => p.id === qp)) return qp;
+        if (prev && projects.some((p) => p.id === prev)) return prev;
+        return projects[0].id;
+      });
     });
   }, [projects, qp]);
 
@@ -151,22 +155,21 @@ function DatasetsPageInner() {
   }
 
   return (
-    <main className="min-h-screen p-6 md:p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-2">Bộ dữ liệu (data-driven)</h1>
-      <p className="text-sm text-slate-300 mb-6">
-        Mỗi phần tử trong <code className="text-emerald-400">rows</code> là một lần lặp khi chạy kịch bản (kết hợp keyword{" "}
-        <code className="text-emerald-400">fill</code> / <code className="text-emerald-400">assertText</code> với{" "}
-        <code className="text-emerald-400">dataKey</code>).
-      </p>
+    <main className={ui.content}>
+      <div className={ui.narrow}>
+        <PageHeader
+          title="Bộ dữ liệu"
+          subtitle="Mỗi phần tử trong rows là một lần lặp khi chạy kịch bản (dùng với fill / assertText và dataKey)."
+        />
 
-      {loading && <p className="text-sm text-slate-400">Đang tải...</p>}
-      {error && <p className="text-sm text-red-400 mb-2">{error}</p>}
-      {msg && <p className="text-sm text-emerald-400 mb-2">{msg}</p>}
+      {loading && <p className="text-sm text-slate-400">Đang tải…</p>}
+      {error && <p className={`${ui.alertError} mb-3`}>{error}</p>}
+      {msg && <p className={`${ui.alertOk} mb-3`}>{msg}</p>}
 
-      <div className="mb-6">
-        <label className="text-xs text-slate-400">Project</label>
+      <div className={`${ui.cardCompact} mb-6`}>
+        <label className={ui.label}>Project</label>
         <select
-          className="mt-1 block rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+          className={ui.select}
           value={projectId}
           onChange={(e) => setProjectId(e.target.value)}
         >
@@ -179,16 +182,13 @@ function DatasetsPageInner() {
       </div>
 
       {canMutate && (
-        <form
-          onSubmit={handleCreate}
-          className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 mb-8 space-y-3"
-        >
-          <h2 className="text-sm font-medium">Tạo bộ dữ liệu</h2>
+        <form onSubmit={handleCreate} className={`${ui.card} mb-8 space-y-4`}>
+          <p className={ui.sectionTitle}>Tạo bộ dữ liệu mới</p>
         <div className="grid md:grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-slate-400">Tên</label>
+            <label className={ui.label}>Tên</label>
             <input
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className={ui.input}
               value={name}
               onChange={(e) => setName(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
               maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
@@ -196,9 +196,9 @@ function DatasetsPageInner() {
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Mô tả</label>
+            <label className={ui.label}>Mô tả</label>
             <textarea
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className={ui.textarea}
               value={description}
               onChange={(e) => setDescription(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
               maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
@@ -207,28 +207,25 @@ function DatasetsPageInner() {
           </div>
         </div>
         <div>
-          <label className="text-xs text-slate-400">rows (JSON array)</label>
+          <label className={ui.label}>rows (JSON array)</label>
           <textarea
-            className="mt-1 w-full min-h-[120px] rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-mono"
+            className={`${ui.textarea} min-h-[140px] font-mono text-xs`}
             value={rowsJson}
             onChange={(e) => setRowsJson(e.target.value)}
           />
         </div>
-          <button
-            type="submit"
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950"
-          >
-            Tạo
+          <button type="submit" className={ui.btnPrimary}>
+            Tạo bộ dữ liệu
           </button>
         </form>
       )}
 
-      <section className="space-y-2">
-        <h2 className="text-sm font-medium mb-2">Danh sách</h2>
+      <section className="space-y-3">
+        <p className={ui.sectionTitle}>Danh sách trong project</p>
         {datasets.map((d) => (
           <div
             key={d.id}
-            className="rounded-lg border border-slate-800 bg-slate-900/40 px-3 py-2 text-sm"
+            className={`${ui.cardCompact} text-sm`}
           >
             <div className="flex justify-between gap-2">
               <div>
@@ -236,18 +233,14 @@ function DatasetsPageInner() {
                 <div className="text-xs text-slate-500">{d.description}</div>
               </div>
               {canMutate ? (
-                <button
-                  type="button"
-                  onClick={() => remove(d.id)}
-                  className="text-xs text-red-400 shrink-0"
-                >
+                <button type="button" onClick={() => remove(d.id)} className={`${ui.btnSm} text-red-400 hover:bg-red-950/40`}>
                   Xóa
                 </button>
               ) : (
                 <span className="text-xs text-slate-500">Chỉ xem</span>
               )}
             </div>
-            <pre className="mt-2 text-[10px] text-slate-400 overflow-auto max-h-24">
+            <pre className={`${ui.pre} mt-2 text-[10px] max-h-28`}>
               {JSON.stringify(d.rows, null, 2)}
             </pre>
           </div>
@@ -256,13 +249,14 @@ function DatasetsPageInner() {
           <p className="text-xs text-slate-500">Chưa có bộ dữ liệu.</p>
         )}
       </section>
+      </div>
     </main>
   );
 }
 
 export default function DatasetsPage() {
   return (
-    <Suspense fallback={<main className="p-8 text-slate-400">Đang tải...</main>}>
+    <Suspense fallback={<main className="p-8 text-slate-400">Đang tải…</main>}>
       <DatasetsPageInner />
     </Suspense>
   );

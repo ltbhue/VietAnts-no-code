@@ -64,8 +64,8 @@ npm run prisma:seed      # tạo admin, tester, project, script, steps, dataset 
 
 Thông tin tài khoản seed:
 
-- Admin: `admin@vietants.com` / `Password123!`
-- Tester: `tester@vietants.com` / `Password123!`
+- Admin: `admin@vietants.com` / `123456@`
+- Tester: `tester@vietants.com` / `123456@`
 
 ### 3.3. Chạy server API
 

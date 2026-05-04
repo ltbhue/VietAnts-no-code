@@ -36,7 +36,12 @@ export default function runsRouter(prisma: PrismaClient) {
         where: {
           suiteId,
           startedAt: { gte: since },
-          suite: { project: { ownerId: req.user!.id, ...(projectId ? { id: projectId } : {}) } },
+          suite: {
+            project: {
+              ...(projectId ? { id: projectId } : {}),
+              OR: [{ ownerId: req.user!.id }, { members: { some: { userId: req.user!.id } } }],
+            },
+          },
         },
         orderBy: { startedAt: "asc" },
       });

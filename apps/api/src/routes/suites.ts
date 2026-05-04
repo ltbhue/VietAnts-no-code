@@ -2,6 +2,7 @@ import { Router } from "express";
 import type { PrismaClient } from "../generated/prisma/client";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/auth";
+import { projectAccessibleWhere } from "../lib/projectAccess";
 
 const createSuiteSchema = z.object({
   name: z.string().min(1),
@@ -21,7 +22,7 @@ export default function suitesRouter(prisma: PrismaClient) {
 
   router.get("/:projectId/suites", async (req, res) => {
     const project = await prisma.project.findFirst({
-      where: { id: req.params.projectId as string, ownerId: req.user!.id },
+      where: projectAccessibleWhere(req.user!.id, req.params.projectId as string),
     });
     if (!project) {
       return res.status(404).json({ error: "Không tìm thấy project" });
@@ -42,7 +43,7 @@ export default function suitesRouter(prisma: PrismaClient) {
 
     const projectId = req.params.projectId as string;
     const project = await prisma.project.findFirst({
-      where: { id: projectId, ownerId: req.user!.id },
+      where: projectAccessibleWhere(req.user!.id, projectId),
     });
     if (!project) {
       return res.status(404).json({ error: "Không tìm thấy project" });

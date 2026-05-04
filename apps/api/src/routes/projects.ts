@@ -2,10 +2,12 @@ import { Router } from "express";
 import type { PrismaClient } from "../generated/prisma/client";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/auth";
+import { projectAccessibleWhere } from "../lib/projectAccess";
 
 const projectSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
+  memberIds: z.array(z.string().cuid()).optional(),
 });
 
 export default function projectsRouter(prisma: PrismaClient) {
@@ -15,8 +17,15 @@ export default function projectsRouter(prisma: PrismaClient) {
 
   router.get("/", async (req, res) => {
     const projects = await prisma.project.findMany({
-      where: { ownerId: req.user!.id },
+      where: projectAccessibleWhere(req.user!.id),
       orderBy: { createdAt: "desc" },
+      include: {
+        members: {
+          include: {
+            user: { select: { id: true, fullName: true, email: true, role: true } },
+          },
+        },
+      },
     });
     res.json(projects);
   });
@@ -28,8 +37,26 @@ export default function projectsRouter(prisma: PrismaClient) {
     }
     const project = await prisma.project.create({
       data: {
-        ...parse.data,
+        name: parse.data.name,
+        description: parse.data.description,
         ownerId: req.user!.id,
+        members: parse.data.memberIds?.length
+          ? {
+              createMany: {
+                data: parse.data.memberIds
+                  .filter((id) => id !== req.user!.id)
+                  .map((userId) => ({ userId })),
+                skipDuplicates: true,
+              },
+            }
+          : undefined,
+      },
+      include: {
+        members: {
+          include: {
+            user: { select: { id: true, fullName: true, email: true, role: true } },
+          },
+        },
       },
     });
     res.status(201).json(project);
@@ -37,7 +64,14 @@ export default function projectsRouter(prisma: PrismaClient) {
 
   router.get("/:id", async (req, res) => {
     const project = await prisma.project.findFirst({
-      where: { id: req.params.id as any, ownerId: req.user!.id },
+      where: projectAccessibleWhere(req.user!.id, req.params.id as any),
+      include: {
+        members: {
+          include: {
+            user: { select: { id: true, fullName: true, email: true, role: true } },
+          },
+        },
+      },
     });
     if (!project) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
     res.json(project);
@@ -48,18 +82,45 @@ export default function projectsRouter(prisma: PrismaClient) {
     if (!parse.success) {
       return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
-    const updated = await prisma.project.updateMany({
-      where: { id: req.params.id as any, ownerId: req.user!.id },
-      data: parse.data,
+    const existing = await prisma.project.findFirst({
+      where: projectAccessibleWhere(req.user!.id, req.params.id as any),
     });
-    if (updated.count === 0) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
-    const project = await prisma.project.findUnique({ where: { id: req.params.id as any } });
+    if (!existing) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
+    const memberIds = parse.data.memberIds;
+    const project = await prisma.$transaction(async (tx) => {
+      const updated = await tx.project.update({
+        where: { id: req.params.id as any },
+        data: {
+          name: parse.data.name,
+          description: parse.data.description,
+        },
+      });
+      if (memberIds) {
+        await tx.projectMember.deleteMany({ where: { projectId: updated.id } });
+        if (memberIds.length > 0) {
+          await tx.projectMember.createMany({
+            data: memberIds.filter((id) => id !== updated.ownerId).map((userId) => ({ projectId: updated.id, userId })),
+            skipDuplicates: true,
+          });
+        }
+      }
+      return tx.project.findUnique({
+        where: { id: updated.id },
+        include: {
+          members: {
+            include: {
+              user: { select: { id: true, fullName: true, email: true, role: true } },
+            },
+          },
+        },
+      });
+    });
     res.json(project);
   });
 
   router.delete("/:id", requireRole(["ADMIN"]), async (req, res) => {
     await prisma.project.deleteMany({
-      where: { id: req.params.id as any, ownerId: req.user!.id },
+      where: projectAccessibleWhere(req.user!.id, req.params.id as any),
     });
     res.status(204).end();
   });

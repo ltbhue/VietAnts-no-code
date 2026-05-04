@@ -2,12 +2,36 @@
 
 import Link from "next/link";
 import { getApiBase, authJsonHeaders } from "@/lib/api";
+import { PageHeader } from "@/components/PageHeader";
+import { ui } from "@/lib/ui";
 import { useEffect, useState } from "react";
 
 type ActionType = "navigate" | "click" | "fill" | "assertText";
 type DraftAction = { type: ActionType; selector?: string; value?: string; expected?: string };
 type Project = { id: string; name: string };
 const DEFAULT_TEXTBOX_MAX_LENGTH = 255;
+
+function toRecordedStep(action: DraftAction): Record<string, unknown> | null {
+  if (!action.selector?.trim()) return null;
+  if (action.type === "click") {
+    return { kind: "recorded.click", selector: action.selector.trim() };
+  }
+  if (action.type === "fill") {
+    return {
+      kind: "keyword.fill",
+      selector: action.selector.trim(),
+      value: action.value?.trim() ?? "",
+    };
+  }
+  if (action.type === "assertText") {
+    return {
+      kind: "keyword.assertText",
+      selector: action.selector.trim(),
+      expected: action.expected?.trim() ?? "",
+    };
+  }
+  return null;
+}
 
 export default function RecorderPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -30,7 +54,7 @@ export default function RecorderPage() {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      setLoadingProjects(false);
+      queueMicrotask(() => setLoadingProjects(false));
       return;
     }
     (async () => {
@@ -128,6 +152,10 @@ export default function RecorderPage() {
         }),
       });
       const text = await res.text();
+      if (!res.ok) {
+        setError(`Smart Analyze lỗi (${res.status}): ${text || "Không có chi tiết lỗi."}`);
+        return;
+      }
       setSmartPreview(`${res.status} ${text}`);
       setNotice("Đã phân tích smart recorder.");
     } catch {
@@ -144,18 +172,28 @@ export default function RecorderPage() {
     setNotice(null);
     setResult(null);
     try {
+      const steps = [
+        { kind: "keyword.navigate", url: url.trim() },
+        ...actions.map(toRecordedStep).filter(Boolean),
+      ];
+      if (steps.length < 2) {
+        setError("Bạn cần ít nhất 1 action hợp lệ (click/fill/assertText) ngoài bước mở trang.");
+        return;
+      }
       const res = await fetch(`${getApiBase()}/projects/${encodeURIComponent(projectId.trim())}/tests`, {
         method: "POST",
         headers: authJsonHeaders(),
         body: JSON.stringify({
           name: name.trim() || "Smart Recorder Case",
           platform: "desktop-web",
-          steps: actions
-            .filter((a) => a.type === "click" && a.selector)
-            .map((a) => ({ kind: "recorded.click", selector: a.selector })),
+          steps,
         }),
       });
       const text = await res.text();
+      if (!res.ok) {
+        setError(`Tạo test draft lỗi (${res.status}): ${text || "Không có chi tiết lỗi."}`);
+        return;
+      }
       setResult(`${res.status} ${text}`);
       setNotice("Đã gửi tạo test draft.");
     } catch {
@@ -166,21 +204,22 @@ export default function RecorderPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-xl font-semibold text-emerald-400">Smart URL Recorder (v1)</h1>
-      <p className="text-slate-400 text-sm mt-1 mb-5">
-        Chia đôi màn hình: bên trái cấu hình recorder, bên phải kết quả/actions để theo dõi ngay.
-      </p>
-      {error && <p className="mb-3 rounded border border-red-800 bg-red-950/40 px-3 py-2 text-sm text-red-300">{error}</p>}
-      {notice && <p className="mb-3 rounded border border-emerald-800 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-300">{notice}</p>}
+    <main className={ui.content}>
+      <div className={ui.wide720}>
+        <PageHeader
+          title="Smart Recorder"
+          subtitle="Cấu hình bên trái, xem actions và phản hồi API bên phải — làm việc song song trên màn hình lớn."
+        />
+      {error && <p className={`${ui.alertError} mb-3`}>{error}</p>}
+      {notice && <p className={`${ui.alertOk} mb-3`}>{notice}</p>}
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 items-start">
-        <section className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 space-y-4">
-          <h2 className="text-sm font-medium text-slate-200">Cấu hình</h2>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+        <section className={`${ui.card} space-y-4`}>
+          <p className={ui.sectionTitle}>Cấu hình</p>
           <label className="block">
-            <span className="text-sm text-slate-400">Project</span>
+            <span className={ui.label}>Project</span>
             <select
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+              className={ui.select}
               value={projectId}
               onChange={(e) => setProjectId(e.target.value)}
               disabled={loadingProjects || projects.length === 0}
@@ -196,28 +235,28 @@ export default function RecorderPage() {
             {projectId && <p className="mt-1 text-[11px] text-slate-500">Project ID: {projectId}</p>}
           </label>
           <label className="block">
-            <span className="text-sm text-slate-400">URL mục tiêu</span>
+            <span className={ui.label}>URL mục tiêu</span>
             <input
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+              className={ui.input}
               value={url}
               onChange={(e) => setUrl(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
               maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
             />
           </label>
           <label className="block">
-            <span className="text-sm text-slate-400">Tên test</span>
+            <span className={ui.label}>Tên test</span>
             <input
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+              className={ui.input}
               value={name}
               onChange={(e) => setName(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
               maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
             />
           </label>
 
-          <div className="rounded border border-slate-800 p-3 space-y-2">
-            <div className="text-sm text-slate-300">Thêm action</div>
+          <div className="rounded-xl border border-slate-800/90 bg-slate-950/40 p-4 space-y-3">
+            <div className="text-sm font-medium text-slate-200">Thêm action</div>
             <select
-              className="w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+              className={ui.select}
               value={actionType}
               onChange={(e) => setActionType(e.target.value as ActionType)}
             >
@@ -226,79 +265,61 @@ export default function RecorderPage() {
               <option value="assertText">assertText</option>
             </select>
             <input
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+              className={ui.input}
               value={selector}
               onChange={(e) => setSelector(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
               maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
               placeholder="selector"
             />
             <input
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+              className={ui.input}
               value={value}
               onChange={(e) => setValue(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
               maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
               placeholder="value (cho fill)"
             />
             <input
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+              className={ui.input}
               value={expected}
               onChange={(e) => setExpected(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
               maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
               placeholder="expected (cho assertText)"
             />
-            <button
-              type="button"
-              onClick={addAction}
-              className="rounded bg-slate-700 px-3 py-1.5 text-xs text-slate-100"
-            >
-              + Add action
+            <button type="button" onClick={addAction} className={ui.btnSecondary}>
+              + Thêm action
             </button>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => void analyzeSmart()}
-              disabled={analyzing}
-              className="rounded bg-indigo-500 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-            >
-              {analyzing ? "Đang phân tích..." : "Smart Analyze"}
+            <button type="button" onClick={() => void analyzeSmart()} disabled={analyzing} className={ui.btnIndigo}>
+              {analyzing ? "Đang phân tích…" : "Smart Analyze"}
             </button>
-            <button
-              type="button"
-              onClick={() => void submit()}
-              disabled={submitting}
-              className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950 disabled:opacity-60"
-            >
-              {submitting ? "Đang gửi..." : "Gửi tạo test (draft)"}
+            <button type="button" onClick={() => void submit()} disabled={submitting} className={ui.btnPrimary}>
+              {submitting ? "Đang gửi…" : "Gửi tạo test (draft)"}
             </button>
-            <button
-              type="button"
-              onClick={clearAll}
-              className="rounded bg-slate-700 px-4 py-2 text-sm font-medium text-slate-100"
-            >
-              Clear all
+            <button type="button" onClick={clearAll} className={ui.btnSecondary}>
+              Xóa tất cả
             </button>
           </div>
-          <Link href="/editor" className="block text-sm text-emerald-400 hover:underline">
-            → Chỉnh sửa nâng cao
+          <Link href="/editor" className={ui.link}>
+            → Biên tập & publish
           </Link>
         </section>
 
-        <section className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 space-y-3">
-          <h2 className="text-sm font-medium text-slate-200">Kết quả hiển thị</h2>
+        <section className={`${ui.card} space-y-4`}>
+          <p className={ui.sectionTitle}>Kết quả & JSON</p>
           <div>
             <div className="mb-1 flex items-center justify-between gap-2">
               <div className="text-xs text-slate-400">Actions hiện tại ({actions.length})</div>
               <button
                 type="button"
                 onClick={() => void copyText("actions JSON", JSON.stringify(actions, null, 2))}
-                className="rounded bg-slate-800 px-2 py-1 text-[11px] text-slate-200"
+                className={`${ui.btnSm} bg-slate-800 text-slate-200 hover:bg-slate-700`}
               >
                 Copy JSON
               </button>
             </div>
-            <pre className="rounded bg-slate-900 border border-slate-800 p-3 text-xs overflow-auto min-h-[180px]">
+            <pre className={`${ui.pre} min-h-[180px]`}>
               {JSON.stringify(actions, null, 2)}
             </pre>
             {actions.length > 0 && (
@@ -327,12 +348,12 @@ export default function RecorderPage() {
                 type="button"
                 onClick={() => void copyText("smart analyze response", smartPreview || "")}
                 disabled={!smartPreview}
-                className="rounded bg-slate-800 px-2 py-1 text-[11px] text-slate-200 disabled:opacity-40"
+                className={`${ui.btnSm} bg-slate-800 text-slate-200 hover:bg-slate-700 disabled:opacity-40`}
               >
                 Copy
               </button>
             </div>
-            <pre className="rounded bg-slate-900 border border-indigo-700 p-3 text-xs overflow-auto min-h-[120px]">
+            <pre className={`${ui.pre} min-h-[120px] border-indigo-800/50`}>
               {smartPreview || "Chưa có dữ liệu. Hãy bấm Smart Analyze."}
             </pre>
           </div>
@@ -343,17 +364,18 @@ export default function RecorderPage() {
                 type="button"
                 onClick={() => void copyText("create test response", result || "")}
                 disabled={!result}
-                className="rounded bg-slate-800 px-2 py-1 text-[11px] text-slate-200 disabled:opacity-40"
+                className={`${ui.btnSm} bg-slate-800 text-slate-200 hover:bg-slate-700 disabled:opacity-40`}
               >
                 Copy
               </button>
             </div>
-            <pre className="rounded bg-slate-900 border border-slate-800 p-3 text-xs overflow-auto min-h-[120px]">
+            <pre className={`${ui.pre} min-h-[120px]`}>
               {result || "Chưa có dữ liệu. Hãy bấm Gửi tạo test (draft)."}
             </pre>
           </div>
         </section>
       </div>
     </div>
+    </main>
   );
 }

@@ -137,6 +137,19 @@ export default function authRouter(prisma: PrismaClient) {
     return res.json(current);
   });
 
+  router.get("/admin/users", authMiddleware, requireRole(["ADMIN"]), async (_req, res) => {
+    const users = await prisma.user.findMany({
+      orderBy: [{ role: "asc" }, { fullName: "asc" }],
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        role: true,
+      },
+    });
+    return res.json(users);
+  });
+
   return router;
 }
 

@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getApiBase, authJsonHeaders } from "@/lib/api";
 import { useState } from "react";
+import { PageHeader } from "@/components/PageHeader";
+import { ui } from "@/lib/ui";
+import { FiDownload } from "react-icons/fi";
 
 export default function ReportDetailPage() {
   const params = useParams();
@@ -26,32 +29,35 @@ export default function ReportDetailPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-4">
-      <h1 className="text-xl font-semibold text-emerald-400">Báo cáo run</h1>
-      <p className="text-slate-400 text-sm">
-        Run ID: <code className="text-emerald-300">{runId || "—"}</code>. Mỗi case fail cần có screenshot + step log ở API (MVP lưu trong JSON results).
-      </p>
-      <label className="block">
-        <span className="text-sm text-slate-400">Suite ID</span>
-        <input
-          className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
-          value={suiteId}
-          onChange={(e) => setSuiteId(e.target.value)}
+    <main className={ui.content}>
+      <div className={ui.narrow}>
+        <PageHeader
+          title="Báo cáo run"
+          subtitle={`Run ID: ${runId || "—"}. Phản hồi thô từ API (MVP).`}
         />
-      </label>
-      <button
-        type="button"
-        onClick={() => void load()}
-        className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950"
-      >
-        Tải báo cáo
-      </button>
-      {result && (
-        <pre className="rounded bg-slate-900 border border-slate-800 p-3 text-xs overflow-auto">{result}</pre>
-      )}
-      <Link href="/suite-runs" className="block text-sm text-emerald-400 hover:underline">
-        ← Quay lại chạy suite
-      </Link>
-    </div>
+
+        <section className={`${ui.card} space-y-4`}>
+          <div>
+            <label className={ui.label} htmlFor="rep-suite">
+              Suite ID
+            </label>
+            <input
+              id="rep-suite"
+              className={`${ui.input} font-mono text-xs`}
+              value={suiteId}
+              onChange={(e) => setSuiteId(e.target.value)}
+            />
+          </div>
+          <button type="button" onClick={() => void load()} className={`${ui.btnPrimary} gap-2`}>
+            <FiDownload className="h-4 w-4" aria-hidden />
+            Tải báo cáo
+          </button>
+          {result && <pre className={ui.pre}>{result}</pre>}
+          <Link href="/suite-runs" className={ui.link}>
+            ← Quay lại chạy suite
+          </Link>
+        </section>
+      </div>
+    </main>
   );
 }

@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { canAccessProjects, getApiBase, getUserRole } from "@/lib/api";
+import { PageHeader } from "@/components/PageHeader";
+import { ui } from "@/lib/ui";
 
 interface Project {
   id: string;
@@ -37,7 +39,9 @@ export default function DashboardPage() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
   const [selectedSuiteId, setSelectedSuiteId] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
   const apiBase = getApiBase();
   const canOpenProjects = canAccessProjects(getUserRole());
 
@@ -80,47 +84,74 @@ export default function DashboardPage() {
     }
   }, [apiBase, selectedProjectId, selectedSuiteId]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  useEffect(() => {
+  const loadAnalytics = useCallback(async () => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
     const params = new URLSearchParams();
     params.set("days", String(rangeDays));
     if (selectedProjectId) params.set("projectId", selectedProjectId);
     if (selectedSuiteId) params.set("suiteId", selectedSuiteId);
-    axios
-      .get<AnalyticsSummary>(`${apiBase}/runs/analytics?${params.toString()}`, {
+    try {
+      const res = await axios.get<AnalyticsSummary>(`${apiBase}/runs/analytics?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setAnalytics(res.data))
-      .catch(() => setAnalytics(null));
+      });
+      setAnalytics(res.data);
+      setLastUpdatedAt(new Date());
+    } catch {
+      setAnalytics(null);
+    }
   }, [apiBase, rangeDays, selectedProjectId, selectedSuiteId]);
 
-  return (
-    <main className="min-h-screen p-6 md:p-8 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-slate-300 mt-1">
-          Theo dõi số liệu kiểm thử tổng quan theo project và suite.
-        </p>
-        {canOpenProjects && (
-          <Link
-            href="/projects"
-            className="inline-flex mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-500"
-          >
-            Đi tới module Project
-          </Link>
-        )}
-      </div>
+  const refreshAll = useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([load(), loadAnalytics()]);
+    setRefreshing(false);
+  }, [load, loadAnalytics]);
 
-      <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 mb-8">
-        <h2 className="text-sm font-medium text-slate-200 mb-3">Thống kê kiểm thử</h2>
+  useEffect(() => {
+    queueMicrotask(() => {
+      void load();
+    });
+  }, [load]);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      void loadAnalytics();
+    });
+  }, [loadAnalytics]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      void refreshAll();
+    }, 20_000);
+    return () => window.clearInterval(timer);
+  }, [refreshAll]);
+
+  return (
+    <main className={ui.content}>
+      <div className={ui.wide}>
+        <PageHeader
+          title="Dashboard"
+          subtitle="Theo dõi số liệu kiểm thử tổng quan theo project và suite. Chọn khoảng thời gian và bộ lọc để xem biểu đồ."
+          actions={
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => void refreshAll()} className={ui.btnSecondary} disabled={refreshing}>
+                {refreshing ? "Đang làm mới..." : "Làm mới"}
+              </button>
+              {canOpenProjects ? (
+                <Link href="/projects" className={ui.btnPrimary}>
+                  Quản lý project
+                </Link>
+              ) : null}
+            </div>
+          }
+        />
+
+      <section className={`${ui.card} mb-2`}>
+        <p className={`${ui.sectionTitle} mb-4`}>Thống kê kiểm thử</p>
         <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
           <select
-            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+            className={ui.select}
             value={rangeDays}
             onChange={(e) => setRangeDays(Number(e.target.value) as 7 | 30)}
           >
@@ -128,7 +159,7 @@ export default function DashboardPage() {
             <option value={30}>30 ngày gần nhất</option>
           </select>
           <select
-            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+            className={ui.select}
             value={selectedProjectId}
             onChange={(e) => {
               setSelectedProjectId(e.target.value);
@@ -143,7 +174,7 @@ export default function DashboardPage() {
             ))}
           </select>
           <select
-            className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+            className={ui.select}
             value={selectedSuiteId}
             onChange={(e) => setSelectedSuiteId(e.target.value)}
           >
@@ -161,23 +192,26 @@ export default function DashboardPage() {
               setSelectedProjectId("");
               setSelectedSuiteId("");
             }}
-            className="rounded bg-slate-800 hover:bg-slate-700 px-3 py-2 text-sm"
+            className={ui.btnSecondary}
           >
             Reset filter
           </button>
         </div>
+        <div className="mb-2 text-xs text-slate-500">
+          Dữ liệu cập nhật: {lastUpdatedAt ? lastUpdatedAt.toLocaleTimeString("vi-VN") : "—"}
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-          <div className="rounded border border-slate-800 bg-slate-950 p-3">
+          <div className={ui.statCard}>
             <div className="text-slate-400">Tổng số run</div>
-            <div className="text-xl font-semibold">{runs.length}</div>
+            <div className="text-xl font-semibold">{analytics?.total ?? runs.length}</div>
           </div>
-          <div className="rounded border border-slate-800 bg-slate-950 p-3">
+          <div className={ui.statCard}>
             <div className="text-slate-400">Pass</div>
             <div className="text-xl font-semibold text-emerald-400">
               {analytics?.passed ?? runs.filter((r) => r.status === "passed" || r.status === "completed").length}
             </div>
           </div>
-          <div className="rounded border border-slate-800 bg-slate-950 p-3">
+          <div className={ui.statCard}>
             <div className="text-slate-400">Fail</div>
             <div className="text-xl font-semibold text-red-400">
               {analytics?.failed ?? runs.filter((r) => r.status === "failed").length}
@@ -185,8 +219,8 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="rounded border border-slate-800 bg-slate-950 p-4">
-            <div className="text-sm font-medium mb-3">Biểu đồ Pass/Fail</div>
+          <div className={`${ui.statCard} p-4`}>
+            <div className="text-sm font-semibold text-slate-200 mb-3">Biểu đồ Pass/Fail</div>
             {(() => {
               const pass = analytics?.passed ?? runs.filter((r) => r.status === "passed" || r.status === "completed").length;
               const fail = analytics?.failed ?? runs.filter((r) => r.status === "failed").length;
@@ -213,8 +247,8 @@ export default function DashboardPage() {
               );
             })()}
           </div>
-          <div className="rounded border border-slate-800 bg-slate-950 p-4">
-            <div className="text-sm font-medium mb-3">Tỉ lệ pass</div>
+          <div className={`${ui.statCard} p-4`}>
+            <div className="text-sm font-semibold text-slate-200 mb-3">Tỉ lệ pass</div>
             <div className="w-full h-5 rounded-full bg-slate-800 overflow-hidden">
               <div
                 className="h-full bg-emerald-500 transition-all duration-500"
@@ -228,8 +262,8 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="rounded border border-slate-800 bg-slate-950 p-4">
-            <div className="text-sm font-medium mb-3">Biểu đồ đường theo thời gian</div>
+          <div className={`${ui.statCard} p-4`}>
+            <div className="text-sm font-semibold text-slate-200 mb-3">Biểu đồ đường theo thời gian</div>
             {(() => {
               const points = analytics?.timeSeries ?? [];
               if (points.length === 0) {
@@ -260,8 +294,8 @@ export default function DashboardPage() {
             })()}
             <div className="mt-2 text-xs text-slate-400">Xanh: Pass, Đỏ: Fail</div>
           </div>
-          <div className="rounded border border-slate-800 bg-slate-950 p-4">
-            <div className="text-sm font-medium mb-3">Donut chart Pass/Fail</div>
+          <div className={`${ui.statCard} p-4`}>
+            <div className="text-sm font-semibold text-slate-200 mb-3">Donut Pass/Fail</div>
             {(() => {
               const pass = analytics?.passed ?? 0;
               const fail = analytics?.failed ?? 0;
@@ -293,8 +327,8 @@ export default function DashboardPage() {
           <div className="text-xs text-slate-400 mb-2">
             Tỉ lệ pass: <span className="text-emerald-300">{analytics?.passRate ?? 0}%</span>
           </div>
-          <div className="rounded border border-slate-800 bg-slate-950 p-3">
-            <div className="text-sm font-medium mb-2">Các lỗi phổ biến</div>
+          <div className={`${ui.statCard} p-4`}>
+            <div className="text-sm font-semibold text-slate-200 mb-2">Các lỗi phổ biến</div>
             {(analytics?.commonErrors ?? []).length === 0 ? (
               <div className="text-xs text-slate-400">Chưa có lỗi.</div>
             ) : (
@@ -311,8 +345,9 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {loading && <p className="text-sm text-slate-300">Đang tải...</p>}
-      {error && <p className="text-sm text-red-400 mb-4">{error}</p>}
+      {loading && <p className="text-sm text-slate-400">Đang tải…</p>}
+      {error && <p className={`${ui.alertError} mb-4`}>{error}</p>}
+      </div>
     </main>
   );
 }

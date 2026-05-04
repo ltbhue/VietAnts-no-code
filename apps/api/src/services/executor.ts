@@ -4,6 +4,38 @@ import { chromium, firefox, webkit } from "playwright";
 import { notifyTelegramOnFailure } from "./telegram";
 import { createLinearIssueOnFailure } from "./linear";
 
+const STEP_TIMEOUT_MS_MIN = 1000;
+const STEP_TIMEOUT_MS_MAX = 180_000;
+
+/** `parameters.timeoutMs`: giới hạn thời gian thao tác Playwright cho bước này (tùy chọn). */
+function playwrightActionTimeoutOpts(parameters: unknown): { timeout?: number } {
+  let params: Record<string, unknown> = {};
+  if (typeof parameters === "string") {
+    try {
+      params = JSON.parse(parameters) as Record<string, unknown>;
+    } catch {
+      return {};
+    }
+  } else if (parameters && typeof parameters === "object") {
+    params = parameters as Record<string, unknown>;
+  }
+  const raw = params.timeoutMs;
+  if (raw === undefined || raw === null || raw === "") return {};
+  const n = typeof raw === "number" ? raw : Number(String(raw).trim());
+  if (!Number.isFinite(n)) return {};
+  const ms = Math.min(Math.max(Math.floor(n), STEP_TIMEOUT_MS_MIN), STEP_TIMEOUT_MS_MAX);
+  return { timeout: ms };
+}
+
+function isLikelyPlainLabel(selector: string): boolean {
+  const s = selector.trim();
+  if (!s) return false;
+  // Nếu có ký tự cú pháp selector/cú pháp engine Playwright thì giữ nguyên.
+  if (/[.#:[\]>+~=()'"`]/.test(s)) return false;
+  if (s.includes("=")) return false;
+  return true;
+}
+
 export async function executeScriptRun(opts: {
   prisma: PrismaClient;
   scriptId: string;
@@ -132,6 +164,7 @@ async function runKeywordStep(
     }
   }
   const dataRow = row ?? {};
+  const timeOpts = playwrightActionTimeoutOpts(params);
 
   switch (keyword) {
     case "navigate":
@@ -140,29 +173,53 @@ async function runKeywordStep(
         if (typeof url !== "string" || !url.trim()) {
           throw new Error("navigate: thiếu parameters.url");
         }
-        await page.goto(url);
+        await page.goto(url, timeOpts);
       } else {
-        await page.goto(params.url);
+        await page.goto(params.url, timeOpts);
       }
       break;
     case "click":
       if (typeof params.selector !== "string" || !params.selector.trim()) {
         throw new Error("click: thiếu parameters.selector");
       }
-      await page.click(params.selector);
+      {
+        const selector = params.selector.trim();
+        await page.click(selector, timeOpts).catch(async (firstErr) => {
+          if (!isLikelyPlainLabel(selector)) throw firstErr;
+          // Hỗ trợ nhập kiểu "Continue"/"Đăng nhập": ưu tiên role button, sau đó text locator.
+          try {
+            await page.getByRole("button", { name: selector, exact: false }).click(timeOpts);
+            return;
+          } catch {
+            await page.locator(`text=${selector}`).first().click(timeOpts);
+          }
+        });
+      }
       break;
     case "fill":
       if (typeof params.selector !== "string" || !params.selector.trim()) {
         throw new Error("fill: thiếu parameters.selector");
       }
-      await page.fill(params.selector, params.value ?? dataRow[params.dataKey]);
+      const fillValue = params.value ?? dataRow[params.dataKey];
+      const selector = params.selector.trim();
+      await page.fill(selector, fillValue, timeOpts).catch(async (firstErr) => {
+        if (!isLikelyPlainLabel(selector)) throw firstErr;
+        // Hỗ trợ nhập kiểu "Email" / "Password": ưu tiên label rồi placeholder.
+        try {
+          await page.getByLabel(selector, { exact: false }).fill(fillValue, timeOpts);
+          return;
+        } catch {
+          await page.getByPlaceholder(selector, { exact: false }).fill(fillValue, timeOpts);
+        }
+      });
       break;
     case "assertText":
       if (typeof params.selector !== "string" || !params.selector.trim()) {
         throw new Error("assertText: thiếu parameters.selector");
       }
-      await page.waitForSelector(params.selector);
-      const text = await page.textContent(params.selector);
+      await page.waitForSelector(params.selector, timeOpts);
+      const loc = page.locator(params.selector).first();
+      const text = await loc.textContent(timeOpts);
       const expected = params.expected ?? dataRow[params.dataKey];
       if (typeof expected !== "string" || !expected.trim()) {
         throw new Error("assertText: thiếu parameters.expected hoặc parameters.dataKey");

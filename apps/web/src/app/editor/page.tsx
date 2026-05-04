@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { getApiBase, authJsonHeaders } from "@/lib/api";
 import { useState } from "react";
+import { PageHeader } from "@/components/PageHeader";
+import { ui } from "@/lib/ui";
+import { FiSend } from "react-icons/fi";
 
 export default function EditorPage() {
   const [projectId, setProjectId] = useState("");
@@ -20,40 +23,46 @@ export default function EditorPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-4">
-      <h1 className="text-xl font-semibold text-emerald-400">Biên tập & publish</h1>
-      <p className="text-slate-400 text-sm">
-        Nhập project và test case ID để gọi publish API (validation nghiệp vụ trước khi Published).
-      </p>
-      <label className="block">
-        <span className="text-sm text-slate-400">Project ID</span>
-        <input
-          className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
-          value={projectId}
-          onChange={(e) => setProjectId(e.target.value)}
+    <main className={ui.content}>
+      <div className={ui.narrow}>
+        <PageHeader
+          title="Biên tập & publish"
+          subtitle="Nhập project ID và test case ID để gọi API publish (kiểm tra nghiệp vụ trước khi Published)."
         />
-      </label>
-      <label className="block">
-        <span className="text-sm text-slate-400">Test case ID</span>
-        <input
-          className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
-          value={testCaseId}
-          onChange={(e) => setTestCaseId(e.target.value)}
-        />
-      </label>
-      <button
-        type="button"
-        onClick={() => void publish()}
-        className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950"
-      >
-        Publish test
-      </button>
-      {result && (
-        <pre className="rounded bg-slate-900 border border-slate-800 p-3 text-xs overflow-auto">{result}</pre>
-      )}
-      <Link href="/suite-runs" className="block text-sm text-emerald-400 hover:underline">
-        → Chạy suite
-      </Link>
-    </div>
+
+        <section className={`${ui.card} space-y-4`}>
+          <div>
+            <label className={ui.label} htmlFor="ed-project">
+              Project ID
+            </label>
+            <input
+              id="ed-project"
+              className={`${ui.input} font-mono text-xs`}
+              value={projectId}
+              onChange={(e) => setProjectId(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={ui.label} htmlFor="ed-case">
+              Test case ID
+            </label>
+            <input
+              id="ed-case"
+              className={`${ui.input} font-mono text-xs`}
+              value={testCaseId}
+              onChange={(e) => setTestCaseId(e.target.value)}
+            />
+          </div>
+          <button type="button" onClick={() => void publish()} className={`${ui.btnPrimary} gap-2`}>
+            <FiSend className="h-4 w-4" aria-hidden />
+            Publish test
+          </button>
+          {result && <pre className={ui.pre}>{result}</pre>}
+          <Link href="/suite-runs" className={ui.link}>
+            → Chạy suite
+          </Link>
+        </section>
+      </div>
+    </main>
   );
 }

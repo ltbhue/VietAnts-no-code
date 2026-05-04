@@ -3,6 +3,7 @@ import type { PrismaClient } from "../generated/prisma/client";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/auth";
 import { executeSuiteRun } from "../services/suite-runner";
+import { projectAccessibleWhere } from "../lib/projectAccess";
 
 const startRunSchema = z.object({
   environment: z.string().optional(),
@@ -22,7 +23,7 @@ export default function suiteRunsRouter(prisma: PrismaClient) {
     const suite = await prisma.testSuite.findFirst({
       where: {
         id: req.params.suiteId as string,
-        project: { ownerId: req.user!.id },
+        project: projectAccessibleWhere(req.user!.id),
       },
     });
     if (!suite) {
@@ -64,7 +65,7 @@ export default function suiteRunsRouter(prisma: PrismaClient) {
       where: {
         id: req.params.runId as string,
         suiteId: req.params.suiteId as string,
-        suite: { project: { ownerId: req.user!.id } },
+        suite: { project: projectAccessibleWhere(req.user!.id) },
       },
     });
     if (!run) {

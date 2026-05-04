@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { downloadRunPdf, getApiBase } from "@/lib/api";
+import { PageHeader } from "@/components/PageHeader";
+import { ui } from "@/lib/ui";
 
 interface Run {
   id: string;
@@ -92,54 +94,55 @@ export default function ReportsPage() {
   const failed = runs.filter((r) => r.status === "failed").length;
 
   return (
-    <main className="min-h-screen p-6 md:p-8 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-2">Báo cáo &amp; thống kê</h1>
-      <p className="text-sm text-slate-400 mb-6">
-        Tải PDF từng lần chạy hoặc xem kết quả từng bước.
-      </p>
+    <main className={ui.content}>
+      <div className={ui.wide}>
+        <PageHeader
+          title="Báo cáo"
+          subtitle="Tải PDF từng lần chạy, xem trạng thái và chi tiết kết quả từng bước."
+        />
 
-      {loading && <p className="text-sm text-slate-300">Đang tải...</p>}
-      {error && <p className="text-sm text-red-400 mb-3">{error}</p>}
+      {loading && <p className="text-sm text-slate-400">Đang tải…</p>}
+      {error && <p className={`${ui.alertError} mb-4`}>{error}</p>}
 
       <section className="grid gap-4 md:grid-cols-3 mb-6 text-sm">
-        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-          <div className="text-slate-300 mb-1">Tổng số lần chạy</div>
+        <div className={ui.statCard}>
+          <div className="text-slate-400 mb-1">Tổng số lần chạy</div>
           <div className="text-2xl font-semibold">{total}</div>
         </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-          <div className="text-slate-300 mb-1">Pass</div>
+        <div className={ui.statCard}>
+          <div className="text-slate-400 mb-1">Pass</div>
           <div className="text-2xl font-semibold text-emerald-400">{passed}</div>
         </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-          <div className="text-slate-300 mb-1">Fail</div>
+        <div className={ui.statCard}>
+          <div className="text-slate-400 mb-1">Fail</div>
           <div className="text-2xl font-semibold text-red-400">{failed}</div>
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-xs">
-        <h2 className="text-sm font-medium mb-3">Lần chạy</h2>
-        <div className="overflow-auto">
-          <table className="min-w-full border-collapse">
+      <section className={`${ui.card} text-sm`}>
+        <p className={`${ui.sectionTitle} mb-4`}>Lần chạy gần đây</p>
+        <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+          <table className="min-w-full border-collapse text-sm">
             <thead>
-              <tr className="border-b border-slate-800 text-slate-300">
-                <th className="py-2 pr-3 text-left">Kịch bản</th>
-                <th className="py-2 pr-3 text-left">Bắt đầu</th>
-                <th className="py-2 pr-3 text-left">Kết thúc</th>
-                <th className="py-2 pr-3 text-left">Trạng thái</th>
-                <th className="py-2 pr-3 text-left">Thao tác</th>
+              <tr className="border-b border-slate-800 bg-slate-950/50 text-slate-400 text-xs uppercase tracking-wide">
+                <th className="py-3 px-4 text-left">Kịch bản</th>
+                <th className="py-3 px-4 text-left">Bắt đầu</th>
+                <th className="py-3 px-4 text-left">Kết thúc</th>
+                <th className="py-3 px-4 text-left">Trạng thái</th>
+                <th className="py-3 px-4 text-left">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {runs.map((r) => (
-                <tr key={r.id} className="border-b border-slate-900">
-                  <td className="py-2 pr-3">{r.script?.name}</td>
-                  <td className="py-2 pr-3 whitespace-nowrap">
+                <tr key={r.id} className="border-b border-slate-800/60 hover:bg-slate-900/30">
+                  <td className="py-3 px-4 font-medium text-white">{r.script?.name}</td>
+                  <td className="py-3 px-4 whitespace-nowrap text-slate-300">
                     {new Date(r.startedAt).toLocaleString("vi-VN")}
                   </td>
-                  <td className="py-2 pr-3 whitespace-nowrap">
+                  <td className="py-3 px-4 whitespace-nowrap text-slate-300">
                     {r.finishedAt ? new Date(r.finishedAt).toLocaleString("vi-VN") : "—"}
                   </td>
-                  <td className="py-2 pr-3">
+                  <td className="py-3 px-4">
                     <span
                       className={
                         r.status === "passed"
@@ -152,20 +155,20 @@ export default function ReportsPage() {
                       {r.status}
                     </span>
                   </td>
-                  <td className="py-2 pr-3">
+                  <td className="py-3 px-4">
                     <div className="flex flex-wrap gap-2">
                       <button
                         type="button"
                         disabled={pdfLoading === r.id}
                         onClick={() => handlePdf(r.id)}
-                        className="text-emerald-400 hover:underline disabled:opacity-50"
+                        className={`${ui.btnSm} text-emerald-400 hover:bg-emerald-950/40 disabled:opacity-50`}
                       >
-                        {pdfLoading === r.id ? "Đang tải..." : "Tải PDF"}
+                        {pdfLoading === r.id ? "Đang tải…" : "Tải PDF"}
                       </button>
                       <button
                         type="button"
                         onClick={() => loadDetail(r.id)}
-                        className="text-slate-300 hover:underline"
+                        className={`${ui.btnSm} text-slate-300 hover:bg-slate-800`}
                       >
                         Chi tiết
                       </button>
@@ -186,19 +189,20 @@ export default function ReportsPage() {
       </section>
 
       {(detail || detailLoading) && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl max-w-2xl w-full max-h-[85vh] overflow-auto p-5 shadow-xl">
-            <div className="flex justify-between items-start gap-2 mb-3">
-              <h3 className="font-medium text-sm">Chi tiết run</h3>
+        <div className={ui.modalOverlay}>
+          <div className="max-w-2xl w-full max-h-[85vh] overflow-auto rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl shadow-black/50">
+            <div className="flex justify-between items-start gap-2 mb-4">
+              <h3 className="text-lg font-semibold text-white">Chi tiết run</h3>
               <button
                 type="button"
                 onClick={() => setDetail(null)}
-                className="text-slate-400 hover:text-white text-lg leading-none"
+                className="rounded-lg px-2 py-1 text-slate-400 hover:bg-slate-800 hover:text-white text-xl leading-none"
+                aria-label="Đóng"
               >
                 ×
               </button>
             </div>
-            {detailLoading && <p className="text-xs text-slate-400">Đang tải...</p>}
+            {detailLoading && <p className="text-sm text-slate-400">Đang tải…</p>}
             {detail && !detailLoading && (
               <div className="space-y-2 text-xs">
                 <p>
@@ -236,6 +240,7 @@ export default function ReportsPage() {
           </div>
         </div>
       )}
+      </div>
     </main>
   );
 }

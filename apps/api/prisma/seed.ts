@@ -11,7 +11,7 @@ const prisma = new PrismaClient({
 async function main() {
   const adminEmail = "admin@vietants.com";
   const testerEmail = "tester@vietants.com";
-  const password = "Password123!";
+  const password = "123456@";
   const passwordHash = await bcrypt.hash(password, 10);
 
   const admin = await prisma.user.upsert({
@@ -58,6 +58,12 @@ async function main() {
         ownerId: admin.id,
       },
     }));
+
+  await prisma.projectMember.upsert({
+    where: { projectId_userId: { projectId: projectFinal.id, userId: tester.id } },
+    update: {},
+    create: { projectId: projectFinal.id, userId: tester.id },
+  });
 
   const scriptName = "Đăng nhập demo";
   const scriptExisting = await prisma.testScript.findFirst({

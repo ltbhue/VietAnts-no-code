@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getUserRole, type UserRole } from "@/lib/api";
+import { getUserRole } from "@/lib/api";
 import {
   FiBarChart2,
   FiBookOpen,
@@ -22,13 +22,6 @@ import {
   FiX,
 } from "react-icons/fi";
 
-type MenuLink = {
-  href: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  roles?: UserRole[];
-};
-
 const menuGroups = [
   {
     title: "Tổng quan",
@@ -38,7 +31,7 @@ const menuGroups = [
     ],
   },
   {
-    title: "No-code mới",
+    title: "Kiểm thử nhanh",
     links: [
       { href: "/recorder", label: "Recorder", icon: FiClipboard, roles: ["ADMIN", "TESTER"] },
       { href: "/editor", label: "Biên tập", icon: FiEdit3, roles: ["ADMIN", "TESTER"] },
@@ -46,7 +39,7 @@ const menuGroups = [
     ],
   },
   {
-    title: "Nghiệp vụ cũ",
+    title: "Kiểm thử kịch bản",
     links: [
       { href: "/scripts", label: "Kịch bản", icon: FiBookOpen, roles: ["ADMIN", "TESTER", "VIEWER"] },
       { href: "/objects", label: "Đối tượng UI", icon: FiBox, roles: ["ADMIN", "TESTER", "VIEWER"] },
@@ -60,6 +53,20 @@ const menuGroups = [
   },
 ];
 
+function readAuthUserDisplay(): { name: string; email: string } {
+  try {
+    const raw = localStorage.getItem("authUser");
+    if (!raw) return { name: "Tài khoản", email: "" };
+    const user = JSON.parse(raw) as { fullName?: string; email?: string };
+    return {
+      name: user.fullName || user.email || "Tài khoản",
+      email: user.email || "",
+    };
+  } catch {
+    return { name: "Tài khoản", email: "" };
+  }
+}
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -69,19 +76,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const role = getUserRole();
   const bare = pathname === "/login" || pathname === "/";
-  const userInfo = useMemo(() => {
-    try {
-      const raw = localStorage.getItem("authUser");
-      if (!raw) return { name: "Tài khoản", email: "" };
-      const user = JSON.parse(raw) as { fullName?: string; email?: string };
-      return {
-        name: user.fullName || user.email || "Tài khoản",
-        email: user.email || "",
-      };
-    } catch {
-      return { name: "Tài khoản", email: "" };
-    }
-  }, [pathname]);
+  const userInfo = readAuthUserDisplay();
 
   const visibleMenuGroups = useMemo(
     () =>
@@ -116,7 +111,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, [bare, canAccessCurrentPath, router]);
 
   useEffect(() => {
-    setUserMenuOpen(false);
+    queueMicrotask(() => setUserMenuOpen(false));
   }, [pathname]);
 
   useEffect(() => {
@@ -163,7 +158,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <aside
         className={`${collapsed ? "w-20" : "w-64"} ${
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        } fixed md:static left-0 top-0 h-full shrink-0 border-r border-slate-800 bg-slate-900/95 backdrop-blur px-3 py-4 flex flex-col gap-3 z-50 transition-all duration-300 ease-out`}
+        } fixed md:static left-0 top-0 h-full shrink-0 border-r border-slate-800/90 bg-slate-900/98 backdrop-blur-md px-3 py-4 flex flex-col gap-3 z-50 transition-all duration-300 ease-out shadow-[4px_0_24px_-8px_rgba(0,0,0,0.5)]`}
       >
         <div className="flex items-center justify-between gap-2">
           <Link href="/dashboard" className="font-semibold text-emerald-400 text-sm px-2 truncate transition-all duration-200">
@@ -195,17 +190,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           {visibleMenuGroups.map((group) => (
             <div key={group.title} className="space-y-1">
               {!collapsed && <div className="px-2 text-[11px] uppercase tracking-wide text-slate-500">{group.title}</div>}
-              {group.links.map((l: MenuLink) => {
+              {group.links.map((l) => {
                 const Icon = l.icon;
                 return (
                 <Link
                   key={l.href}
                   href={l.href}
                   onClick={() => setMobileOpen(false)}
-                  className={`group flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-all duration-200 ${
+                  className={`group flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${
                     pathname === l.href || pathname.startsWith(l.href + "/")
-                      ? "bg-emerald-600 text-slate-950 font-medium shadow-sm"
-                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                      ? "bg-emerald-600 text-slate-950 font-semibold shadow-md shadow-emerald-900/20"
+                      : "text-slate-300 hover:bg-slate-800/80 hover:text-white"
                   }`}
                   title={l.label}
                 >
@@ -219,13 +214,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
       </aside>
-      <main className="flex-1 min-w-0 md:ml-0 h-screen overflow-y-auto transition-all duration-300 ease-out">
-        <div className="sticky top-0 z-30 flex justify-end px-4 md:px-6 py-3 bg-slate-950/75 backdrop-blur border-b border-slate-800">
+      <main className="flex-1 min-w-0 md:ml-0 h-screen overflow-y-auto transition-all duration-300 ease-out bg-gradient-to-b from-slate-950/80 to-slate-900/50">
+        <div className="sticky top-0 z-30 flex justify-end px-4 md:px-6 py-3 bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80">
           <div className="relative" ref={userMenuRef}>
             <button
               type="button"
               onClick={() => setUserMenuOpen((v) => !v)}
-              className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 hover:bg-slate-800 inline-flex items-center gap-2"
+              className="rounded-xl border border-slate-700 bg-slate-900/90 px-3 py-2 text-sm text-slate-100 hover:bg-slate-800 hover:border-slate-600 inline-flex items-center gap-2 transition-colors"
               title={userInfo.name}
             >
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-slate-950 text-xs font-semibold">
@@ -234,7 +229,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               {userInfo.name}
             </button>
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-64 rounded-lg border border-slate-700 bg-slate-900 p-2 shadow-lg">
+              <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-700 bg-slate-900/95 p-2 shadow-xl shadow-black/40 backdrop-blur-sm">
                 <div className="px-3 py-2 border-b border-slate-800">
                   <div className="text-sm font-medium text-slate-100">{userInfo.name}</div>
                   <div className="text-xs text-slate-400">{userInfo.email || "Không có email"}</div>

@@ -23,6 +23,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   projects    Project[]
+  projectMemberships ProjectMember[]
   testScripts TestScript[] @relation("TestScriptCreatedBy")
   testRuns    TestRun[]
 }
@@ -47,6 +48,7 @@ model Project {
 
   owner      User       @relation(fields: [ownerId], references: [id], onDelete: Restrict)
   workspace  Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  members    ProjectMember[]
   testScripts TestScript[]
   uiObjects   UiObject[]
   datasets    DataSet[]
@@ -55,6 +57,20 @@ model Project {
 
   @@index([ownerId])
   @@index([workspaceId])
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
 }
 
 model TestScript {

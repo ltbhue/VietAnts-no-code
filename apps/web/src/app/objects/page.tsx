@@ -4,6 +4,8 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { canMutateNoCode, getApiBase, getUserRole } from "@/lib/api";
+import { PageHeader } from "@/components/PageHeader";
+import { ui } from "@/lib/ui";
 
 interface Project {
   id: string;
@@ -78,10 +80,12 @@ function ObjectsPageInner() {
 
   useEffect(() => {
     if (projects.length === 0) return;
-    setProjectId((prev) => {
-      if (qp && projects.some((p) => p.id === qp)) return qp;
-      if (prev && projects.some((p) => p.id === prev)) return prev;
-      return projects[0].id;
+    queueMicrotask(() => {
+      setProjectId((prev) => {
+        if (qp && projects.some((p) => p.id === qp)) return qp;
+        if (prev && projects.some((p) => p.id === prev)) return prev;
+        return projects[0].id;
+      });
     });
   }, [projects, qp]);
 
@@ -139,20 +143,21 @@ function ObjectsPageInner() {
   }
 
   return (
-    <main className="min-h-screen p-6 md:p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-2">Đối tượng UI (locator)</h1>
-      <p className="text-sm text-slate-300 mb-6">
-        Dùng trong bước kịch bản qua <code className="text-emerald-400">targetId</code> (cuid của đối tượng).
-      </p>
+    <main className={ui.content}>
+      <div className={ui.narrow}>
+        <PageHeader
+          title="Đối tượng UI"
+          subtitle="Lưu locator có tên — dùng trong kịch bản qua targetId (cuid của đối tượng)."
+        />
 
-      {loading && <p className="text-sm text-slate-400">Đang tải...</p>}
-      {error && <p className="text-sm text-red-400 mb-2">{error}</p>}
-      {msg && <p className="text-sm text-emerald-400 mb-2">{msg}</p>}
+      {loading && <p className="text-sm text-slate-400">Đang tải…</p>}
+      {error && <p className={`${ui.alertError} mb-3`}>{error}</p>}
+      {msg && <p className={`${ui.alertOk} mb-3`}>{msg}</p>}
 
-      <div className="mb-6">
-        <label className="text-xs text-slate-400">Project</label>
+      <div className={`${ui.cardCompact} mb-6`}>
+        <label className={ui.label}>Project</label>
         <select
-          className="mt-1 block rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+          className={ui.select}
           value={projectId}
           onChange={(e) => setProjectId(e.target.value)}
         >
@@ -165,16 +170,13 @@ function ObjectsPageInner() {
       </div>
 
       {canMutate && (
-        <form
-          onSubmit={handleCreate}
-          className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 mb-8 space-y-3"
-        >
-          <h2 className="text-sm font-medium">Thêm đối tượng</h2>
+        <form onSubmit={handleCreate} className={`${ui.card} mb-8 space-y-4`}>
+          <p className={ui.sectionTitle}>Thêm đối tượng</p>
         <div className="grid md:grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-slate-400">Tên</label>
+            <label className={ui.label}>Tên</label>
             <input
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className={ui.input}
               value={name}
               onChange={(e) => setName(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
               maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
@@ -182,9 +184,9 @@ function ObjectsPageInner() {
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Locator (CSS / text Playwright)</label>
+            <label className={ui.label}>Locator (CSS / text Playwright)</label>
             <input
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className={`${ui.input} font-mono text-xs`}
               value={locator}
               onChange={(e) => setLocator(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
               maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
@@ -194,33 +196,30 @@ function ObjectsPageInner() {
           </div>
         </div>
         <div>
-          <label className="text-xs text-slate-400">Mô tả</label>
+          <label className={ui.label}>Mô tả</label>
           <textarea
-            className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+            className={ui.textarea}
             value={description}
             onChange={(e) => setDescription(e.target.value.slice(0, DEFAULT_TEXTBOX_MAX_LENGTH))}
             maxLength={DEFAULT_TEXTBOX_MAX_LENGTH}
             rows={4}
           />
         </div>
-          <button
-            type="submit"
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-slate-950"
-          >
-            Thêm
+          <button type="submit" className={ui.btnPrimary}>
+            Thêm đối tượng
           </button>
         </form>
       )}
 
-      <section className="space-y-2">
-        <h2 className="text-sm font-medium mb-2">Danh sách</h2>
+      <section className="space-y-3">
+        <p className={ui.sectionTitle}>Danh sách</p>
         {objects.map((o) => (
           <div
             key={o.id}
-            className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-slate-800 bg-slate-900/40 px-3 py-2 text-sm"
+            className={`flex flex-wrap items-start justify-between gap-2 ${ui.cardCompact} text-sm`}
           >
             <div>
-              <div className="font-medium">{o.name}</div>
+              <div className="font-semibold text-white">{o.name}</div>
               <div className="text-xs text-slate-400 font-mono">{o.locator}</div>
               <div className="text-[10px] text-slate-500 mt-1">id: {o.id}</div>
             </div>
@@ -241,6 +240,7 @@ function ObjectsPageInner() {
           <p className="text-xs text-slate-500">Chưa có đối tượng.</p>
         )}
       </section>
+      </div>
     </main>
   );
 }
