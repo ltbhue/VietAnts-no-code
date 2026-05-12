@@ -11,7 +11,9 @@ interface Run {
   status: string;
   startedAt: string;
   finishedAt?: string;
+  scriptId?: string;
   script: {
+    id?: string;
     name: string;
   };
 }
@@ -24,10 +26,31 @@ interface RunDetail extends Run {
     message?: string | null;
     screenshot?: string | null;
   }>;
+  stepMeta?: Array<{
+    order: number;
+    keyword: string;
+    targetId?: string | null;
+  }>;
+  objectMap?: Array<{
+    id: string;
+    name: string;
+    locator: string;
+  }>;
+}
+
+function viStatus(status: string): string {
+  if (status === "passed") return "Thành công";
+  if (status === "failed") return "Thất bại";
+  if (status === "queued") return "Đang chờ";
+  if (status === "running") return "Đang chạy";
+  return status;
 }
 
 export default function ReportsPage() {
   const [runs, setRuns] = useState<Run[]>([]);
+  const [scripts, setScripts] = useState<Array<{ id: string; name: string }>>([]);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedScriptId, setSelectedScriptId] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
@@ -44,10 +67,19 @@ export default function ReportsPage() {
     }
     async function load() {
       try {
-        const res = await axios.get<Run[]>(`${apiBase}/runs`, {
+        const params = new URLSearchParams();
+        if (selectedStatus) params.set("status", selectedStatus);
+        if (selectedScriptId) params.set("scriptId", selectedScriptId);
+        const res = await axios.get<Run[]>(`${apiBase}/runs${params.toString() ? `?${params.toString()}` : ""}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRuns(res.data);
+        const map = new Map<string, string>();
+        for (const r of res.data) {
+          const sid = r.script?.id ?? r.scriptId;
+          if (sid) map.set(sid, r.script?.name ?? sid);
+        }
+        setScripts([...map.entries()].map(([id, name]) => ({ id, name })));
       } catch (err: unknown) {
         const e = err as { response?: { data?: { error?: string } } };
         setError(e?.response?.data?.error ?? "Không tải được dữ liệu runs");
@@ -56,7 +88,7 @@ export default function ReportsPage() {
       }
     }
     load();
-  }, [apiBase]);
+  }, [apiBase, selectedScriptId, selectedStatus]);
 
   async function loadDetail(id: string) {
     const token = localStorage.getItem("authToken");
@@ -89,6 +121,12 @@ export default function ReportsPage() {
     }
   }
 
+  function getScreenshotUrl(screenshotPath: string): string {
+    if (/^https?:\/\//i.test(screenshotPath)) return screenshotPath;
+    const normalized = screenshotPath.startsWith("/") ? screenshotPath : `/${screenshotPath}`;
+    return `${apiBase}${normalized}`;
+  }
+
   const total = runs.length;
   const passed = runs.filter((r) => r.status === "passed").length;
   const failed = runs.filter((r) => r.status === "failed").length;
@@ -110,12 +148,42 @@ export default function ReportsPage() {
           <div className="text-2xl font-semibold">{total}</div>
         </div>
         <div className={ui.statCard}>
-          <div className="text-slate-400 mb-1">Pass</div>
+          <div className="text-slate-400 mb-1">Thành công</div>
           <div className="text-2xl font-semibold text-emerald-400">{passed}</div>
         </div>
         <div className={ui.statCard}>
-          <div className="text-slate-400 mb-1">Fail</div>
+          <div className="text-slate-400 mb-1">Thất bại</div>
           <div className="text-2xl font-semibold text-red-400">{failed}</div>
+        </div>
+      </section>
+
+      <section className={`${ui.card} mb-6`}>
+        <p className={`${ui.sectionTitle} mb-3`}>Bộ lọc báo cáo</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <select className={ui.select} value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+            <option value="">Tất cả trạng thái</option>
+            <option value="passed">Thành công</option>
+            <option value="failed">Thất bại</option>
+            <option value="queued">Đang chờ</option>
+          </select>
+          <select className={ui.select} value={selectedScriptId} onChange={(e) => setSelectedScriptId(e.target.value)}>
+            <option value="">Tất cả kịch bản</option>
+            {scripts.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedStatus("");
+              setSelectedScriptId("");
+            }}
+            className={ui.btnSecondary}
+          >
+            Xóa bộ lọc
+          </button>
         </div>
       </section>
 
@@ -152,7 +220,7 @@ export default function ReportsPage() {
                             : "text-slate-200"
                       }
                     >
-                      {r.status}
+                      {viStatus(r.status)}
                     </span>
                   </td>
                   <td className="py-3 px-4">
@@ -212,25 +280,66 @@ export default function ReportsPage() {
                   <span className="text-slate-500">Script:</span> {detail.script?.name}
                 </p>
                 <p>
-                  <span className="text-slate-500">Trạng thái:</span> {detail.status}
+                  <span className="text-slate-500">Trạng thái:</span> {viStatus(detail.status)}
                 </p>
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    disabled={pdfLoading === detail.id}
+                    onClick={() => handlePdf(detail.id)}
+                    className={`${ui.btnSm} text-emerald-400 hover:bg-emerald-950/40 disabled:opacity-50`}
+                  >
+                    {pdfLoading === detail.id ? "Đang tải PDF…" : "Tải PDF báo cáo"}
+                  </button>
+                </div>
                 <div className="border-t border-slate-800 pt-2 mt-2">
                   <div className="text-slate-400 mb-1">Kết quả từng bước</div>
                   <ul className="space-y-1 font-mono text-[11px]">
                     {(detail.results ?? []).map((x) => (
                       <li key={x.id} className="border-b border-slate-800/80 pb-1">
+                        {(() => {
+                          const meta = (detail.stepMeta ?? []).find((m) => m.order === x.stepOrder);
+                          const obj = meta?.targetId
+                            ? (detail.objectMap ?? []).find((o) => o.id === meta.targetId)
+                            : undefined;
+                          return (
+                            <>
                         Bước {x.stepOrder}:{" "}
                         <span
                           className={
                             x.status === "passed" ? "text-emerald-400" : "text-red-400"
                           }
                         >
-                          {x.status}
+                          {viStatus(x.status)}
                         </span>
+                              {meta?.keyword ? <span className="text-slate-500"> ({meta.keyword})</span> : null}
                         {x.message && <span className="text-slate-400"> — {x.message}</span>}
-                        {x.screenshot && (
-                          <div className="text-slate-500 mt-0.5">Screenshot: {x.screenshot}</div>
-                        )}
+                              {obj ? (
+                                <div className="text-emerald-400 mt-0.5">
+                                  Object: {obj.name} <span className="text-slate-500">({obj.id})</span>
+                                </div>
+                              ) : null}
+                              {x.screenshot && (
+                                <div className="mt-2 space-y-1.5">
+                                  <a
+                                    href={getScreenshotUrl(x.screenshot)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-emerald-400 hover:underline text-[11px]"
+                                  >
+                                    Mở ảnh lỗi: {x.screenshot}
+                                  </a>
+                                  <img
+                                    src={getScreenshotUrl(x.screenshot)}
+                                    alt={`Screenshot bước ${x.stepOrder}`}
+                                    className="max-h-64 w-auto rounded-md border border-slate-700 bg-slate-950"
+                                    loading="lazy"
+                                  />
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
                       </li>
                     ))}
                   </ul>

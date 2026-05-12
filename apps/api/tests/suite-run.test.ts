@@ -20,6 +20,9 @@ beforeAll(async () => {
         name: "Regression",
       }),
     },
+    projectTelegramConfig: {
+      findUnique: async () => null,
+    },
     suiteRun: {
       create: async () => ({ id: "run1" }),
       findUnique: async (args: { where: { id: string }; include?: unknown }) => {
@@ -28,6 +31,8 @@ beforeAll(async () => {
           return {
             id: "run1",
             suite: {
+              projectId: "p1",
+              name: "Regression",
               items: [
                 {
                   testCaseVersionId: "ver1",

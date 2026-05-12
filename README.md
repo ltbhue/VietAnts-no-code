@@ -125,7 +125,7 @@ Trong thư mục `docs/`:
 - `design/use-cases.md`: Use case chính.
 - `design/sequence-diagrams.md`: Mô tả sequence diagram.
 - `design/class-diagram-notes.md`: Ghi chú sơ đồ lớp.
-- `manual/user-manual.md`: Hướng dẫn sử dụng cho người dùng.
+- `final/04-user-manual.md`: Hướng dẫn sử dụng cho người dùng (bản nộp theo khung tài liệu).
 - `README.md`: Mục lục tài liệu và thứ tự đọc khuyến nghị.
 - `final/06-system-architecture-diagrams.md`: Bộ sơ đồ tổng hợp mới nhất (Mermaid) cho báo cáo.
 

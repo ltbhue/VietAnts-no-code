@@ -75,14 +75,12 @@ function ScriptsPageInner() {
 
   const loadScripts = useCallback(async () => {
     if (!token) return;
-    const res = await axios.get<Script[]>(`${apiBase}/scripts`, {
+    const params = new URLSearchParams();
+    if (projectIdFilter) params.set("projectId", projectIdFilter);
+    const res = await axios.get<Script[]>(`${apiBase}/scripts${params.toString() ? `?${params.toString()}` : ""}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const all = res.data;
-    const filtered = projectIdFilter
-      ? all.filter((s) => s.projectId === projectIdFilter)
-      : all;
-    setScripts(filtered);
+    setScripts(res.data);
   }, [apiBase, token, projectIdFilter]);
 
   useEffect(() => {
@@ -94,8 +92,7 @@ function ScriptsPageInner() {
       setLoading(true);
       setError(null);
       try {
-        await loadProjects();
-        await loadScripts();
+        await Promise.all([loadProjects(), loadScripts()]);
       } catch (err: unknown) {
         const e = err as { response?: { data?: { error?: string } } };
         setError(e?.response?.data?.error ?? "Không tải dữ liệu");
@@ -148,7 +145,7 @@ function ScriptsPageInner() {
       <div className={ui.wide}>
         <PageHeader
           title="Kịch bản kiểm thử"
-          subtitle="Keywords: navigate, click, fill, assertText — mở từng kịch bản để thêm bước và chạy thử."
+          subtitle="Từ khóa: navigate, click, fill, assertText — mở từng kịch bản để thêm bước và chạy thử."
           actions={
             canMutate ? (
               <button type="button" onClick={() => setShowCreate(true)} className={ui.btnPrimary}>

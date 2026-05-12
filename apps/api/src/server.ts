@@ -21,6 +21,7 @@ export function buildServer(options?: BuildServerOptions) {
 
   app.use(cors());
   app.use(express.json());
+  app.use("/screenshots", express.static("screenshots"));
 
   app.get("/health", (_req, res) => {
     res.json({ status: "ok" });

@@ -30,7 +30,7 @@ export default function projectsRouter(prisma: PrismaClient) {
     res.json(projects);
   });
 
-  router.post("/", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
+  router.post("/", requireRole(["ADMIN"]), async (req, res) => {
     const parse = projectSchema.safeParse(req.body);
     if (!parse.success) {
       return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
@@ -77,7 +77,7 @@ export default function projectsRouter(prisma: PrismaClient) {
     res.json(project);
   });
 
-  router.put("/:id", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
+  router.put("/:id", requireRole(["ADMIN"]), async (req, res) => {
     const parse = projectSchema.partial().safeParse(req.body);
     if (!parse.success) {
       return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });

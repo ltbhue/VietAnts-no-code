@@ -16,8 +16,17 @@ export default function runsRouter(prisma: PrismaClient) {
   router.use(authMiddleware);
 
   router.get("/", async (req, res) => {
+    const status = (req.query.status as string | undefined)?.trim();
+    const scriptId = (req.query.scriptId as string | undefined)?.trim();
+    const projectId = (req.query.projectId as string | undefined)?.trim();
+
     const runs = await prisma.testRun.findMany({
-      where: { userId: req.user!.id },
+      where: {
+        userId: req.user!.id,
+        ...(status ? { status } : {}),
+        ...(scriptId ? { scriptId } : {}),
+        ...(projectId ? { script: { projectId } } : {}),
+      },
       orderBy: { startedAt: "desc" },
       include: { script: true },
     });
@@ -143,10 +152,32 @@ export default function runsRouter(prisma: PrismaClient) {
       return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parse.error.flatten() });
     }
     const { scriptId, dataSetId, browser } = parse.data;
+    const script = await prisma.testScript.findFirst({
+      where: {
+        id: scriptId,
+        project: {
+          OR: [{ ownerId: req.user!.id }, { members: { some: { userId: req.user!.id } } }],
+        },
+      },
+      select: { id: true, projectId: true },
+    });
+    if (!script) {
+      return res.status(404).json({ error: "Không tìm thấy kịch bản hoặc bạn không có quyền truy cập" });
+    }
+
+    if (dataSetId) {
+      const dataSet = await prisma.dataSet.findFirst({
+        where: { id: dataSetId, projectId: script.projectId },
+        select: { id: true },
+      });
+      if (!dataSet) {
+        return res.status(400).json({ error: "Bộ dữ liệu không thuộc cùng project với kịch bản" });
+      }
+    }
 
     const result = await executeScriptRun({
       prisma,
-      scriptId,
+      scriptId: script.id,
       userId: req.user!.id,
       dataSetId: dataSetId ?? null,
       browserName: browser ?? "chromium",
@@ -158,10 +189,35 @@ export default function runsRouter(prisma: PrismaClient) {
   router.get("/:id/results", async (req, res) => {
     const run = await prisma.testRun.findFirst({
       where: { id: req.params.id as any, userId: req.user!.id },
-      include: { results: true, script: true },
+      include: {
+        results: true,
+        script: {
+          include: {
+            steps: {
+              orderBy: { order: "asc" },
+              select: { order: true, keyword: true, targetId: true },
+            },
+          },
+        },
+      },
     });
     if (!run) return res.status(404).json({ error: "Không tìm thấy dữ liệu" });
-    res.json(run);
+
+    const objectIds = run.script.steps
+      .map((s) => s.targetId)
+      .filter((id): id is string => typeof id === "string" && id.length > 0);
+    const objects = objectIds.length
+      ? await prisma.uiObject.findMany({
+          where: { id: { in: objectIds } },
+          select: { id: true, name: true, locator: true },
+        })
+      : [];
+
+    res.json({
+      ...run,
+      stepMeta: run.script.steps,
+      objectMap: objects,
+    });
   });
 
   router.get("/:id/report.pdf", requireRole(["ADMIN", "TESTER", "VIEWER"]), async (req, res) => {

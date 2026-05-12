@@ -21,7 +21,10 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     return res.status(401).json({ error: "Thiếu header xác thực" });
   }
   const token = header.slice("Bearer ".length);
-  const jwtSecret = process.env.JWT_SECRET || "CHANGE_ME_IN_PRODUCTION";
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    return res.status(500).json({ error: "Thiếu cấu hình JWT_SECRET trên server" });
+  }
 
   try {
     const decoded = jwt.verify(token, jwtSecret) as AuthUser & { sub?: string };

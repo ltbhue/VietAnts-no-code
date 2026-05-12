@@ -127,6 +127,7 @@ export default function DashboardPage() {
     return () => window.clearInterval(timer);
   }, [refreshAll]);
 
+
   return (
     <main className={ui.content}>
       <div className={ui.wide}>
@@ -206,13 +207,13 @@ export default function DashboardPage() {
             <div className="text-xl font-semibold">{analytics?.total ?? runs.length}</div>
           </div>
           <div className={ui.statCard}>
-            <div className="text-slate-400">Pass</div>
+            <div className="text-slate-400">Thành công</div>
             <div className="text-xl font-semibold text-emerald-400">
               {analytics?.passed ?? runs.filter((r) => r.status === "passed" || r.status === "completed").length}
             </div>
           </div>
           <div className={ui.statCard}>
-            <div className="text-slate-400">Fail</div>
+            <div className="text-slate-400">Thất bại</div>
             <div className="text-xl font-semibold text-red-400">
               {analytics?.failed ?? runs.filter((r) => r.status === "failed").length}
             </div>
@@ -220,7 +221,7 @@ export default function DashboardPage() {
         </div>
         <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className={`${ui.statCard} p-4`}>
-            <div className="text-sm font-semibold text-slate-200 mb-3">Biểu đồ Pass/Fail</div>
+            <div className="text-sm font-semibold text-slate-200 mb-3">Biểu đồ Thành công/Thất bại</div>
             {(() => {
               const pass = analytics?.passed ?? runs.filter((r) => r.status === "passed" || r.status === "completed").length;
               const fail = analytics?.failed ?? runs.filter((r) => r.status === "failed").length;
@@ -234,14 +235,14 @@ export default function DashboardPage() {
                       className="w-16 rounded-t bg-emerald-500/80 transition-all duration-500"
                       style={{ height: `${passHeight}px` }}
                     />
-                    <div className="text-xs text-slate-300">Pass ({pass})</div>
+                    <div className="text-xs text-slate-300">Thành công ({pass})</div>
                   </div>
                   <div className="flex flex-col items-center gap-2">
                     <div
                       className="w-16 rounded-t bg-red-500/80 transition-all duration-500"
                       style={{ height: `${failHeight}px` }}
                     />
-                    <div className="text-xs text-slate-300">Fail ({fail})</div>
+                    <div className="text-xs text-slate-300">Thất bại ({fail})</div>
                   </div>
                 </div>
               );
@@ -295,7 +296,7 @@ export default function DashboardPage() {
             <div className="mt-2 text-xs text-slate-400">Xanh: Pass, Đỏ: Fail</div>
           </div>
           <div className={`${ui.statCard} p-4`}>
-            <div className="text-sm font-semibold text-slate-200 mb-3">Donut Pass/Fail</div>
+            <div className="text-sm font-semibold text-slate-200 mb-3">Donut Thành công/Thất bại</div>
             {(() => {
               const pass = analytics?.passed ?? 0;
               const fail = analytics?.failed ?? 0;
@@ -314,8 +315,8 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div className="text-sm space-y-2">
-                    <div className="text-emerald-300">Pass: {pass}</div>
-                    <div className="text-red-300">Fail: {fail}</div>
+                    <div className="text-emerald-300">Thành công: {pass}</div>
+                    <div className="text-red-300">Thất bại: {fail}</div>
                     <div className="text-slate-400">Tổng: {pass + fail}</div>
                   </div>
                 </div>

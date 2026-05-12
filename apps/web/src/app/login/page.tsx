@@ -49,7 +49,7 @@ export default function LoginPage() {
         <div className="mb-6 text-center space-y-2">
           <p className="text-xs font-semibold uppercase tracking-widest text-emerald-500/90">Vietants</p>
           <h1 className="text-2xl font-bold text-white">Đăng nhập</h1>
-          <p className="text-sm text-slate-400">No-code testing — quản lý kịch bản và báo cáo chạy thử.</p>
+          <p className="text-sm text-slate-400">Kiểm thử không cần viết mã — quản lý kịch bản và báo cáo chạy thử.</p>
         </div>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
@@ -94,6 +94,17 @@ export default function LoginPage() {
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-500">
+          Chưa có tài khoản?{" "}
+          <Link href="/register" className={ui.link}>
+            Đăng ký
+          </Link>
+        </p>
+        <p className="mt-2 text-center text-sm text-slate-500">
+          <Link href="/forgot-password" className={ui.link}>
+            Quên mật khẩu?
+          </Link>
+        </p>
+        <p className="mt-2 text-center text-sm text-slate-500">
           <Link href="/" className={ui.link}>
             ← Về trang giới thiệu
           </Link>

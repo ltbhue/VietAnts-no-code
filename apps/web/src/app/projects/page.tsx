@@ -83,6 +83,8 @@ export default function ProjectsPage() {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsers(uRes.data.filter((u) => u.role !== "ADMIN"));
+      } else {
+        setUsers([]);
       }
     } catch (err: unknown) {
       const e = err as { response?: { data?: { error?: string } } };
@@ -108,10 +110,13 @@ export default function ProjectsPage() {
     );
   }, [projects, search]);
 
+  const canCreateOrEditProject = role === "ADMIN";
+  const canAssignMembers = role === "ADMIN";
+
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (role !== "ADMIN") {
-      setError("Chỉ ADMIN mới có thể tạo project.");
+    if (!canCreateOrEditProject) {
+      setError("Bạn không có quyền tạo project.");
       return;
     }
     const normalizedName = name.trim().slice(0, PROJECT_NAME_MAX_LENGTH);
@@ -128,7 +133,11 @@ export default function ProjectsPage() {
     try {
       await axios.post(
         `${apiBase}/projects`,
-        { name: normalizedName, description: normalizedDescription || undefined, memberIds },
+        {
+          name: normalizedName,
+          description: normalizedDescription || undefined,
+          ...(canAssignMembers && memberIds.length > 0 ? { memberIds } : {}),
+        },
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setName("");
@@ -154,8 +163,8 @@ export default function ProjectsPage() {
 
   async function saveEdit(e: React.FormEvent) {
     e.preventDefault();
-    if (role !== "ADMIN") {
-      setError("Chỉ ADMIN mới có thể chỉnh sửa project.");
+    if (!canCreateOrEditProject) {
+      setError("Bạn không có quyền chỉnh sửa project.");
       return;
     }
     if (!editing) return;
@@ -167,7 +176,11 @@ export default function ProjectsPage() {
     try {
       await axios.put(
         `${apiBase}/projects/${editing.id}`,
-        { name: editName, description: editDesc || undefined, memberIds: editMemberIds },
+        {
+          name: editName,
+          description: editDesc || undefined,
+          ...(canAssignMembers ? { memberIds: editMemberIds } : {}),
+        },
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setEditing(null);
@@ -207,9 +220,9 @@ export default function ProjectsPage() {
       <div className={ui.wide}>
         <PageHeader
           title="Quản lý project"
-          subtitle={`Tạo, cập nhật và tìm kiếm project. Quyền hiện tại: ${role ?? "Chưa xác định"}.`}
+          subtitle={`Chỉ Admin: tạo / sửa / xóa dự án và gán thành viên. Tester không quản lý dự án trên hệ thống (chỉ làm việc trên dự án được gán). Quyền hiện tại: ${role ?? "—"}.`}
           actions={
-            role === "ADMIN" ? (
+            canCreateOrEditProject ? (
               <button
                 type="button"
                 onClick={() => {
@@ -276,7 +289,7 @@ export default function ProjectsPage() {
                 <td className={`${ui.td} text-slate-400`}>{currentUserName}</td>
                 <td className={ui.td}>
                   <div className="flex flex-wrap gap-2">
-                    {role === "ADMIN" && (
+                    {canCreateOrEditProject && (
                       <button
                         type="button"
                         onClick={() => startEdit(project)}
@@ -343,6 +356,7 @@ export default function ProjectsPage() {
                   rows={4}
                 />
               </div>
+              {canAssignMembers && (
               <div>
                 <label className={ui.label}>Gán Tester/Viewer</label>
                 <select
@@ -358,6 +372,7 @@ export default function ProjectsPage() {
                   ))}
                 </select>
               </div>
+              )}
               <div className="flex gap-2 justify-end pt-2">
                 <button type="button" onClick={() => setEditing(null)} className={ui.btnSecondary}>
                   Hủy
@@ -398,6 +413,7 @@ export default function ProjectsPage() {
                   rows={4}
                 />
               </div>
+              {canAssignMembers && (
               <div>
                 <label className={ui.label}>Gán Tester/Viewer</label>
                 <select
@@ -413,6 +429,7 @@ export default function ProjectsPage() {
                   ))}
                 </select>
               </div>
+              )}
               <div className="flex gap-2 justify-end pt-2">
                 <button type="button" onClick={() => setShowCreateForm(false)} className={ui.btnSecondary}>
                   Hủy

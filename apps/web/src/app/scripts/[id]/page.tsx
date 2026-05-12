@@ -45,6 +45,12 @@ interface DataSet {
   projectId: string;
 }
 
+interface UiObject {
+  id: string;
+  name: string;
+  locator: string;
+}
+
 type StepKeyword = "navigate" | "click" | "fill" | "assertText";
 
 const DEFAULT_TEXTBOX_MAX_LENGTH = 255;
@@ -183,7 +189,9 @@ export default function ScriptDetailPage() {
   const [steps, setSteps] = useState<Step[]>([]);
   const [dirty, setDirty] = useState(false);
   const [datasets, setDatasets] = useState<DataSet[]>([]);
+  const [uiObjects, setUiObjects] = useState<UiObject[]>([]);
   const [runDatasetId, setRunDatasetId] = useState("");
+  const [runBrowser, setRunBrowser] = useState<"chromium" | "firefox" | "webkit">("chromium");
   const [running, setRunning] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -197,6 +205,7 @@ export default function ScriptDetailPage() {
   const [draftValue, setDraftValue] = useState("");
   const [draftDataKey, setDraftDataKey] = useState("");
   const [draftTimeoutMs, setDraftTimeoutMs] = useState("");
+  const [selectedObjectId, setSelectedObjectId] = useState("");
 
   const [runStepVisual, setRunStepVisual] = useState<Map<number, RunStepVisual>>(new Map());
   const [runStepFailureDetail, setRunStepFailureDetail] = useState<Map<number, string>>(new Map());
@@ -216,12 +225,19 @@ export default function ScriptDetailPage() {
     setEditingIndex(null);
     const pid = res.data.projectId;
     if (pid) {
-      const dsRes = await axios.get<DataSet[]>(`${apiBase}/datasets?projectId=${pid}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const [dsRes, objRes] = await Promise.all([
+        axios.get<DataSet[]>(`${apiBase}/datasets?projectId=${pid}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get<UiObject[]>(`${apiBase}/objects?projectId=${pid}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
       setDatasets(dsRes.data);
+      setUiObjects(objRes.data);
     } else {
       setDatasets([]);
+      setUiObjects([]);
     }
   }, [apiBase, scriptId, token]);
 
@@ -270,6 +286,7 @@ export default function ScriptDetailPage() {
     setDraftValue("");
     setDraftDataKey("");
     setDraftTimeoutMs("");
+    setSelectedObjectId("");
   }
 
   function draftTimeoutMsParsed(): number | undefined {
@@ -312,9 +329,22 @@ export default function ScriptDetailPage() {
     setDraftValue(getParam(st, "value"));
     setDraftDataKey(getParam(st, "dataKey"));
     setDraftTimeoutMs(timeoutMsFromStep(st));
+    const selector = getParam(st, "selector");
+    const matchedObject =
+      (st.targetId ? uiObjects.find((o) => o.id === st.targetId) : undefined) ??
+      (selector ? uiObjects.find((o) => o.locator === selector) : undefined);
+    setSelectedObjectId(matchedObject?.id ?? "");
     setEditingIndex(idx);
     setError(null);
     setMsg(null);
+  }
+
+  function pickObject(objectId: string) {
+    setSelectedObjectId(objectId);
+    if (!objectId) return;
+    const found = uiObjects.find((o) => o.id === objectId);
+    if (!found) return;
+    setDraftSelector(found.locator);
   }
 
   function commitDraftStep() {
@@ -330,6 +360,8 @@ export default function ScriptDetailPage() {
     }
 
     let parameters: Record<string, unknown>;
+
+    const targetId = selectedObjectId || null;
 
     if (kw === "navigate") {
       if (!draftUrl.trim()) return setError("Nhập địa chỉ trang (URL) cần mở.");
@@ -369,13 +401,14 @@ export default function ScriptDetailPage() {
           ...cur,
           order: editingIndex,
           keyword: kw,
+          targetId: kw === "navigate" ? null : targetId,
           parameters,
         };
         return prev.map((s, i) => (i === editingIndex ? updated : s));
       });
     } else {
       setSteps((prev) =>
-        [...prev, { order: prev.length, keyword: kw, targetId: null, parameters }].map((s, i) => ({
+        [...prev, { order: prev.length, keyword: kw, targetId: kw === "navigate" ? null : targetId, parameters }].map((s, i) => ({
           ...s,
           order: i,
         })),
@@ -433,11 +466,13 @@ export default function ScriptDetailPage() {
     }
     if (st.keyword === "click") {
       const lines = [`Selector: ${getParam(st, "selector") || "—"}`];
+      if (st.targetId) lines.push(`Object ID: ${st.targetId}`);
       appendTimeoutSummary(lines, st);
       return lines;
     }
     if (st.keyword === "fill") {
       const lines = [`Selector: ${getParam(st, "selector") || "—"}`];
+      if (st.targetId) lines.push(`Object ID: ${st.targetId}`);
       const v = getParam(st, "value");
       const dk = getParam(st, "dataKey");
       if (v) lines.push(`Giá trị: ${v}`);
@@ -447,6 +482,7 @@ export default function ScriptDetailPage() {
     }
     if (st.keyword === "assertText") {
       const lines = [`Selector: ${getParam(st, "selector") || "—"}`];
+      if (st.targetId) lines.push(`Object ID: ${st.targetId}`);
       const ex = getParam(st, "expected");
       const dk = getParam(st, "dataKey");
       if (ex) lines.push(`Mong đợi chứa: ${ex}`);
@@ -499,7 +535,10 @@ export default function ScriptDetailPage() {
     setMsg(null);
     const STAGGER_MS = 120;
     try {
-      const body: { scriptId: string; dataSetId?: string } = { scriptId: script.id };
+      const body: { scriptId: string; dataSetId?: string; browser: "chromium" | "firefox" | "webkit" } = {
+        scriptId: script.id,
+        browser: runBrowser,
+      };
       if (runDatasetId) body.dataSetId = runDatasetId;
       const res = await axios.post<TestRunResponseDto>(`${apiBase}/runs`, body, {
         headers: { Authorization: `Bearer ${token}` },
@@ -733,6 +772,16 @@ export default function ScriptDetailPage() {
                       {d.name}
                     </option>
                   ))}
+                </select>
+                <label className="text-xs font-medium text-slate-400 block mb-1.5">Trình duyệt chạy</label>
+                <select
+                  className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-sm text-slate-200 mb-4 focus:outline-none focus:ring-2 focus:ring-emerald-600/40"
+                  value={runBrowser}
+                  onChange={(e) => setRunBrowser(e.target.value as "chromium" | "firefox" | "webkit")}
+                >
+                  <option value="chromium">Chromium</option>
+                  <option value="firefox">Firefox</option>
+                  <option value="webkit">Webkit</option>
                 </select>
                 <button
                   type="button"

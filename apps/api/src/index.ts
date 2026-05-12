@@ -3,6 +3,9 @@ import { buildServer } from "./server";
 import { prisma } from "./prisma";
 
 dotenv.config();
+if (!process.env.JWT_SECRET) {
+  throw new Error("Missing required env var JWT_SECRET");
+}
 
 const app = buildServer({ prisma });
 const parsedPort = Number(process.env.API_PORT ?? 4000);

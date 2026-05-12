@@ -46,9 +46,20 @@ export default function scriptsRouter(prisma: PrismaClient) {
   router.use(authMiddleware);
 
   router.get("/", async (req, res) => {
+    const projectId = typeof req.query.projectId === "string" ? req.query.projectId.trim() : "";
     const scripts = await prisma.testScript.findMany({
-      where: { project: projectAccessibleWhere(req.user!.id) },
-      include: { project: true },
+      where: {
+        project: projectAccessibleWhere(req.user!.id),
+        ...(projectId ? { projectId } : {}),
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        projectId: true,
+        createdAt: true,
+        project: { select: { id: true, name: true } },
+      },
       orderBy: { createdAt: "desc" },
     });
     res.json(scripts);
@@ -189,15 +200,15 @@ export default function scriptsRouter(prisma: PrismaClient) {
 
     await prisma.$transaction(async (tx: any) => {
       await tx.testStep.deleteMany({ where: { scriptId: script.id } });
-      for (const s of stepsParse.data) {
-        await tx.testStep.create({
-          data: {
+      if (stepsParse.data.length > 0) {
+        await tx.testStep.createMany({
+          data: stepsParse.data.map((s) => ({
             order: s.order,
             keyword: s.keyword,
             targetId: s.targetId ?? null,
             parameters: s.parameters as any,
             scriptId: script.id,
-          },
+          })),
         });
       }
     });

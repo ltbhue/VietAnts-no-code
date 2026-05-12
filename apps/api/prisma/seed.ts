@@ -44,6 +44,22 @@ async function main() {
     },
   });
 
+  const viewerEmail = "viewer@vietants.com";
+  const viewer = await prisma.user.upsert({
+    where: { email: viewerEmail },
+    update: {
+      password: passwordHash,
+      fullName: "Vietants Viewer",
+      role: Role.VIEWER,
+    },
+    create: {
+      email: viewerEmail,
+      password: passwordHash,
+      fullName: "Vietants Viewer",
+      role: Role.VIEWER,
+    },
+  });
+
   const projectName = "Demo Vietants Web";
   const project = await prisma.project.findFirst({
     where: { ownerId: admin.id, name: projectName },
@@ -63,6 +79,12 @@ async function main() {
     where: { projectId_userId: { projectId: projectFinal.id, userId: tester.id } },
     update: {},
     create: { projectId: projectFinal.id, userId: tester.id },
+  });
+
+  await prisma.projectMember.upsert({
+    where: { projectId_userId: { projectId: projectFinal.id, userId: viewer.id } },
+    update: {},
+    create: { projectId: projectFinal.id, userId: viewer.id },
   });
 
   const scriptName = "Đăng nhập demo";
@@ -149,6 +171,7 @@ async function main() {
   console.log("Seed dữ liệu thành công.");
   console.log("Tài khoản admin:", adminEmail, "mật khẩu:", password);
   console.log("Tài khoản tester:", testerEmail, "mật khẩu:", password);
+  console.log("Tài khoản viewer:", viewerEmail, "mật khẩu:", password);
 }
 
 main()

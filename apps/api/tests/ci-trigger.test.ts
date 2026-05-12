@@ -18,6 +18,9 @@ beforeAll(async () => {
         name: "CI Suite",
       }),
     },
+    projectTelegramConfig: {
+      findUnique: async () => null,
+    },
     suiteRun: {
       create: async () => ({ id: "run-ci-1" }),
       findUnique: async (args: { where: { id: string }; include?: unknown }) => {
@@ -26,6 +29,8 @@ beforeAll(async () => {
           return {
             id: "run-ci-1",
             suite: {
+              projectId: "p1",
+              name: "CI Suite",
               items: [
                 {
                   testCaseVersionId: "ver1",
@@ -81,7 +86,7 @@ test("rejects invalid CI token", async () => {
   });
   expect(response.status).toBe(403);
   const body = (await response.json()) as { error: string };
-  expect(body.error).toBe("forbidden_scope");
+  expect(body.error).toBe("Không có quyền trigger CI");
 });
 
 test("accepts valid CI token and returns run", async () => {

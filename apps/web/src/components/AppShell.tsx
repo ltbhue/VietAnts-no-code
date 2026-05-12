@@ -18,7 +18,8 @@ import {
   FiLayers,
   FiLogOut,
   FiMenu,
-  FiShield,
+  FiUser,
+  FiUsers,
   FiX,
 } from "react-icons/fi";
 
@@ -27,15 +28,15 @@ const menuGroups = [
     title: "Tổng quan",
     links: [
       { href: "/dashboard", label: "Dashboard", icon: FiBarChart2 },
-      { href: "/projects", label: "Project", icon: FiFolder, roles: ["ADMIN"] },
+      { href: "/projects", label: "Dự án", icon: FiFolder, roles: ["ADMIN"] },
     ],
   },
   {
     title: "Kiểm thử nhanh",
     links: [
-      { href: "/recorder", label: "Recorder", icon: FiClipboard, roles: ["ADMIN", "TESTER"] },
+      { href: "/recorder", label: "Ghi thao tác", icon: FiClipboard, roles: ["ADMIN", "TESTER"] },
       { href: "/editor", label: "Biên tập", icon: FiEdit3, roles: ["ADMIN", "TESTER"] },
-      { href: "/suite-runs", label: "Suite", icon: FiLayers, roles: ["ADMIN", "TESTER"] },
+      { href: "/suite-runs", label: "Bộ kiểm thử", icon: FiLayers, roles: ["ADMIN", "TESTER"] },
     ],
   },
   {
@@ -49,7 +50,10 @@ const menuGroups = [
   },
   {
     title: "Hệ thống",
-    links: [{ href: "/admin/roles", label: "Vai trò", icon: FiShield, roles: ["ADMIN"] }],
+    links: [
+      { href: "/settings/account", label: "Tài khoản", icon: FiUser },
+      { href: "/admin/users", label: "Người dùng", icon: FiUsers, roles: ["ADMIN"] },
+    ],
   },
 ];
 
@@ -75,7 +79,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const role = getUserRole();
-  const bare = pathname === "/login" || pathname === "/";
+  const bare =
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password" ||
+    pathname === "/";
   const userInfo = readAuthUserDisplay();
 
   const visibleMenuGroups = useMemo(

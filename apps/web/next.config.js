@@ -7,6 +7,9 @@ const nextConfig = {
   turbopack: {
     root: path.join(__dirname, "..", ".."),
   },
+  experimental: {
+    optimizePackageImports: ["react-icons"],
+  },
 };
 
 module.exports = nextConfig;
