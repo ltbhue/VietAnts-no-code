@@ -1,0 +1,59 @@
+
+Nội dung và Phạm vi Đề tài
+Nội dung: Đề tài tập trung vào việc nghiên cứu, thiết kế và phát triển một ứng dụng kiểm thử tự động theo mô hình no-code. Mục tiêu là trang bị cho Công ty Vietants một công cụ cho phép các nhân viên không chuyên về lập trình (như QA Tester, BA, PM) có thể tạo, chỉnh sửa, thực thi và báo cáo kết quả kiểm thử một cách trực quan và hiệu quả. Ứng dụng sẽ hỗ trợ tự động hóa các quy trình kiểm thử ứng dụng web, giảm thiểu sự phụ thuộc vào các kỹ năng lập trình chuyên sâu.
+Các chức năng chính của ứng dụng bao gồm:
+Chức năng 1: Quản lý Hệ thống & Phân quyền (Identity Management) 
+Xây dựng quy trình đăng ký, đăng nhập an toàn.
+Triển khai cơ chế phân quyền người dùng theo vai trò (Admin, Tester, Viewer).
+Chức năng 2: Quản lý Kịch bản Kiểm thử (Test Script Management) 
+Hoàn thiện chức năng Ghi và Phát lại (Record & Playback).
+Xây dựng giao diện chỉnh sửa kịch bản trực quan với các hành động mẫu (Keywords).
+Triển khai Quản lý Kho Đối tượng (Object Repository) để định vị và tái sử dụng các thành phần UI.
+Chức năng 3: Thực thi và Tích hợp Dữ liệu (Execution & Data Integration) 
+Chức năng thực thi kịch bản trên các trình duyệt phổ biến.
+Triển khai kiểm thử dựa trên dữ liệu (Data-Driven Testing) cho phép chạy kịch bản với nhiều bộ dữ liệu khác nhau.
+Chức năng 4: Báo cáo & Phân tích Kết quả (Reporting & Analytics) 
+Tự động sinh báo cáo kết quả kiểm thử chi tiết.
+Tích hợp tính năng chụp ảnh màn hình và ghi log khi lỗi xảy ra.
+Xây dựng Dashboard báo cáo thống kê trực quan (tỷ lệ Pass/Fail, các lỗi phổ biến).
+Phạm vi Đề tài:
+Đối tượng ứng dụng kiểm thử: Ứng dụng sẽ tập trung chủ yếu vào kiểm thử các ứng dụng web của Công ty Vietants.
+Loại kiểm thử: Ưu tiên kiểm thử chức năng (Functional Testing) và kiểm thử hồi quy (Regression Testing).
+Đối tượng người dùng: Nhân viên kiểm thử, chuyên viên nghiệp vụ, quản lý dự án tại Vietants, những người có ít hoặc không có kinh nghiệm lập trình.
+Không bao gồm trong phạm vi: Kiểm thử hiệu năng, kiểm thử bảo mật chuyên sâu, kiểm thử các ứng dụng desktop hoặc mobile native (trừ khi có phát sinh thêm). Tích hợp trực tiếp với các hệ thống quản lý test case chuyên nghiệp phức tạp.
+Công nghệ, Công cụ và Ngôn ngữ Lập trình
+Backend: 
+Ngôn ngữ/Framework: NodeJS (Express)
+ORM: Prisma
+Frontend: 
+Framework: Next JS 16
+Ngôn ngữ: TypeScript
+UI Components/Styling: Radix UI
+Charting Library: ng2-charts (cho các báo cáo biểu đồ)
+Cơ sở dữ liệu: Supabase (PostgreSQL)
+Công cụ phát triển: 
+IDE: Visual Studio Code
+Version Control: Git/GitHub
+API Testing: Postman
+Các Kết quả Chính Dự kiến Đạt được
+Tài liệu Đặc tả Phần mềm: 
+Báo cáo Phân tích Thiết kế Hệ thống (SRS).
+Các sơ đồ mô hình hóa: Sơ đồ Use Case, Sơ đồ Lớp (Class Diagram), Sơ đồ Tuần tự (Sequence Diagram), Sơ đồ Quan hệ Thực thể (ERD).
+Tài liệu Hướng dẫn Sử dụng (User Manual) cho người dùng cuối tại Vietants.
+Sản phẩm Phần mềm: 
+Ứng dụng web kiểm thử tự động no-code hoàn chỉnh với các chức năng cốt lõi đã nêu.
+Chức năng 1: Quản lý Hệ thống & Phân quyền (Identity Management) 
+Xây dựng quy trình đăng ký, đăng nhập an toàn.
+Triển khai cơ chế phân quyền người dùng theo vai trò (Admin, Tester, Viewer).
+Chức năng 2: Quản lý Kịch bản Kiểm thử (Test Script Management) 
+Hoàn thiện chức năng Ghi và Phát lại (Record & Playback).
+Xây dựng giao diện chỉnh sửa kịch bản trực quan với các hành động mẫu (Keywords).
+Triển khai Quản lý Kho Đối tượng (Object Repository) để định vị và tái sử dụng các thành phần UI.
+Chức năng 3: Thực thi và Tích hợp Dữ liệu (Execution & Data Integration) 
+Chức năng thực thi kịch bản trên các trình duyệt phổ biến.
+Triển khai kiểm thử dựa trên dữ liệu (Data-Driven Testing) cho phép chạy kịch bản với nhiều bộ dữ liệu khác nhau.
+Chức năng 4: Báo cáo & Phân tích Kết quả (Reporting & Analytics) 
+Tự động sinh báo cáo kết quả kiểm thử chi tiết.
+Tích hợp tính năng chụp ảnh màn hình và ghi log khi lỗi xảy ra.
+Xây dựng Dashboard báo cáo thống kê trực quan (tỷ lệ Pass/Fail, các lỗi phổ biến).
+
