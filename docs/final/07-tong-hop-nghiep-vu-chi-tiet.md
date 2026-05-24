@@ -1,7 +1,8 @@
 # TỔNG HỢP CHI TIẾT NGHIỆP VỤ HỆ THỐNG
 
 > Dùng làm nội dung nền để biên soạn báo cáo DOCX đồ án tốt nghiệp  
-> Đề tài: **Hệ thống kiểm thử tự động no-code cho ứng dụng web nội bộ Vietants**
+> Đề tài: **Hệ thống kiểm thử tự động no-code cho ứng dụng web nội bộ Vietants**  
+> **Đồng bộ mã nguồn:** bản cập nhật phản ánh codebase monorepo (`apps/web` Next.js, `apps/api` Express + Prisma + Playwright) tại thời điểm biên soạn.
 
 ---
 
@@ -13,10 +14,12 @@ Trong quy trình phát triển phần mềm nội bộ, các thay đổi chức 
 
 Đề tài xây dựng một nền tảng **no-code testing** cho phép người dùng không biết code vẫn có thể:
 
-- Thiết kế kịch bản kiểm thử bằng keyword/action.
-- Quản lý object locator tập trung.
-- Chạy test theo dữ liệu (data-driven).
-- Theo dõi kết quả, xuất báo cáo PDF, nhận cảnh báo khi lỗi.
+- Thiết kế kịch bản kiểm thử bằng keyword/action trên **Test Script** (mô hình cổ điển: bước gắn `UiObject` + tham số).
+- Tạo **Test Case** có phiên bản (`TestCaseVersion`): ghi thao tác qua recorder/editor, trạng thái Draft/Published.
+- Gom nhiều phiên bản test case đã chọn vào **Test Suite** và chạy regression một lần (UI hoặc CI).
+- Quản lý object locator tập trung theo project.
+- Chạy script theo dữ liệu (**data-driven**) với `DataSet`.
+- Theo dõi kết quả, dashboard analytics (`GET /runs/analytics`), xuất PDF cho **run của script**; khi script fail có thể tạo issue **Linear** (tuỳ biến môi trường `LINEAR_*`).
 
 ### 1.2. Bài toán thực tế
 
@@ -38,16 +41,20 @@ Bài toán đặt ra là xây dựng hệ thống kiểm thử tự động có 
 
 **Trong phạm vi:**
 
-- Kiểm thử giao diện web nội bộ theo kịch bản no-code.
-- Quản lý Project, Script, Step, Object, Dataset.
-- Thực thi test bằng Playwright và lưu kết quả.
-- Dashboard theo dõi run, thống kê pass/fail, xuất PDF.
+- Kiểm thử giao diện web nội bộ theo kịch bản no-code (script và/hoặc test case trong suite).
+- Quản lý **Project** (owner + thành viên), **TestScript** + **TestStep**, **UiObject**, **DataSet**, **TestRun** + **TestResult**.
+- Quản lý **TestCase** / **TestCaseVersion**, **TestSuite** / **TestSuiteItem**, **SuiteRun** và kết quả JSON + screenshot khi fail.
+- Thực thi bằng Playwright (script run: chromium/firefox/webkit; suite run: chromium).
+- Dashboard analytics (theo run script của user, hoặc theo **suite** với query `suiteId`).
+- Xuất PDF báo cáo cho một **TestRun** (script).
+- API CI: `POST /ci/trigger-suite` xác thực bằng Bearer `CI_API_TOKEN`.
 
 **Ngoài phạm vi:**
 
 - Tự động kiểm thử mobile native.
-- Tích hợp CI/CD quy mô lớn nhiều môi trường.
+- CI/CD đa môi trường/đa pipeline đầy đủ (hiện chỉ có điểm trigger suite có kiểm soát token).
 - AI tự sinh test case.
+- Mô hình **Workspace** trong CSDL (chuẩn bị mở rộng) chưa được expose đầy đủ qua API nghiệp vụ trong MVP.
 
 ---
 
@@ -55,70 +62,86 @@ Bài toán đặt ra là xây dựng hệ thống kiểm thử tự động có 
 
 ### 2.1. Các bên liên quan (Stakeholders)
 
-- **Admin**: quản trị người dùng, giám sát toàn bộ dữ liệu.
-- **Tester/QA**: tạo và vận hành kịch bản kiểm thử.
-- **Viewer/PM/BA**: theo dõi kết quả, đánh giá chất lượng.
-- **Nhóm phát triển**: nhận thông tin lỗi để sửa và cải tiến.
+- **Admin**: quản trị người dùng (danh sách, đổi role/mật khẩu), **tạo/sửa/xóa project** và gán thành viên; có đầy đủ quyền thao tác như Tester trên tài sản kiểm thử.
+- **Tester/QA**: thao tác script/object/dataset/test case/suite trong các **project được phép** (owner hoặc `ProjectMember`); chạy script run và suite run.
+- **Viewer/PM/BA**: xem dữ liệu trong project được phép; không tạo/sửa/xóa script/object/dataset/test case/suite; không chạy test (API giới hạn `requireRole`).
+- **Nhóm phát triển**: nhận thông tin lỗi (PDF run, analytics, issue Linear nếu bật).
 
 ### 2.2. Mô tả nghiệp vụ tổng quát
 
-Quy trình nghiệp vụ kiểm thử trong hệ thống được tổ chức theo chuỗi:
+Luồng tổng quát (có thể dùng song song hai đường: **Script cổ điển** và **Test case + Suite**):
 
-1. Người dùng đăng nhập hệ thống.
-2. Tạo Project để quản lý phạm vi kiểm thử.
-3. Tạo Script kiểm thử theo mục tiêu chức năng.
-4. Khai báo các Step (keyword) cho từng script.
-5. Khai báo Object Repository (locator phần tử UI).
-6. Tạo Dataset để chạy dữ liệu mẫu (nếu cần).
-7. Thực thi test run.
-8. Hệ thống ghi nhận kết quả, thống kê pass/fail.
-9. Người dùng xem báo cáo, xuất PDF.
-10. Khi có lỗi, hệ thống gửi cảnh báo Telegram và có thể tạo issue Linear.
+**A. Đường Script + Object + Dataset (kiểm thử theo keyword + repository)**
+
+1. Đăng ký / đăng nhập (JWT).
+2. Admin tạo **Project**, gán **thành viên** (tuỳ chọn).
+3. Tester tạo **Test Script**, khai báo **Test Step** (`navigate`, `click`, `fill`, `assertText`) và liên kết **UiObject** khi cần.
+4. Tạo **DataSet** (JSON `rows`) nếu chạy data-driven.
+5. `POST /runs` — thực thi Playwright theo browser đã chọn; lưu `TestRun` + `TestResult`, screenshot khi fail.
+6. Xem kết quả, analytics; xuất **PDF** cho run đó.
+
+**B. Đường Test case + Suite (ghi thao tác / draft → publish → regression)**
+
+1. Trong project được phép, tạo **Test Case** (`POST /projects/:projectId/tests`) với các bước đã validate (recorder/editor → payload JSON).
+2. Gọi **smart-record** (`POST .../tests/smart-record`) để gợi ý bước từ danh sách hành động thô (tuỳ UI).
+3. **Publish** (`POST .../tests/:testCaseId/publish`) sau khi validate — chuyển `lifecycle` sang Published.
+4. Tạo **Test Suite** gồm nhiều `testCaseVersionId` trong cùng project.
+5. Chạy suite: `POST /suites/:suiteId/runs` (trigger `ui`) hoặc `POST /ci/trigger-suite` (trigger `ci`, Bearer token).
+6. `SuiteRun` lưu JSON `results` theo từng test case (pass/fail, step log, screenshot khi fail).
+
+**Tích hợp lỗi (script run):** khi một bước của **script run** thất bại, backend có thể gọi API **Linear** tạo issue nếu đã cấu hình biến môi trường.
 
 ### 2.3. Tác nhân và quyền nghiệp vụ
 
 #### 2.3.1. Admin
 
-- Tạo/sửa/xóa dữ liệu trong phạm vi được thiết kế.
-- Giám sát toàn bộ run và báo cáo.
-- Quản lý cấu hình vận hành ở mức hệ thống.
+- CRUD **User** qua API admin (`/auth/admin/*`): tạo user, liệt kê, cập nhật (email, họ tên, role, mật khẩu), xóa.
+- **Chỉ ADMIN** được `POST/PUT/DELETE /projects` (tạo/sửa/xóa project và danh sách `memberIds`).
+- Được phép mọi thao tác của Tester trên script/object/dataset/run/test/suite khi truy cập được project.
 
 #### 2.3.2. Tester/QA
 
-- Tạo project, script, step, object, dataset.
-- Chạy test thủ công theo nhu cầu.
-- Xem run result, theo dõi lỗi, xuất báo cáo.
+- **Không** tạo/xóa project (do API hạn chế); làm việc trong project do Admin thêm làm owner hoặc thành viên.
+- CRUD script/step/object/dataset; tạo test case, publish; tạo suite; chạy script run và suite run.
 
 #### 2.3.3. Viewer
 
-- Xem danh sách project, script, report theo quyền.
-- Không thực hiện thao tác tạo/sửa/xóa nhạy cảm.
+- Đọc dữ liệu trong project được phép (danh sách script, objects, runs của chính user nếu có, v.v. tuỳ endpoint).
+- Không POST/PUT/DELETE trên script/object/dataset; không chạy run/suite.
+- **PDF:** endpoint cho phép role VIEWER nhưng báo cáo PDF hiện chỉ sinh được cho **TestRun thuộc đúng user** (`userId` khớp) — thực tế Viewer chỉ xem PDF các run do chính họ thực hiện (nếu được giao quyền chạy trong phiên bản tương lai cần mở rộng kiểm tra theo project).
 
 ### 2.4. Danh sách use case chính
 
-- UC01: Đăng ký tài khoản.
-- UC02: Đăng nhập hệ thống.
-- UC03: Quản lý project kiểm thử.
-- UC04: Quản lý test script.
-- UC05: Quản lý các bước kiểm thử (steps).
-- UC06: Quản lý object repository.
-- UC07: Quản lý dataset kiểm thử.
-- UC08: Chạy test (single run/data-driven run).
-- UC09: Xem báo cáo và thống kê.
-- UC10: Xuất báo cáo PDF.
-- UC11: Nhận thông báo lỗi qua Telegram.
-- UC12: Tự động tạo issue trên Linear khi fail (tùy chọn cấu hình).
+- UC01: Đăng ký tài khoản (role mặc định TESTER; có thể chọn VIEWER; không tự đăng ký ADMIN).
+- UC02: Đăng nhập hệ thống (có cơ chế giới hạn số lần thử theo IP/email).
+- UC03: Đổi mật khẩu khi đã đăng nhập.
+- UC04: Quên mật khẩu / đặt lại mật khẩu bằng token (MVP: token lưu bộ nhớ process — phù hợp demo, cần Redis/email cho production).
+- UC05: Admin quản lý danh sách người dùng.
+- UC06: Admin quản lý project và thành viên (`ProjectMember`).
+- UC07: Quản lý test script và các bước keyword (`PUT /scripts/:id/steps`).
+- UC08: Quản lý object repository (`UiObject`).
+- UC09: Quản lý dataset kiểm thử (data-driven cho script).
+- UC10: Chạy script (`POST /runs`) — single hoặc data-driven; chọn `chromium` | `firefox` | `webkit`.
+- UC11: Xem analytics dashboard (`GET /runs/analytics`, có `projectId`, `days`, và nhánh `suiteId`).
+- UC12: Xuất báo cáo PDF cho TestRun script (`GET /runs/:id/report.pdf`).
+- UC13: Quản lý test case / phiên bản; smart-record; publish.
+- UC14: Quản lý test suite và chạy suite (UI).
+- UC15: Trigger chạy suite từ CI (`POST /ci/trigger-suite` + `CI_API_TOKEN`).
+- UC16: Khi script run fail — tạo issue Linear (tuỳ cấu hình `LINEAR_API_KEY`, `LINEAR_TEAM_ID`).
 
 ### 2.5. Business Rules (quy tắc nghiệp vụ cốt lõi)
 
-- BR01: Người dùng phải đăng nhập để truy cập chức năng nghiệp vụ.
-- BR02: Quyền truy cập API phụ thuộc role (RBAC).
-- BR03: Mỗi project thuộc quyền quản lý của owner, dữ liệu phải được cô lập theo người dùng.
-- BR04: Step trong script phải có thứ tự `order` rõ ràng.
-- BR05: Một lần chạy test (run) phải lưu trạng thái tổng và chi tiết từng step.
-- BR06: Nếu step thất bại, trạng thái run phải phản ánh đúng lỗi.
-- BR07: Dữ liệu chạy data-driven phải khớp cấu trúc tham số step.
-- BR08: Chỉ xuất được PDF khi user có quyền với run tương ứng.
+- BR01: Người dùng phải đăng nhập để truy cập chức năng nghiệp vụ (JWT).
+- BR02: Quyền truy cập API phụ thuộc role **ADMIN / TESTER / VIEWER** (RBAC).
+- BR03: Truy cập dữ liệu theo **project**: user phải là **owner** hoặc **ProjectMember** (`projectAccessibleWhere`).
+- BR04: **Chỉ ADMIN** tạo/sửa/xóa project và gán thành viên.
+- BR05: Step trong script phải có thứ tự `order` rõ ràng; keyword thuộc tập cố định (`navigate`, `click`, `fill`, `assertText`).
+- BR06: `TestRun` lưu trạng thái tổng và `TestResult` chi tiết từng step; fail → screenshot và message.
+- BR07: DataSet dùng cho run phải cùng **project** với script.
+- BR08: PDF run chỉ cho **TestRun** mà `userId` trùng người gọi API (kể cả khi role VIEWER được phép route).
+- BR09: Item trong suite phải trỏ tới `testCaseVersionId` thuộc đúng project của suite.
+- BR10: Publish test case chỉ khi `validateForPublish` pass (đủ bước, lifecycle/platform hợp lệ).
+- BR11: Trigger CI không dùng JWT user mà dùng **Bearer `CI_API_TOKEN`** khớp biến môi trường.
 
 ### 2.6. Luồng nghiệp vụ tổng quát (As-is/To-be)
 
@@ -130,9 +153,8 @@ Quy trình nghiệp vụ kiểm thử trong hệ thống được tổ chức th
 
 **To-be (sau khi triển khai):**
 
-- Người dùng thao tác toàn bộ trên 1 nền tảng web.
-- Kịch bản được chuẩn hóa dạng no-code.
-- Kết quả tập trung, có thể thống kê và xuất báo cáo tức thì.
+- Người dùng thao tác trên một nền tảng web: script keyword, object repository, data-driven, test case + suite regression và điểm trigger CI.
+- Kết quả tập trung (run script, suite run), có analytics và xuất PDF cho run script.
 
 ---
 
@@ -140,61 +162,73 @@ Quy trình nghiệp vụ kiểm thử trong hệ thống được tổ chức th
 
 ### 3.1. Yêu cầu chức năng
 
-- Đăng ký/đăng nhập và xác thực token.
-- Quản lý project kiểm thử.
-- Quản lý script và step theo keyword.
-- Quản lý object locator dùng lại nhiều script.
-- Quản lý dataset phục vụ data-driven testing.
-- Chạy test theo script và lưu run result.
-- Dashboard thống kê pass/fail.
-- Xuất PDF báo cáo theo từng run.
-- Tích hợp thông báo ngoài hệ thống (Telegram/Linear).
+- Đăng ký/đăng nhập, JWT; đổi mật khẩu; quên/đặt lại mật khẩu (MVP).
+- Admin CRUD user; chỉ Admin CRUD project + gán thành viên.
+- Quản lý script/step/object/dataset trong project được phép.
+- Quản lý test case (tạo bản ghi, smart-record, publish).
+- Quản lý suite và suite run; trigger CI có kiểm soát token.
+- Chạy script run (Playwright, chọn browser); lưu `TestRun`/`TestResult`.
+- Dashboard analytics (script runs của user; hoặc suite runs khi có `suiteId`).
+- Xuất PDF cho script run.
+- Tích hợp Linear khi script run fail (tuỳ env).
 
 ### 3.2. Yêu cầu phi chức năng
 
-- **Hiệu năng**: phản hồi API nhanh trong quy mô dữ liệu đồ án.
-- **Bảo mật**: JWT auth, kiểm tra role và owner.
-- **Tính dùng được**: giao diện đơn giản cho người không code.
-- **Khả năng mở rộng**: kiến trúc module hóa, dễ thêm keyword mới.
-- **Độ tin cậy**: lưu log kết quả đầy đủ để truy vết.
+- **Hiệu năng**: phản hồi API trong phạm vi đồ án; analytics gom theo cửa sổ 7/30 ngày.
+- **Bảo mật**: JWT, bcrypt; RBAC; kiểm tra quyền project; giới hạn đăng nhập sai; CI token tách khỏi JWT người dùng.
+- **Tính dùng được**: Next.js App Router — các trang dashboard, scripts, editor/recorder, reports, suite-runs, admin users, account settings.
+- **Khả năng mở rộng**: engine keyword + domain package (`@vietants/domain`); schema có Workspace/Suite/version.
+- **Độ tin cậy**: log/step message, screenshot khi fail (script run và suite run).
 
 ### 3.3. Đặc tả dữ liệu mức nghiệp vụ
 
 Các thực thể chính:
 
-- `User`: thông tin đăng nhập, vai trò.
-- `Project`: không gian nghiệp vụ chứa script/object/dataset.
-- `TestScript`: kịch bản kiểm thử.
-- `TestStep`: từng hành động no-code.
-- `ObjectRepository`: locator UI tái sử dụng.
-- `DataSet`: dữ liệu đầu vào cho data-driven.
-- `TestRun`: phiên thực thi kịch bản.
-- `TestResult`: kết quả chi tiết từng step.
+- `User`: đăng nhập, vai trò **ADMIN | TESTER | VIEWER**.
+- `Project`: owner + tùy chọn `ProjectMember`; chứa script, object, dataset, test case, suite.
+- `Workspace`: nhóm project (schema — MVP chưa dùng đầy đủ API).
+- `TestScript` / `TestStep`: kịch bản keyword + `UiObject`.
+- `UiObject`: locator theo project.
+- `DataSet`: `rows` JSON cho data-driven.
+- `TestRun` / `TestResult`: run và kết quả từng bước (script).
+- `TestCase` / `TestCaseVersion`: nội dung JSON các bước recorded/keyword, lifecycle.
+- `TestSuite` / `TestSuiteItem`: gom phiên bản test case.
+- `SuiteRun`: một lần chạy suite — `status`, `results` JSON, metadata CI (`trigger`, `buildId`, `commitSha`, …).
 
 ### 3.4. Luồng xử lý nghiệp vụ cốt lõi
 
-#### 3.4.1. Luồng chạy test single run
+#### 3.4.1. Luồng chạy test single run (script)
 
-1. Người dùng chọn script.
-2. Hệ thống nạp step theo thứ tự.
-3. Trình thực thi Playwright chạy từng step.
-4. Kết quả mỗi step được ghi `passed/failed`.
-5. Tổng hợp trạng thái run và hiển thị report.
+1. Tester chọn script và browser (mặc định chromium).
+2. Hệ thống nạp step theo `order`.
+3. Playwright thực thi từng keyword (hỗ trợ timeout từng bước qua `parameters.timeoutMs` trong giới hạn an toàn).
+4. Mỗi step ghi `TestResult` passed/failed.
+5. Cập nhật `TestRun`; fail có screenshot và có thể tạo Linear issue.
 
-#### 3.4.2. Luồng chạy test data-driven
+#### 3.4.2. Luồng chạy test data-driven (script + dataset)
 
-1. Người dùng chọn script + dataset.
-2. Hệ thống lặp qua từng dòng dữ liệu.
-3. Mỗi vòng lặp thực thi toàn bộ step với tham số tương ứng.
-4. Ghi nhận nhiều bản ghi kết quả trong cùng run.
-5. Tính toán tỷ lệ pass/fail toàn bộ lần chạy.
+1. Tester chọn script + dataset cùng project.
+2. Với mỗi dòng trong `rows`, thực thi toàn bộ step (substitution theo executor).
+3. Ghi nhận message theo dòng dữ liệu khi cần.
+4. Run fail nếu có step fail trên một dòng.
 
-#### 3.4.3. Luồng xử lý lỗi
+#### 3.4.3. Luồng chạy test suite
 
-1. Step fail tạo `TestResult` trạng thái lỗi.
-2. Cập nhật `TestRun` sang `failed` (hoặc trạng thái tương ứng theo quy tắc xử lý).
-3. Gửi cảnh báo Telegram nếu cấu hình hợp lệ.
-4. Tạo issue trên Linear nếu bật tích hợp.
+1. Chuẩn bị các test case đã publish và thêm vào suite.
+2. Gọi start suite run (UI hoặc CI).
+3. Với mỗi item trong suite (theo `sortOrder`), Playwright chạy tuần tự các step trong JSON phiên bản (semantic locator cho nhãn tiếng Việt/text).
+4. Gộp kết quả vào `SuiteRun.results`; fail sớm trong một case có thể dừng case đó và chuyển sang case kế.
+
+#### 3.4.4. Luồng xử lý lỗi (script run)
+
+1. Step fail → `TestResult` failed + screenshot path.
+2. `TestRun` → failed.
+3. Gọi Linear (nếu cấu hình).
+
+#### 3.4.5. Luồng xử lý lỗi (suite run)
+
+1. Step fail trong một test case → case đó failed, screenshot file dưới thư mục `screenshots/`.
+2. Toàn suite có thể passed hoặc failed tùy tổng hợp trong service `suite-runner`.
 
 ---
 
@@ -216,47 +250,75 @@ Bên cạnh đó có lớp thực thi kiểm thử:
 
 #### 4.2.1. Phân hệ xác thực và phân quyền
 
-- API đăng ký, đăng nhập.
-- JWT token cho phiên người dùng.
-- Middleware kiểm tra quyền theo role.
+- API đăng ký, đăng nhập, `/auth/me`, đổi mật khẩu, quên/đặt lại mật khẩu.
+- JWT cho phiên người dùng; middleware kiểm tra role.
+- API admin quản lý user.
 
-#### 4.2.2. Phân hệ quản lý tài sản kiểm thử
+#### 4.2.2. Phân hệ project và không gian làm việc
 
-- Quản lý Project, Script, Step.
-- Quản lý Object Repository và Dataset.
-- Đảm bảo ràng buộc owner và tính nhất quán dữ liệu.
+- Quản lý **Project**, **owner**, danh sách **ProjectMember** — chỉ **ADMIN** được tạo/sửa/xóa project và gán thành viên.
 
-#### 4.2.3. Phân hệ thực thi và báo cáo
+#### 4.2.3. Phân hệ tài sản kiểm thử (script, test case, suite)
 
-- Tiếp nhận yêu cầu chạy test.
-- Điều phối execution engine.
-- Lưu kết quả và sinh báo cáo PDF.
-- Trả dữ liệu dashboard cho giao diện.
+- Script/step/object/dataset trong project được phép (owner hoặc member).
+- Test case / publish / smart-record.
+- Suite và suite items.
+
+#### 4.2.4. Phân hệ thực thi và báo cáo
+
+- Executor script (`executor.ts`) — Playwright multi-browser, data-driven, Linear on failure.
+- Suite runner (`suite-runner.ts`) — Chromium, kết quả JSON per case.
+- PDF báo cáo (`reportPdf.ts`) cho script run.
+- Analytics (`GET /runs/analytics`).
+- CI router (`/ci/trigger-suite`) gọi `executeSuiteRun`.
 
 ### 4.3. Thiết kế API nghiệp vụ (tóm tắt)
 
-- `POST /auth/register`, `POST /auth/login`
-- `GET/POST/PUT/DELETE /projects`
-- `GET/POST/PUT/DELETE /scripts`, `PUT /scripts/:id/steps`
-- `GET/POST/PUT/DELETE /objects`
-- `GET/POST/PUT/DELETE /datasets`
-- `GET/POST /runs`, `GET /runs/:id/results`
-- `GET /runs/:id/report.pdf`
+**Auth**
+
+- `POST /auth/register`, `POST /auth/login`, `GET /auth/me`
+- `POST /auth/change-password`, `POST /auth/forgot-password`, `POST /auth/reset-password`
+- `POST /auth/admin/create-user`, `GET /auth/admin/users`, `PUT /auth/admin/users/:id`, `DELETE /auth/admin/users/:id`
+
+**Project**
+
+- `GET /projects`, `POST /projects`, `GET /projects/:id`, `PUT /projects/:id`, `DELETE /projects/:id`  
+  *(POST/PUT/DELETE: role ADMIN)*
+
+**Script / object / dataset / run**
+
+- `GET|POST /scripts`, `GET|PUT|DELETE /scripts/:id`, `PUT /scripts/:id/steps`
+- `GET|POST /objects`, `PUT|DELETE /objects/:id`
+- `GET|POST /datasets`, `PUT|DELETE /datasets/:id`
+- `GET /runs`, `GET /runs/analytics`, `POST /runs`, `GET /runs/:id/results`, `GET /runs/:id/report.pdf`
+
+**Test case & suite**
+
+- `GET|POST /projects/:projectId/tests`, `POST /projects/:projectId/tests/smart-record`
+- `POST /projects/:projectId/tests/:testCaseId/publish`
+- `GET|POST /projects/:projectId/suites`
+- `POST /suites/:suiteId/runs`, `GET /suites/:suiteId/runs/:runId`
+
+**CI**
+
+- `POST /ci/trigger-suite` — header `Authorization: Bearer <CI_API_TOKEN>`
 
 ### 4.4. Thiết kế giao diện mức chức năng
 
-- Màn hình đăng nhập.
+- Trang đăng nhập / đăng ký / quên mật khẩu / đặt lại mật khẩu.
 - Dashboard tổng quan.
-- Màn hình quản lý scripts.
-- Màn hình quản lý datasets/objects.
-- Màn hình reports và lịch sử runs.
+- Projects; Scripts (danh sách + chi tiết script); Objects; Datasets.
+- Editor & Recorder (thiết kế test case).
+- Reports & chi tiết report theo run.
+- Suite runs.
+- Admin — quản lý users.
+- Settings — tài khoản (đổi mật khẩu).
 
 ### 4.5. Thiết kế bảo mật và kiểm soát truy cập
 
-- Bảo vệ endpoint bằng JWT.
-- Chặn truy cập trái phép khi thiếu token.
-- Kiểm tra role ở các endpoint thao tác dữ liệu.
-- Giới hạn truy cập dữ liệu theo owner.
+- Bảo vệ endpoint bằng JWT (trừ register/login/forgot/reset và CI token route).
+- RBAC theo role; project scope theo owner/member.
+- CI dùng token tĩnh môi trường, tách khỏi phiên người dùng.
 
 ---
 
@@ -264,40 +326,42 @@ Bên cạnh đó có lớp thực thi kiểm thử:
 
 ### 5.1. Chiến lược kiểm thử
 
-- Kiểm thử API theo module (Auth, RBAC, Project, Script, Run).
-- Kiểm thử tích hợp luồng end-to-end.
+- Kiểm thử API theo module (Auth, RBAC, Project access, Script, Run, Test case, Suite, CI token).
+- Kiểm thử tích hợp luồng end-to-end (script run và suite run).
 - Kiểm thử giao diện báo cáo và xuất PDF.
-- Kiểm thử thông báo khi có lỗi run.
+- Kiểm thử tích hợp Linear (mock hoặc env staging).
 
 ### 5.2. Bộ test case tiêu biểu
 
 Tham chiếu bộ test case trong tài liệu:
 
-- Auth & RBAC
-- Project Management
-- Script & Steps
-- Object Repository
-- Dataset
-- Execution & Reporting
+- Auth & RBAC & Admin users
+- Project & ProjectMember
+- Script & Steps & timeoutMs
+- Object Repository & Dataset
+- Execution & Reporting & PDF
+- Test case lifecycle & Suite & SuiteRun & CI trigger
 
 ### 5.3. Tiêu chí đánh giá kết quả
 
 - Đúng chức năng theo use case.
-- Kết quả pass/fail phản ánh chính xác trạng thái thực thi.
-- Báo cáo run đầy đủ thông tin.
-- Hệ thống thông báo lỗi kịp thời.
+- Kết quả pass/fail phản ánh chính xác trạng thái thực thi (script và suite).
+- Báo cáo run đầy đủ thông tin; suite có JSON chi tiết theo từng case.
+- Linear chỉ gọi khi script run fail và env hợp lệ.
 
 ### 5.4. Kết quả đạt được
 
-- Hoàn thiện nền tảng no-code testing ở mức đồ án ứng dụng.
-- Cho phép người dùng không code tạo và chạy test cơ bản.
-- Có cơ chế báo cáo và tích hợp thông báo tự động.
+- Hoàn thiện nền tảng no-code testing với **hai lớp tự động hóa**: script keyword + suite regression.
+- Hỗ trợ người không code qua recorder/editor và dashboard.
+- Có điểm tích hợp CI có kiểm soát và báo cáo PDF/analytics.
 
 ### 5.5. Hạn chế hiện tại
 
-- Chưa tối ưu cho khối lượng lớn script/runs.
-- Chưa tích hợp sâu pipeline CI/CD.
-- Chưa có cơ chế phân tích nguyên nhân lỗi nâng cao.
+- Chưa tối ưu cho khối lượng rất lớn script/runs/suite runs đồng thời.
+- Trigger CI mới ở mức **một endpoint** với token — chưa dashboard quản lý pipeline đa môi trường.
+- Suite runner chỉ dùng Chromium; Linear chỉ gắn với **script run**, chưa với suite run.
+- Reset mật khẩu MVP lưu token trong bộ nhớ tiến trình — không phù hợp triển khai đa instance.
+- PDF chỉ cho TestRun script của đúng user thực hiện — chưa có PDF tổng hợp suite.
 
 ---
 
@@ -309,11 +373,12 @@ Tham chiếu bộ test case trong tài liệu:
 
 ### 6.2. Hướng phát triển
 
-- Bổ sung nhiều keyword/action hơn cho step.
+- Bổ sung nhiều keyword/action hơn cho step và recorded kinds.
 - Thêm lịch chạy tự động theo thời gian (scheduler).
-- Tích hợp CI/CD và multi-environment.
-- Thêm dashboard phân tích xu hướng lỗi theo thời gian.
-- Cải tiến phân quyền chi tiết hơn theo module.
+- Mở rộng CI/CD đa job, webhook đa môi trường, secret rotation.
+- Thêm dashboard phân tích xu hướng lỗi cho suite runs và PDF tổng hợp suite.
+- Cải tiến phân quyền chi tiết hơn (ví dụ VIEWER xem PDF mọi run trong project).
+- Hoàn thiện Workspace trong API và UI.
 
 ---
 
@@ -329,4 +394,4 @@ Tham chiếu bộ test case trong tài liệu:
 
 ### A.3. Định hướng mở rộng
 
-"Trong giai đoạn tiếp theo, hệ thống có thể mở rộng theo hướng tích hợp CI/CD, tăng độ phủ keyword no-code, bổ sung phân tích dữ liệu kiểm thử và triển khai mô hình vận hành đa môi trường để phù hợp nhu cầu doanh nghiệp ở quy mô lớn hơn."
+"Trong giai đoạn tiếp theo, hệ thống có thể mở rộng theo hướng CI/CD đầy đủ, tăng độ phủ keyword và recorded actions, bổ sung PDF/lịch sử cho suite run, phân tích dữ liệu kiểm thử và triển khai mô hình vận hành đa môi trường để phù hợp nhu cầu doanh nghiệp ở quy mô lớn hơn."
