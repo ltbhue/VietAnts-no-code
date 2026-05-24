@@ -2,7 +2,7 @@
 
 Mỗi **nhóm chức năng** gồm **2 hình**: biểu đồ trình tự (Sequence) + biểu đồ hoạt động (Activity).
 
-Tham chiếu đặc tả: `11-dac-ta-chuc-nang-giao-dien-web.md`.
+Tham chiếu đặc tả: `11-dac-ta-chuc-nang-giao-dien-web.md` (chi tiết) · `17-dac-ta-chuc-nang-gop-nhom.md` (gộp 12 nhóm).
 
 | STT | Nhóm | Use case | Hình trình tự | Hình hoạt động |
 |-----|------|----------|---------------|----------------|

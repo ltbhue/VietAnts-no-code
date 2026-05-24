@@ -1,31 +1,52 @@
-# Đặc tả chức năng giao diện web — VietAnts No-code Testing
+# Đặc tả chức năng (gộp 12 nhóm) — Giao diện web
 
-Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8 cột theo khung đồ án.
+Tài liệu này **ánh xạ 42 use case** vào **12 nhóm**, khớp với biểu đồ trình tự/hoạt động (`14`, `15`, `16`).
 
-**Bản gộp theo 12 nhóm** (khớp biểu đồ trình tự/hoạt động): xem `17-dac-ta-chuc-nang-gop-nhom.md`.
-
----
-
-## Bảng ánh xạ: Đặc tả ↔ Nhóm ↔ Biểu đồ
-
-| STT | Nhóm chức năng | Use case | Bảng đặc tả | Biểu đồ (file `16`) |
-|-----|----------------|----------|-------------|----------------------|
-| 1 | Trang chủ | ĐC-01 | Bảng 3.3 | STT 1 — Hình 3.5.1a/b |
-| 2 | Xác thực & tài khoản | ĐC-02 → ĐC-07 | Bảng 3.4 – 3.9 | STT 2 — Hình 3.5.2a/b |
-| 3 | Dashboard | ĐC-08 | Bảng 3.10 | STT 3 — Hình 3.5.3a/b |
-| 4 | Quản lý dự án | ĐC-09 → ĐC-12 | Bảng 3.11 – 3.14 | STT 4 — Hình 3.5.4a/b |
-| 5 | Quản lý kịch bản | ĐC-13 → ĐC-18 | Bảng 3.15 – 3.20 | STT 5 — Hình 3.5.5a/b |
-| 6 | Thực thi kịch bản | ĐC-19 | Bảng 3.21 | STT 6 — Hình 3.5.6a/b |
-| 7 | Đối tượng UI | ĐC-20 → ĐC-23 | Bảng 3.22 – 3.25 | STT 7 — Hình 3.5.7a/b |
-| 8 | Bộ dữ liệu | ĐC-24 → ĐC-27 | Bảng 3.26 – 3.29 | STT 8 — Hình 3.5.8a/b |
-| 9 | Báo cáo | ĐC-28 → ĐC-32 | Bảng 3.30 – 3.34 | STT 9 — Hình 3.5.9a/b |
-| 10 | Ghi thao tác & publish | ĐC-33 → ĐC-37 | Bảng 3.35 – 3.39 | STT 10 — Hình 3.5.10a/b |
-| 11 | Chạy suite | ĐC-38 | Bảng 3.40 | STT 11 — Hình 3.5.11a/b |
-| 12 | Quản trị người dùng | ĐC-39 → ĐC-42 | Bảng 3.41 – 3.44 | STT 12 — Hình 3.5.12a/b |
+Bản chi tiết từng bảng đầy đủ 8 cột: `11-dac-ta-chuc-nang-giao-dien-web.md`.
 
 ---
 
-## A.1. Trang công khai & xác thực
+## Bảng ánh xạ tổng hợp (Đặc tả ↔ Biểu đồ)
+
+| STT nhóm | Tên nhóm | Mã use case | Số UC | Bảng đặc tả (Chương 3) | Màn hình | Biểu đồ trình tự | Biểu đồ hoạt động | File |
+|----------|----------|-------------|-------|------------------------|----------|------------------|-------------------|------|
+| 1 | Trang chủ | ĐC-01 | 1 | Bảng 3.3 | / | Hình 3.5.1a | Hình 3.5.1b | `16` STT 1 |
+| 2 | Xác thực & quản lý tài khoản | ĐC-02 → ĐC-07 | 6 | Bảng 3.4, 3.5, 3.6, 3.7, 3.8, 3.9 | /login, /register, … | Hình 3.5.2a | Hình 3.5.2b | `16` STT 2 |
+| 3 | Dashboard & thống kê | ĐC-08 | 1 | Bảng 3.10 | /dashboard | Hình 3.5.3a | Hình 3.5.3b | `16` STT 3 |
+| 4 | Quản lý dự án | ĐC-09 → ĐC-12 | 4 | Bảng 3.11, 3.12, 3.13, 3.14 | /projects | Hình 3.5.4a | Hình 3.5.4b | `16` STT 4 |
+| 5 | Quản lý kịch bản kiểm thử | ĐC-13 → ĐC-18 | 6 | Bảng 3.15, 3.16, 3.17, 3.18, 3.19, 3.20 | /scripts, /scripts/[id] | Hình 3.5.5a | Hình 3.5.5b | `16` STT 5 |
+| 6 | Thực thi kịch bản | ĐC-19 | 1 | Bảng 3.21 | /scripts/[id] | Hình 3.5.6a | Hình 3.5.6b | `16` STT 6 |
+| 7 | Quản lý đối tượng UI | ĐC-20 → ĐC-23 | 4 | Bảng 3.22, 3.23, 3.24, 3.25 | /objects | Hình 3.5.7a | Hình 3.5.7b | `16` STT 7 |
+| 8 | Quản lý bộ dữ liệu | ĐC-24 → ĐC-27 | 4 | Bảng 3.26, 3.27, 3.28, 3.29 | /datasets | Hình 3.5.8a | Hình 3.5.8b | `16` STT 8 |
+| 9 | Báo cáo & xuất PDF | ĐC-28 → ĐC-32 | 5 | Bảng 3.30, 3.31, 3.32, 3.33, 3.34 | /reports, /report/[runId] | Hình 3.5.9a | Hình 3.5.9b | `16` STT 9 |
+| 10 | Ghi thao tác & publish test case | ĐC-33 → ĐC-37 | 5 | Bảng 3.35, 3.36, 3.37, 3.38, 3.39 | /recorder, /editor | Hình 3.5.10a | Hình 3.5.10b | `16` STT 10 |
+| 11 | Chạy test suite | ĐC-38 | 1 | Bảng 3.40 | /suite-runs | Hình 3.5.11a | Hình 3.5.11b | `16` STT 11 |
+| 12 | Quản trị người dùng | ĐC-39 → ĐC-42 | 4 | Bảng 3.41, 3.42, 3.43, 3.44 | /admin/users | Hình 3.5.12a | Hình 3.5.12b | `16` STT 12 |
+
+**Quy ước đánh số hình trong đồ án (gợi ý):**
+- **Chương 3.4** — Bảng đặc tả: Bảng 3.3 – 3.44 (file `11` hoặc các mục STT bên dưới).
+- **Chương 3.5** — Biểu đồ: 12 nhóm × (Sequence + Activity) = 24 hình (file `16`).
+
+---
+
+## Nhóm STT 1 — Trang chủ
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-01 |
+| **Số use case** | 1 |
+| **Bảng đặc tả** | Bảng 3.3 – 3.3 (chi tiết: `11`) |
+| **Màn hình** | / |
+| **Biểu đồ trình tự** | Hình 3.5.1a — file `16`, STT 1 |
+| **Biểu đồ hoạt động** | Hình 3.5.1b — file `16`, STT 1 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-01 | Truy cập trang giới thiệu hệ thống | Bảng 3.3 |
+
+### Đặc tả chi tiết (8 cột)
 
 ### Bảng 3.3 — ĐC-01: Truy cập trang giới thiệu hệ thống
 
@@ -42,6 +63,32 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
+## Nhóm STT 2 — Xác thực & quản lý tài khoản
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-02 → ĐC-07 |
+| **Số use case** | 6 |
+| **Bảng đặc tả** | Bảng 3.4 – 3.9 (chi tiết: `11`) |
+| **Màn hình** | /login, /register, … |
+| **Biểu đồ trình tự** | Hình 3.5.2a — file `16`, STT 2 |
+| **Biểu đồ hoạt động** | Hình 3.5.2b — file `16`, STT 2 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-02 | Đăng nhập hệ thống | Bảng 3.4 |
+| ĐC-03 | Đăng ký tài khoản mới | Bảng 3.5 |
+| ĐC-04 | Yêu cầu quên mật khẩu | Bảng 3.6 |
+| ĐC-05 | Đặt lại mật khẩu bằng token | Bảng 3.7 |
+| ĐC-06 | Đổi mật khẩu (tài khoản đang đăng nhập) | Bảng 3.8 |
+| ĐC-07 | Đăng xuất | Bảng 3.9 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.4 — ĐC-02: Đăng nhập hệ thống
 
 | Cột | Nội dung |
@@ -54,6 +101,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Mở `/login`. 2. Nhập email, mật khẩu. 3. Nhấn **Đăng nhập** → `POST /auth/login`. 4. API validate (Zod), tìm user, so sánh mật khẩu. 5. Sinh JWT gồm `sub`, `email`, `role`. 6. Frontend lưu token và thông tin user. 7. Chuyển hướng `/dashboard` |
 | **Ngoại lệ** | E1: Sai email/mật khẩu → 401, tăng bộ đếm thất bại. E2: Sau 5 lần sai trong 10 phút → 429, tạm khóa đăng nhập. E3: Thiếu `JWT_SECRET` → 500. E4: Không kết nối API → thông báo lỗi trên UI |
 | **Các yêu cầu đặc biệt** | Khóa theo cặp email + IP; không tiết lộ user tồn tại hay không khi sai MK; mật khẩu không lưu plain text phía client |
+
+---
 
 ---
 
@@ -72,6 +121,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.6 — ĐC-04: Yêu cầu quên mật khẩu
 
 | Cột | Nội dung |
@@ -84,6 +135,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Mở `/forgot-password`. 2. Nhập email. 3. Submit → `POST /auth/forgot-password`. 4. API validate email. 5. Nếu user tồn tại: sinh token ngẫu nhiên, lưu map token→userId. 6. Trả message thành công (+ `resetToken` trong MVP). 7. Người dùng chuyển sang `/reset-password` với token |
 | **Ngoại lệ** | E1: Email không hợp lệ → 400. E2: Email không tồn tại → vẫn 200 với message chung (bảo mật) |
 | **Các yêu cầu đặc biệt** | Token một lần, hết hạn 15 phút; production nên gửi token qua email thay vì trả trong JSON |
+
+---
 
 ---
 
@@ -102,6 +155,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.8 — ĐC-06: Đổi mật khẩu (tài khoản đang đăng nhập)
 
 | Cột | Nội dung |
@@ -114,6 +169,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Đăng nhập, mở `/settings/account`. 2. Nhập MK hiện tại, MK mới, xác nhận. 3. UI kiểm tra xác nhận khớp. 4. Submit → `POST /auth/change-password` kèm Bearer token. 5. API so sánh MK cũ, validate MK mới, cập nhật hash. 6. Thông báo thành công, xóa form |
 | **Ngoại lệ** | E1: MK hiện tại sai → 401. E2: MK mới trùng MK cũ → 400. E3: MK mới không đủ mạnh → 400. E4: Xác nhận không khớp → lỗi UI, không gọi API |
 | **Các yêu cầu đặc biệt** | MK tối thiểu 8 ký tự, có hoa/thường/số; giới hạn độ dài input 255 ký tự trên UI |
+
+---
 
 ---
 
@@ -134,6 +191,27 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ## A.2. Dashboard
 
+---
+
+## Nhóm STT 3 — Dashboard & thống kê
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-08 |
+| **Số use case** | 1 |
+| **Bảng đặc tả** | Bảng 3.10 – 3.10 (chi tiết: `11`) |
+| **Màn hình** | /dashboard |
+| **Biểu đồ trình tự** | Hình 3.5.3a — file `16`, STT 3 |
+| **Biểu đồ hoạt động** | Hình 3.5.3b — file `16`, STT 3 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-08 | Xem dashboard & thống kê analytics | Bảng 3.10 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.10 — ĐC-08: Xem dashboard & thống kê analytics
 
 | Cột | Nội dung |
@@ -151,6 +229,30 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ## A.3. Quản lý dự án
 
+---
+
+## Nhóm STT 4 — Quản lý dự án
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-09 → ĐC-12 |
+| **Số use case** | 4 |
+| **Bảng đặc tả** | Bảng 3.11 – 3.14 (chi tiết: `11`) |
+| **Màn hình** | /projects |
+| **Biểu đồ trình tự** | Hình 3.5.4a — file `16`, STT 4 |
+| **Biểu đồ hoạt động** | Hình 3.5.4b — file `16`, STT 4 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-09 | Xem danh sách dự án | Bảng 3.11 |
+| ĐC-10 | Tạo dự án mới | Bảng 3.12 |
+| ĐC-11 | Cập nhật dự án và gán thành viên | Bảng 3.13 |
+| ĐC-12 | Xóa dự án | Bảng 3.14 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.11 — ĐC-09: Xem danh sách dự án
 
 | Cột | Nội dung |
@@ -163,6 +265,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Admin mở `/projects`. 2. `GET /projects` với Bearer token. 3. Backend lọc theo `projectAccessibleWhere`. 4. Trả danh sách project + members. 5. UI hiển thị bảng, hỗ trợ tìm kiếm theo tên |
 | **Ngoại lệ** | E1: Không phải ADMIN → AppShell chuyển `/dashboard`. E2: 401 → login |
 | **Các yêu cầu đặc biệt** | Chỉ ADMIN thấy menu Dự án; hiển thị owner và danh sách thành viên |
+
+---
 
 ---
 
@@ -181,6 +285,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.13 — ĐC-11: Cập nhật dự án và gán thành viên
 
 | Cột | Nội dung |
@@ -193,6 +299,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Admin chọn **Sửa** trên một project. 2. Sửa tên, mô tả, tick thành viên. 3. Submit → `PUT /projects/:id`. 4. API kiểm tra quyền, cập nhật project. 5. Nếu có memberIds: deleteMany ProjectMember, createMany mới. 6. Trả project đầy đủ. 7. UI đóng form, refresh |
 | **Ngoại lệ** | E1: Project không tồn tại → 404. E2: memberId không hợp lệ → lỗi transaction/400 |
 | **Các yêu cầu đặc biệt** | Owner không bị loại khỏi project khi sync member |
+
+---
 
 ---
 
@@ -213,6 +321,32 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ## A.4. Quản lý kịch bản kiểm thử
 
+---
+
+## Nhóm STT 5 — Quản lý kịch bản kiểm thử
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-13 → ĐC-18 |
+| **Số use case** | 6 |
+| **Bảng đặc tả** | Bảng 3.15 – 3.20 (chi tiết: `11`) |
+| **Màn hình** | /scripts, /scripts/[id] |
+| **Biểu đồ trình tự** | Hình 3.5.5a — file `16`, STT 5 |
+| **Biểu đồ hoạt động** | Hình 3.5.5b — file `16`, STT 5 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-13 | Xem danh sách kịch bản theo dự án | Bảng 3.15 |
+| ĐC-14 | Tạo kịch bản mới | Bảng 3.16 |
+| ĐC-15 | Xóa kịch bản | Bảng 3.17 |
+| ĐC-16 | Xem chi tiết kịch bản | Bảng 3.18 |
+| ĐC-17 | Thêm / sửa / xóa / sắp xếp bước kiểm thử | Bảng 3.19 |
+| ĐC-18 | Lưu danh sách bước lên server | Bảng 3.20 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.15 — ĐC-13: Xem danh sách kịch bản theo dự án
 
 | Cột | Nội dung |
@@ -225,6 +359,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Mở `/scripts`. 2. Chọn project (dropdown). 3. `GET /scripts?projectId=`. 4. Backend lọc script thuộc project accessible. 5. Hiển thị danh sách, link tới chi tiết |
 | **Ngoại lệ** | E1: Project không accessible → danh sách rỗng hoặc 403 |
 | **Các yêu cầu đặc biệt** | Viewer chỉ xem, không nút tạo/xóa |
+
+---
 
 ---
 
@@ -243,6 +379,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.17 — ĐC-15: Xóa kịch bản
 
 | Cột | Nội dung |
@@ -255,6 +393,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Chọn xóa trên danh sách. 2. Xác nhận. 3. `DELETE /scripts/:id`. 4. 204. 5. Cập nhật UI |
 | **Ngoại lệ** | E1: Script không tồn tại → 404. E2: Còn TestRun liên quan → có thể lỗi FK tùy DB |
 | **Các yêu cầu đặc biệt** | Cảnh báo nếu script đã có lịch sử chạy |
+
+---
 
 ---
 
@@ -273,6 +413,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.19 — ĐC-17: Thêm / sửa / xóa / sắp xếp bước kiểm thử
 
 | Cột | Nội dung |
@@ -285,6 +427,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Chọn keyword trên card. 2. Nhập tham số (url, selector, value, expected, dataKey, timeout). 3. Có thể chọn UiObject để điền selector. 4. Thêm bước / sửa bước / xóa / move up-down. 5. Đánh dấu dirty=true |
 | **Ngoại lệ** | E1: Keyword navigate thiếu url → chặn khi lưu. E2: fill thiếu value và dataKey → chặt khi lưu |
 | **Các yêu cầu đặc biệt** | timeoutMs 1000–180000 ms; semantic label cho selector dạng text thuần |
+
+---
 
 ---
 
@@ -303,6 +447,27 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
+## Nhóm STT 6 — Thực thi kịch bản
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-19 |
+| **Số use case** | 1 |
+| **Bảng đặc tả** | Bảng 3.21 – 3.21 (chi tiết: `11`) |
+| **Màn hình** | /scripts/[id] |
+| **Biểu đồ trình tự** | Hình 3.5.6a — file `16`, STT 6 |
+| **Biểu đồ hoạt động** | Hình 3.5.6b — file `16`, STT 6 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-19 | Chạy kịch bản kiểm thử | Bảng 3.21 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.21 — ĐC-19: Chạy kịch bản kiểm thử
 
 | Cột | Nội dung |
@@ -320,6 +485,30 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ## A.5. Đối tượng UI
 
+---
+
+## Nhóm STT 7 — Quản lý đối tượng UI
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-20 → ĐC-23 |
+| **Số use case** | 4 |
+| **Bảng đặc tả** | Bảng 3.22 – 3.25 (chi tiết: `11`) |
+| **Màn hình** | /objects |
+| **Biểu đồ trình tự** | Hình 3.5.7a — file `16`, STT 7 |
+| **Biểu đồ hoạt động** | Hình 3.5.7b — file `16`, STT 7 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-20 | Xem danh sách đối tượng UI | Bảng 3.22 |
+| ĐC-21 | Thêm đối tượng UI | Bảng 3.23 |
+| ĐC-22 | Sửa đối tượng UI | Bảng 3.24 |
+| ĐC-23 | Xóa đối tượng UI | Bảng 3.25 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.22 — ĐC-20: Xem danh sách đối tượng UI
 
 | Cột | Nội dung |
@@ -332,6 +521,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Mở `/objects`. 2. Chọn project. 3. Gọi API. 4. Hiển thị name, locator, mô tả |
 | **Ngoại lệ** | E1: Project không accessible → 403 |
 | **Các yêu cầu đặc biệt** | Sắp xếp createdAt desc |
+
+---
 
 ---
 
@@ -350,6 +541,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.24 — ĐC-22: Sửa đối tượng UI
 
 | Cột | Nội dung |
@@ -362,6 +555,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Chọn sửa. 2. Sửa field. 3. PUT. 4. Cập nhật UI |
 | **Ngoại lệ** | E1: Không tìm thấy → 404. E2: Đổi projectId sang project không quyền → 403 |
 | **Các yêu cầu đặc biệt** | Steps đang reference targetId vẫn trỏ tới object id |
+
+---
 
 ---
 
@@ -382,6 +577,30 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ## A.6. Bộ dữ liệu
 
+---
+
+## Nhóm STT 8 — Quản lý bộ dữ liệu
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-24 → ĐC-27 |
+| **Số use case** | 4 |
+| **Bảng đặc tả** | Bảng 3.26 – 3.29 (chi tiết: `11`) |
+| **Màn hình** | /datasets |
+| **Biểu đồ trình tự** | Hình 3.5.8a — file `16`, STT 8 |
+| **Biểu đồ hoạt động** | Hình 3.5.8b — file `16`, STT 8 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-24 | Xem danh sách bộ dữ liệu | Bảng 3.26 |
+| ĐC-25 | Tạo bộ dữ liệu | Bảng 3.27 |
+| ĐC-26 | Cập nhật bộ dữ liệu | Bảng 3.28 |
+| ĐC-27 | Xóa bộ dữ liệu | Bảng 3.29 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.26 — ĐC-24: Xem danh sách bộ dữ liệu
 
 | Cột | Nội dung |
@@ -394,6 +613,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Mở trang. 2. Chọn project. 3. GET /datasets. 4. Hiển thị name, rows preview |
 | **Ngoại lệ** | E1: 403 project |
 | **Các yêu cầu đặc biệt** | rows lưu dạng JSON array |
+
+---
 
 ---
 
@@ -412,6 +633,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.28 — ĐC-26: Cập nhật bộ dữ liệu
 
 | Cột | Nội dung |
@@ -424,6 +647,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Sửa form. 2. PUT. 3. Cập nhật DB. 4. Refresh |
 | **Ngoại lệ** | E1: 404/403 |
 | **Các yêu cầu đặc biệt** | Run cũ vẫn giữ dataSetId snapshot |
+
+---
 
 ---
 
@@ -444,6 +669,31 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ## A.7. Báo cáo
 
+---
+
+## Nhóm STT 9 — Báo cáo & xuất PDF
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-28 → ĐC-32 |
+| **Số use case** | 5 |
+| **Bảng đặc tả** | Bảng 3.30 – 3.34 (chi tiết: `11`) |
+| **Màn hình** | /reports, /report/[runId] |
+| **Biểu đồ trình tự** | Hình 3.5.9a — file `16`, STT 9 |
+| **Biểu đồ hoạt động** | Hình 3.5.9b — file `16`, STT 9 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-28 | Xem danh sách lần chạy & thống kê Pass/Fail | Bảng 3.30 |
+| ĐC-29 | Lọc báo cáo theo trạng thái / kịch bản | Bảng 3.31 |
+| ĐC-30 | Xem chi tiết kết quả từng bước | Bảng 3.32 |
+| ĐC-31 | Tải báo cáo PDF một lần chạy | Bảng 3.33 |
+| ĐC-32 | Xem chi tiết suite run theo Run ID | Bảng 3.34 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.30 — ĐC-28: Xem danh sách lần chạy & thống kê Pass/Fail
 
 | Cột | Nội dung |
@@ -456,6 +706,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Mở `/reports`. 2. GET /runs. 3. Tính total/passed/failed cards. 4. Hiển thị bảng runs |
 | **Ngoại lệ** | E1: Không có run → 0 |
 | **Các yêu cầu đặc biệt** | Hiển thị tên script, thời gian, trạng thái tiếng Việt |
+
+---
 
 ---
 
@@ -474,6 +726,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.32 — ĐC-30: Xem chi tiết kết quả từng bước
 
 | Cột | Nội dung |
@@ -489,6 +743,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.33 — ĐC-31: Tải báo cáo PDF một lần chạy
 
 | Cột | Nội dung |
@@ -501,6 +757,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Nhấn **Tải PDF**. 2. fetch với Bearer header. 3. API generateRunPdf. 4. Trả application/pdf. 5. Browser download file |
 | **Ngoại lệ** | E1: 404. E2: Lỗi generate → thông báo |
 | **Các yêu cầu đặc biệt** | Phải gửi Authorization vì link trần không mang JWT |
+
+---
 
 ---
 
@@ -521,6 +779,31 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ## A.8. Kiểm thử nhanh — Recorder & Editor
 
+---
+
+## Nhóm STT 10 — Ghi thao tác & publish test case
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-33 → ĐC-37 |
+| **Số use case** | 5 |
+| **Bảng đặc tả** | Bảng 3.35 – 3.39 (chi tiết: `11`) |
+| **Màn hình** | /recorder, /editor |
+| **Biểu đồ trình tự** | Hình 3.5.10a — file `16`, STT 10 |
+| **Biểu đồ hoạt động** | Hình 3.5.10b — file `16`, STT 10 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-33 | Ghi thao tác thủ công | Bảng 3.35 |
+| ĐC-34 | Import kịch bản từ script Playwright | Bảng 3.36 |
+| ĐC-35 | Phân tích ghi thao tác thông minh (Smart Record) | Bảng 3.37 |
+| ĐC-36 | Tạo test case ở trạng thái Draft | Bảng 3.38 |
+| ĐC-37 | Publish test case | Bảng 3.39 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.35 — ĐC-33: Ghi thao tác thủ công
 
 | Cột | Nội dung |
@@ -533,6 +816,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Chọn project, URL. 2. Chọn loại thao tác, selector, value/expected. 3. **Thêm thao tác**. 4. Lặp. 5. Có thể xóa từng dòng hoặc xóa hết |
 | **Ngoại lệ** | E1: Selector rỗng → không thêm |
 | **Các yêu cầu đặc biệt** | Tối đa 255 ký tự một số field text |
+
+---
 
 ---
 
@@ -551,6 +836,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.37 — ĐC-35: Phân tích ghi thao tác thông minh (Smart Record)
 
 | Cột | Nội dung |
@@ -566,6 +853,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.38 — ĐC-36: Tạo test case ở trạng thái Draft
 
 | Cột | Nội dung |
@@ -578,6 +867,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Nhấn tạo test draft. 2. Build steps (navigate + recorded steps). 3. POST {name, platform, steps}. 4. parseStep validate. 5. Tạo case + version content Draft. 6. Hiển thị id, version |
 | **Ngoại lệ** | E1: Step invalid → 400. E2: Project không tồn tại → 404 |
 | **Các yêu cầu đặc biệt** | platform mặc định desktop-web |
+
+---
 
 ---
 
@@ -598,6 +889,27 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ## A.9. Bộ kiểm thử
 
+---
+
+## Nhóm STT 11 — Chạy test suite
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-38 |
+| **Số use case** | 1 |
+| **Bảng đặc tả** | Bảng 3.40 – 3.40 (chi tiết: `11`) |
+| **Màn hình** | /suite-runs |
+| **Biểu đồ trình tự** | Hình 3.5.11a — file `16`, STT 11 |
+| **Biểu đồ hoạt động** | Hình 3.5.11b — file `16`, STT 11 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-38 | Chạy test suite từ giao diện | Bảng 3.40 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.40 — ĐC-38: Chạy test suite từ giao diện
 
 | Cột | Nội dung |
@@ -615,6 +927,30 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ## A.10. Quản trị người dùng
 
+---
+
+## Nhóm STT 12 — Quản trị người dùng
+
+| Thuộc tính nhóm | Giá trị |
+|-----------------|--------|
+| **Mã use case** | ĐC-39 → ĐC-42 |
+| **Số use case** | 4 |
+| **Bảng đặc tả** | Bảng 3.41 – 3.44 (chi tiết: `11`) |
+| **Màn hình** | /admin/users |
+| **Biểu đồ trình tự** | Hình 3.5.12a — file `16`, STT 12 |
+| **Biểu đồ hoạt động** | Hình 3.5.12b — file `16`, STT 12 |
+
+### Danh sách use case trong nhóm
+
+| Mã | Tên use case | Bảng |
+|----|--------------|------|
+| ĐC-39 | Xem danh sách người dùng | Bảng 3.41 |
+| ĐC-40 | Tạo người dùng (Admin) | Bảng 3.42 |
+| ĐC-41 | Cập nhật thông tin / quyền người dùng | Bảng 3.43 |
+| ĐC-42 | Xóa người dùng | Bảng 3.44 |
+
+### Đặc tả chi tiết (8 cột)
+
 ### Bảng 3.41 — ĐC-39: Xem danh sách người dùng
 
 | Cột | Nội dung |
@@ -627,6 +963,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Mở `/admin/users`. 2. GET users + GET projects (cho dropdown). 3. Hiển thị bảng, search local |
 | **Ngoại lệ** | E1: 403 → redirect dashboard |
 | **Các yêu cầu đặc biệt** | Sắp xếp role, fullName |
+
+---
 
 ---
 
@@ -645,6 +983,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 
 ---
 
+---
+
 ### Bảng 3.43 — ĐC-41: Cập nhật thông tin / quyền người dùng
 
 | Cột | Nội dung |
@@ -657,6 +997,8 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | **Luồng sự kiện** | 1. Mở modal sửa. 2. Sửa field. 3. PUT. 4. Kiểm tra email trùng, ràng buộc admin duy nhất. 5. Cập nhật. 6. Refresh |
 | **Ngoại lệ** | E1: Hạ quyền admin cuối → 400. E2: Email taken → 409 |
 | **Các yêu cầu đặc biệt** | Không hạ quyền admin của chính mình nếu là admin duy nhất |
+
+---
 
 ---
 
@@ -723,3 +1065,14 @@ Tài liệu mô tả **42 use case** trên giao diện web. Mỗi bảng gồm 8
 | ĐC-42 | 3.44 | `/admin/users` |
 
 *Tổng: **42** đặc tả chức năng (Bảng 3.3 – 3.44).*
+
+---
+
+## Liên kết tài liệu
+
+| File | Nội dung |
+|------|----------|
+| `11-dac-ta-chuc-nang-giao-dien-web.md` | 42 bảng đặc tả (đánh số Bảng 3.3–3.44) |
+| `17-dac-ta-chuc-nang-gop-nhom.md` | **File này** — cùng nội dung, nhóm theo STT 1–12 |
+| `16-bieu-do-gop-trinh-tu-va-hoat-dong.md` | 12 nhóm biểu đồ Sequence + Activity |
+| `12`, `13` | Phụ lục: 42 biểu đồ tách riêng (nếu cần) |
