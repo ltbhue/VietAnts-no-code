@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="vietants-uml-mau" version="24.0.0">
+  <diagram id="ĐC-08: Dashboard & analytics" name="ĐC-08: Dashboard &amp; analytics">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="950" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="2" value="Người dùng" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="95" y="50" width="40" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="3" style="endArrow=none;dashed=1;html=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="115" y="110" as="sourcePoint"/>
+            <mxPoint x="115" y="890" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4" value="GD_Dashboard_analytics" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#000000;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="237" y="50" width="56" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="5" style="endArrow=none;dashed=1;html=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="265" y="106" as="sourcePoint"/>
+            <mxPoint x="265" y="890" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6" value="Ctr_Dashboard_analytics" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="387" y="50" width="56" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="7" style="endArrow=none;dashed=1;html=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="415" y="106" as="sourcePoint"/>
+            <mxPoint x="415" y="890" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8" value="E_DuLieu" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="537" y="50" width="56" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="9" style="endArrow=none;dashed=1;html=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="565" y="106" as="sourcePoint"/>
+            <mxPoint x="565" y="890" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="10" value="1. Mở /dashboard" style="endArrow=block;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="115" y="150" as="sourcePoint"/>
+            <mxPoint x="265" y="150" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="11" value="2. GET /projects (Bearer)" style="endArrow=block;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="265" y="198" as="sourcePoint"/>
+            <mxPoint x="415" y="198" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12" value="3. projects accessible" style="endArrow=block;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="415" y="246" as="sourcePoint"/>
+            <mxPoint x="565" y="246" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="13" value="4. return Danh sách project" style="endArrow=open;dashed=1;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="565" y="294" as="sourcePoint"/>
+            <mxPoint x="415" y="294" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="14" value="4. return projects[]" style="endArrow=open;dashed=1;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="415" y="342" as="sourcePoint"/>
+            <mxPoint x="265" y="342" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="15" value="4. GET /runs" style="endArrow=block;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="265" y="390" as="sourcePoint"/>
+            <mxPoint x="415" y="390" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="16" value="5. testRuns by userId" style="endArrow=block;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="415" y="438" as="sourcePoint"/>
+            <mxPoint x="565" y="438" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="17" value="6. return runs[]" style="endArrow=open;dashed=1;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="415" y="486" as="sourcePoint"/>
+            <mxPoint x="265" y="486" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="18" value="6. Chọn project, days, suite" style="endArrow=block;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="115" y="534" as="sourcePoint"/>
+            <mxPoint x="265" y="534" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="19" value="7. GET /projects/:id/suites" style="endArrow=block;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="265" y="582" as="sourcePoint"/>
+            <mxPoint x="415" y="582" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="20" value="8. return suites[]" style="endArrow=open;dashed=1;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="415" y="630" as="sourcePoint"/>
+            <mxPoint x="265" y="630" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="21" value="8. GET /runs/analytics?days&amp;projectId&amp;suiteId" style="endArrow=block;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="265" y="678" as="sourcePoint"/>
+            <mxPoint x="415" y="678" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="22" value="9. aggregate runs/suiteRuns" style="endArrow=block;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="415" y="726" as="sourcePoint"/>
+            <mxPoint x="565" y="726" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="23" value="10. return passRate, timeSeries, commonErrors" style="endArrow=open;dashed=1;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="415" y="774" as="sourcePoint"/>
+            <mxPoint x="265" y="774" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="24" value="10. return Hiển thị biểu đồ &amp; thẻ thống kê" style="endArrow=open;dashed=1;html=1;strokeColor=#000000;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="265" y="822" as="sourcePoint"/>
+            <mxPoint x="115" y="822" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

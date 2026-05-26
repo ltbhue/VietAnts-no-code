@@ -1,0 +1,149 @@
+{
+  "source": "docs\\final\\16-bieu-do-gop-trinh-tu-va-hoat-dong.md",
+  "images": [
+    {
+      "stt": 1,
+      "title": "Trang chủ (ĐC-01)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-01-sequence-trang-chu-c-01.png"
+    },
+    {
+      "stt": 1,
+      "title": "Trang chủ (ĐC-01)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-01-activity-trang-chu-c-01.png"
+    },
+    {
+      "stt": 2,
+      "title": "Xác thực & quản lý tài khoản (ĐC-02 → ĐC-07)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-02-sequence-xac-thuc-quan-ly-tai-khoan-c-02-c-07.png"
+    },
+    {
+      "stt": 2,
+      "title": "Xác thực & quản lý tài khoản (ĐC-02 → ĐC-07)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-02-activity-xac-thuc-quan-ly-tai-khoan-c-02-c-07.png"
+    },
+    {
+      "stt": 3,
+      "title": "Dashboard & thống kê (ĐC-08)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-03-sequence-dashboard-thong-ke-c-08.png"
+    },
+    {
+      "stt": 3,
+      "title": "Dashboard & thống kê (ĐC-08)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-03-activity-dashboard-thong-ke-c-08.png"
+    },
+    {
+      "stt": 4,
+      "title": "Quản lý dự án CRUD (ĐC-09 → ĐC-12)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-04-sequence-quan-ly-du-an-crud-c-09-c-12.png"
+    },
+    {
+      "stt": 4,
+      "title": "Quản lý dự án CRUD (ĐC-09 → ĐC-12)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-04-activity-quan-ly-du-an-crud-c-09-c-12.png"
+    },
+    {
+      "stt": 5,
+      "title": "Quản lý kịch bản kiểm thử (ĐC-13 → ĐC-18)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-05-sequence-quan-ly-kich-ban-kiem-thu-c-13-c-18.png"
+    },
+    {
+      "stt": 5,
+      "title": "Quản lý kịch bản kiểm thử (ĐC-13 → ĐC-18)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-05-activity-quan-ly-kich-ban-kiem-thu-c-13-c-18.png"
+    },
+    {
+      "stt": 6,
+      "title": "Thực thi kịch bản (ĐC-19)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-06-sequence-thuc-thi-kich-ban-c-19.png"
+    },
+    {
+      "stt": 6,
+      "title": "Thực thi kịch bản (ĐC-19)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-06-activity-thuc-thi-kich-ban-c-19.png"
+    },
+    {
+      "stt": 7,
+      "title": "Quản lý đối tượng UI CRUD (ĐC-20 → ĐC-23)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-07-sequence-quan-ly-oi-tuong-ui-crud-c-20-c-23.png"
+    },
+    {
+      "stt": 7,
+      "title": "Quản lý đối tượng UI CRUD (ĐC-20 → ĐC-23)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-07-activity-quan-ly-oi-tuong-ui-crud-c-20-c-23.png"
+    },
+    {
+      "stt": 8,
+      "title": "Quản lý bộ dữ liệu CRUD (ĐC-24 → ĐC-27)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-08-sequence-quan-ly-bo-du-lieu-crud-c-24-c-27.png"
+    },
+    {
+      "stt": 8,
+      "title": "Quản lý bộ dữ liệu CRUD (ĐC-24 → ĐC-27)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-08-activity-quan-ly-bo-du-lieu-crud-c-24-c-27.png"
+    },
+    {
+      "stt": 9,
+      "title": "Báo cáo & xuất PDF (ĐC-28 → ĐC-32)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-09-sequence-bao-cao-xuat-pdf-c-28-c-32.png"
+    },
+    {
+      "stt": 9,
+      "title": "Báo cáo & xuất PDF (ĐC-28 → ĐC-32)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-09-activity-bao-cao-xuat-pdf-c-28-c-32.png"
+    },
+    {
+      "stt": 10,
+      "title": "Ghi thao tác, test case & publish (ĐC-33 → ĐC-37)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-10-sequence-ghi-thao-tac-test-case-publish-c-33-c-37.png"
+    },
+    {
+      "stt": 10,
+      "title": "Ghi thao tác, test case & publish (ĐC-33 → ĐC-37)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-10-activity-ghi-thao-tac-test-case-publish-c-33-c-37.png"
+    },
+    {
+      "stt": 11,
+      "title": "Chạy test suite (ĐC-38)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-11-sequence-chay-test-suite-c-38.png"
+    },
+    {
+      "stt": 11,
+      "title": "Chạy test suite (ĐC-38)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-11-activity-chay-test-suite-c-38.png"
+    },
+    {
+      "stt": 12,
+      "title": "Quản trị người dùng (ĐC-39 → ĐC-42)",
+      "kind": "sequence",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-12-sequence-quan-tri-nguoi-dung-c-39-c-42.png"
+    },
+    {
+      "stt": 12,
+      "title": "Quản trị người dùng (ĐC-39 → ĐC-42)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\16-bieu-do-gop-trinh-tu-va-hoat-dong\\stt-12-activity-quan-tri-nguoi-dung-c-39-c-42.png"
+    }
+  ]
+}

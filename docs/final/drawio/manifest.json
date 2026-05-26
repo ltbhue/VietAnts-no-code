@@ -1,0 +1,62 @@
+[
+  {
+    "stt": 1,
+    "sequence": "stt-01-sequence.drawio",
+    "activity": "stt-01-activity.drawio"
+  },
+  {
+    "stt": 2,
+    "sequence": "stt-02-sequence.drawio",
+    "activity": "stt-02-activity.drawio"
+  },
+  {
+    "stt": 3,
+    "sequence": "stt-03-sequence.drawio",
+    "activity": "stt-03-activity.drawio"
+  },
+  {
+    "stt": 4,
+    "sequence": "stt-04-sequence.drawio",
+    "activity": "stt-04-activity.drawio"
+  },
+  {
+    "stt": 5,
+    "sequence": "stt-05-sequence.drawio",
+    "activity": "stt-05-activity.drawio"
+  },
+  {
+    "stt": 6,
+    "sequence": "stt-06-sequence.drawio",
+    "activity": "stt-06-activity.drawio"
+  },
+  {
+    "stt": 7,
+    "sequence": "stt-07-sequence.drawio",
+    "activity": "stt-07-activity.drawio"
+  },
+  {
+    "stt": 8,
+    "sequence": "stt-08-sequence.drawio",
+    "activity": "stt-08-activity.drawio"
+  },
+  {
+    "stt": 9,
+    "sequence": "stt-09-sequence.drawio",
+    "activity": "stt-09-activity.drawio"
+  },
+  {
+    "stt": 10,
+    "sequence": "stt-10-sequence.drawio",
+    "activity": "stt-10-activity.drawio"
+  },
+  {
+    "stt": 11,
+    "sequence": "stt-11-sequence.drawio",
+    "activity": "stt-11-activity.drawio"
+  },
+  {
+    "stt": 12,
+    "sequence": "stt-12-sequence.drawio",
+    "activity": "stt-12-activity.drawio"
+  }
+]

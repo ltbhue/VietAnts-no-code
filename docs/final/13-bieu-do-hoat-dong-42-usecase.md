@@ -506,7 +506,7 @@ flowchart TD
     D --> E{Selector rỗng?}
     E -- Có --> F[Lỗi]
     F --> D
-    E -- Không --> G[Thêm vào actions[]]
+    E -- Không --> G["Thêm vào actions[]"]
     G --> H{Còn thêm?}
     H -- Có --> C
     H -- Không --> I([Kết thúc / chờ submit])

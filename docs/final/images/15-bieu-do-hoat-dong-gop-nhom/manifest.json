@@ -1,0 +1,77 @@
+{
+  "source": "docs\\final\\15-bieu-do-hoat-dong-gop-nhom.md",
+  "images": [
+    {
+      "stt": 1,
+      "title": "Trang chủ (ĐC-01)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-01-activity-trang-chu-c-01.png"
+    },
+    {
+      "stt": 2,
+      "title": "Xác thực & quản lý tài khoản (ĐC-02 → ĐC-07)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-02-activity-xac-thuc-quan-ly-tai-khoan-c-02-c-07.png"
+    },
+    {
+      "stt": 3,
+      "title": "Dashboard (ĐC-08)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-03-activity-dashboard-c-08.png"
+    },
+    {
+      "stt": 4,
+      "title": "Quản lý dự án (ĐC-09 → ĐC-12)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-04-activity-quan-ly-du-an-c-09-c-12.png"
+    },
+    {
+      "stt": 5,
+      "title": "Quản lý kịch bản (ĐC-13 → ĐC-18)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-05-activity-quan-ly-kich-ban-c-13-c-18.png"
+    },
+    {
+      "stt": 6,
+      "title": "Thực thi kịch bản (ĐC-19)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-06-activity-thuc-thi-kich-ban-c-19.png"
+    },
+    {
+      "stt": 7,
+      "title": "Đối tượng UI CRUD (ĐC-20 → ĐC-23)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-07-activity-oi-tuong-ui-crud-c-20-c-23.png"
+    },
+    {
+      "stt": 8,
+      "title": "Bộ dữ liệu CRUD (ĐC-24 → ĐC-27)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-08-activity-bo-du-lieu-crud-c-24-c-27.png"
+    },
+    {
+      "stt": 9,
+      "title": "Báo cáo (ĐC-28 → ĐC-32)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-09-activity-bao-cao-c-28-c-32.png"
+    },
+    {
+      "stt": 10,
+      "title": "Ghi thao tác & publish (ĐC-33 → ĐC-37)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-10-activity-ghi-thao-tac-publish-c-33-c-37.png"
+    },
+    {
+      "stt": 11,
+      "title": "Chạy test suite (ĐC-38)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-11-activity-chay-test-suite-c-38.png"
+    },
+    {
+      "stt": 12,
+      "title": "Quản trị người dùng (ĐC-39 → ĐC-42)",
+      "kind": "activity",
+      "file": "docs\\final\\images\\15-bieu-do-hoat-dong-gop-nhom\\stt-12-activity-quan-tri-nguoi-dung-c-39-c-42.png"
+    }
+  ]
+}

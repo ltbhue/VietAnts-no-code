@@ -1,0 +1,631 @@
+{
+  "source": "17-dac-ta-chuc-nang-gop-nhom.md",
+  "images": [
+    {
+      "stt": 1,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-01-sequence.png"
+    },
+    {
+      "stt": 1,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-01-activity.png"
+    },
+    {
+      "stt": 2,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-02-sequence.png"
+    },
+    {
+      "stt": 2,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-02-activity.png"
+    },
+    {
+      "stt": 3,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-03-sequence.png"
+    },
+    {
+      "stt": 3,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-03-activity.png"
+    },
+    {
+      "stt": 4,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-04-sequence.png"
+    },
+    {
+      "stt": 4,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-04-activity.png"
+    },
+    {
+      "stt": 5,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-05-sequence.png"
+    },
+    {
+      "stt": 5,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-05-activity.png"
+    },
+    {
+      "stt": 6,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-06-sequence.png"
+    },
+    {
+      "stt": 6,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-06-activity.png"
+    },
+    {
+      "stt": 7,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-07-sequence.png"
+    },
+    {
+      "stt": 7,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-07-activity.png"
+    },
+    {
+      "stt": 8,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-08-sequence.png"
+    },
+    {
+      "stt": 8,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-08-activity.png"
+    },
+    {
+      "stt": 9,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-09-sequence.png"
+    },
+    {
+      "stt": 9,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-09-activity.png"
+    },
+    {
+      "stt": 10,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-10-sequence.png"
+    },
+    {
+      "stt": 10,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-10-activity.png"
+    },
+    {
+      "stt": 11,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-11-sequence.png"
+    },
+    {
+      "stt": 11,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-11-activity.png"
+    },
+    {
+      "stt": 12,
+      "kind": "sequence",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-12-sequence.png"
+    },
+    {
+      "stt": 12,
+      "kind": "activity",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/stt-12-activity.png"
+    }
+  ],
+  "perUseCase": [
+    {
+      "dc": 1,
+      "kind": "sequence",
+      "title": "Truy cập trang giới thiệu",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-01-sequence.png"
+    },
+    {
+      "dc": 1,
+      "kind": "activity",
+      "title": "Truy cập trang giới thiệu",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-01-activity.png"
+    },
+    {
+      "dc": 2,
+      "kind": "sequence",
+      "title": "Đăng nhập hệ thống",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-02-sequence.png"
+    },
+    {
+      "dc": 2,
+      "kind": "activity",
+      "title": "Đăng nhập hệ thống",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-02-activity.png"
+    },
+    {
+      "dc": 3,
+      "kind": "sequence",
+      "title": "Đăng ký tài khoản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-03-sequence.png"
+    },
+    {
+      "dc": 3,
+      "kind": "activity",
+      "title": "Đăng ký tài khoản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-03-activity.png"
+    },
+    {
+      "dc": 4,
+      "kind": "sequence",
+      "title": "Quên mật khẩu",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-04-sequence.png"
+    },
+    {
+      "dc": 4,
+      "kind": "activity",
+      "title": "Quên mật khẩu",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-04-activity.png"
+    },
+    {
+      "dc": 5,
+      "kind": "sequence",
+      "title": "Đặt lại mật khẩu",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-05-sequence.png"
+    },
+    {
+      "dc": 5,
+      "kind": "activity",
+      "title": "Đặt lại mật khẩu",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-05-activity.png"
+    },
+    {
+      "dc": 6,
+      "kind": "sequence",
+      "title": "Đổi mật khẩu",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-06-sequence.png"
+    },
+    {
+      "dc": 6,
+      "kind": "activity",
+      "title": "Đổi mật khẩu",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-06-activity.png"
+    },
+    {
+      "dc": 7,
+      "kind": "sequence",
+      "title": "Đăng xuất",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-07-sequence.png"
+    },
+    {
+      "dc": 7,
+      "kind": "activity",
+      "title": "Đăng xuất",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-07-activity.png"
+    },
+    {
+      "dc": 8,
+      "kind": "sequence",
+      "title": "Dashboard & analytics",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-08-sequence.png"
+    },
+    {
+      "dc": 8,
+      "kind": "activity",
+      "title": "Dashboard & analytics",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-08-activity.png"
+    },
+    {
+      "dc": 9,
+      "kind": "sequence",
+      "title": "Xem danh sách dự án",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-09-sequence.png"
+    },
+    {
+      "dc": 9,
+      "kind": "activity",
+      "title": "Xem danh sách dự án",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-09-activity.png"
+    },
+    {
+      "dc": 10,
+      "kind": "sequence",
+      "title": "Tạo dự án",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-10-sequence.png"
+    },
+    {
+      "dc": 10,
+      "kind": "activity",
+      "title": "Tạo dự án",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-10-activity.png"
+    },
+    {
+      "dc": 11,
+      "kind": "sequence",
+      "title": "Cập nhật dự án",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-11-sequence.png"
+    },
+    {
+      "dc": 11,
+      "kind": "activity",
+      "title": "Cập nhật dự án",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-11-activity.png"
+    },
+    {
+      "dc": 12,
+      "kind": "sequence",
+      "title": "Xóa dự án",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-12-sequence.png"
+    },
+    {
+      "dc": 12,
+      "kind": "activity",
+      "title": "Xóa dự án",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-12-activity.png"
+    },
+    {
+      "dc": 13,
+      "kind": "sequence",
+      "title": "Xem danh sách kịch bản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-13-sequence.png"
+    },
+    {
+      "dc": 13,
+      "kind": "activity",
+      "title": "Xem danh sách kịch bản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-13-activity.png"
+    },
+    {
+      "dc": 14,
+      "kind": "sequence",
+      "title": "Tạo kịch bản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-14-sequence.png"
+    },
+    {
+      "dc": 14,
+      "kind": "activity",
+      "title": "Tạo kịch bản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-14-activity.png"
+    },
+    {
+      "dc": 15,
+      "kind": "sequence",
+      "title": "Xóa kịch bản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-15-sequence.png"
+    },
+    {
+      "dc": 15,
+      "kind": "activity",
+      "title": "Xóa kịch bản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-15-activity.png"
+    },
+    {
+      "dc": 16,
+      "kind": "sequence",
+      "title": "Xem chi tiết kịch bản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-16-sequence.png"
+    },
+    {
+      "dc": 16,
+      "kind": "activity",
+      "title": "Xem chi tiết kịch bản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-16-activity.png"
+    },
+    {
+      "dc": 17,
+      "kind": "sequence",
+      "title": "Biên tập bước (client)",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-17-sequence.png"
+    },
+    {
+      "dc": 17,
+      "kind": "activity",
+      "title": "Biên tập bước",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-17-activity.png"
+    },
+    {
+      "dc": 18,
+      "kind": "sequence",
+      "title": "Lưu danh sách bước",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-18-sequence.png"
+    },
+    {
+      "dc": 18,
+      "kind": "activity",
+      "title": "Lưu danh sách bước",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-18-activity.png"
+    },
+    {
+      "dc": 19,
+      "kind": "sequence",
+      "title": "Chạy kịch bản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-19-sequence.png"
+    },
+    {
+      "dc": 19,
+      "kind": "activity",
+      "title": "Chạy kịch bản",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-19-activity.png"
+    },
+    {
+      "dc": 20,
+      "kind": "sequence",
+      "title": "Xem danh sách object",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-20-sequence.png"
+    },
+    {
+      "dc": 20,
+      "kind": "activity",
+      "title": "Xem danh sách object",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-20-activity.png"
+    },
+    {
+      "dc": 21,
+      "kind": "sequence",
+      "title": "Thêm object",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-21-sequence.png"
+    },
+    {
+      "dc": 21,
+      "kind": "activity",
+      "title": "Thêm object",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-21-activity.png"
+    },
+    {
+      "dc": 22,
+      "kind": "sequence",
+      "title": "Sửa object",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-22-sequence.png"
+    },
+    {
+      "dc": 22,
+      "kind": "activity",
+      "title": "Sửa object",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-22-activity.png"
+    },
+    {
+      "dc": 23,
+      "kind": "sequence",
+      "title": "Xóa object",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-23-sequence.png"
+    },
+    {
+      "dc": 23,
+      "kind": "activity",
+      "title": "Xóa object",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-23-activity.png"
+    },
+    {
+      "dc": 24,
+      "kind": "sequence",
+      "title": "Xem danh sách dataset",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-24-sequence.png"
+    },
+    {
+      "dc": 24,
+      "kind": "activity",
+      "title": "Xem danh sách dataset",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-24-activity.png"
+    },
+    {
+      "dc": 25,
+      "kind": "sequence",
+      "title": "Tạo dataset",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-25-sequence.png"
+    },
+    {
+      "dc": 25,
+      "kind": "activity",
+      "title": "Tạo dataset",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-25-activity.png"
+    },
+    {
+      "dc": 26,
+      "kind": "sequence",
+      "title": "Cập nhật dataset",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-26-sequence.png"
+    },
+    {
+      "dc": 26,
+      "kind": "activity",
+      "title": "Cập nhật dataset",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-26-activity.png"
+    },
+    {
+      "dc": 27,
+      "kind": "sequence",
+      "title": "Xóa dataset",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-27-sequence.png"
+    },
+    {
+      "dc": 27,
+      "kind": "activity",
+      "title": "Xóa dataset",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-27-activity.png"
+    },
+    {
+      "dc": 28,
+      "kind": "sequence",
+      "title": "Xem danh sách runs",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-28-sequence.png"
+    },
+    {
+      "dc": 28,
+      "kind": "activity",
+      "title": "Xem danh sách runs",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-28-activity.png"
+    },
+    {
+      "dc": 29,
+      "kind": "sequence",
+      "title": "Lọc báo cáo",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-29-sequence.png"
+    },
+    {
+      "dc": 29,
+      "kind": "activity",
+      "title": "Lọc báo cáo",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-29-activity.png"
+    },
+    {
+      "dc": 30,
+      "kind": "sequence",
+      "title": "Chi tiết kết quả run",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-30-sequence.png"
+    },
+    {
+      "dc": 30,
+      "kind": "activity",
+      "title": "Chi tiết kết quả run",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-30-activity.png"
+    },
+    {
+      "dc": 31,
+      "kind": "sequence",
+      "title": "Tải PDF",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-31-sequence.png"
+    },
+    {
+      "dc": 31,
+      "kind": "activity",
+      "title": "Tải PDF",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-31-activity.png"
+    },
+    {
+      "dc": 32,
+      "kind": "sequence",
+      "title": "Xem suite run",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-32-sequence.png"
+    },
+    {
+      "dc": 32,
+      "kind": "activity",
+      "title": "Xem suite run",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-32-activity.png"
+    },
+    {
+      "dc": 33,
+      "kind": "sequence",
+      "title": "Ghi thao tác thủ công",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-33-sequence.png"
+    },
+    {
+      "dc": 33,
+      "kind": "activity",
+      "title": "Ghi thao tác thủ công",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-33-activity.png"
+    },
+    {
+      "dc": 34,
+      "kind": "sequence",
+      "title": "Import Playwright script",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-34-sequence.png"
+    },
+    {
+      "dc": 34,
+      "kind": "activity",
+      "title": "Import Playwright",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-34-activity.png"
+    },
+    {
+      "dc": 35,
+      "kind": "sequence",
+      "title": "Smart record",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-35-sequence.png"
+    },
+    {
+      "dc": 35,
+      "kind": "activity",
+      "title": "Smart record",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-35-activity.png"
+    },
+    {
+      "dc": 36,
+      "kind": "sequence",
+      "title": "Tạo test case Draft",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-36-sequence.png"
+    },
+    {
+      "dc": 36,
+      "kind": "activity",
+      "title": "Tạo test case Draft",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-36-activity.png"
+    },
+    {
+      "dc": 37,
+      "kind": "sequence",
+      "title": "Publish test case",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-37-sequence.png"
+    },
+    {
+      "dc": 37,
+      "kind": "activity",
+      "title": "Publish test case",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-37-activity.png"
+    },
+    {
+      "dc": 38,
+      "kind": "sequence",
+      "title": "Chạy test suite",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-38-sequence.png"
+    },
+    {
+      "dc": 38,
+      "kind": "activity",
+      "title": "Chạy test suite",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-38-activity.png"
+    },
+    {
+      "dc": 39,
+      "kind": "sequence",
+      "title": "Xem danh sách user",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-39-sequence.png"
+    },
+    {
+      "dc": 39,
+      "kind": "activity",
+      "title": "Xem danh sách user",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-39-activity.png"
+    },
+    {
+      "dc": 40,
+      "kind": "sequence",
+      "title": "Tạo user",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-40-sequence.png"
+    },
+    {
+      "dc": 40,
+      "kind": "activity",
+      "title": "Tạo user",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-40-activity.png"
+    },
+    {
+      "dc": 41,
+      "kind": "sequence",
+      "title": "Cập nhật user",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-41-sequence.png"
+    },
+    {
+      "dc": 41,
+      "kind": "activity",
+      "title": "Cập nhật user",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-41-activity.png"
+    },
+    {
+      "dc": 42,
+      "kind": "sequence",
+      "title": "Xóa user",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-42-sequence.png"
+    },
+    {
+      "dc": 42,
+      "kind": "activity",
+      "title": "Xóa user",
+      "file": "docs/final/images/17-dac-ta-chuc-nang-gop-nhom/dc-42-activity.png"
+    }
+  ]
+}

@@ -20,6 +20,7 @@ yarn-error.log*
 # Runtime generated files
 screenshots
 .worktrees/
+docs/final/images/.tmp/
 
 # Playwright / test output
 apps/api/test-results/
