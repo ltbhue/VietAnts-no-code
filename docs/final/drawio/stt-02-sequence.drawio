@@ -5,7 +5,7 @@
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
-        <mxCell id="2" value="Người dùng" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+        <mxCell id="2" value=":User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
           <mxGeometry x="140" y="60" width="40" height="60" as="geometry"/>
         </mxCell>
         <mxCell id="3" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1">
@@ -14,8 +14,8 @@
             <mxPoint x="160" y="1245" as="targetPoint"/>
           </mxGeometry>
         </mxCell>
-        <mxCell id="4" value="Frontend" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="260" y="60" width="120" height="40" as="geometry"/>
+        <mxCell id="4" value=": Form Login" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="292" y="48" width="56" height="56" as="geometry"/>
         </mxCell>
         <mxCell id="5" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
@@ -23,8 +23,8 @@
             <mxPoint x="320" y="1245" as="targetPoint"/>
           </mxGeometry>
         </mxCell>
-        <mxCell id="6" value="API Auth" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="420" y="60" width="120" height="40" as="geometry"/>
+        <mxCell id="6" value=": Đk Đăng nhập" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="452" y="48" width="56" height="56" as="geometry"/>
         </mxCell>
         <mxCell id="7" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
@@ -32,8 +32,8 @@
             <mxPoint x="480" y="1245" as="targetPoint"/>
           </mxGeometry>
         </mxCell>
-        <mxCell id="8" value="PostgreSQL" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="580" y="60" width="120" height="40" as="geometry"/>
+        <mxCell id="8" value=": DL User" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="612" y="48" width="56" height="56" as="geometry"/>
         </mxCell>
         <mxCell id="9" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#999999;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">

@@ -65,7 +65,7 @@ Bản chi tiết từng bảng đầy đủ 8 cột: `11-dac-ta-chuc-nang-giao-d
 | **Mục đích** | Giới thiệu hệ thống và điều hướng người dùng tới trang đăng nhập |
 | **Điều kiện tiên quyết** | Frontend đang chạy; người dùng truy cập được URL gốc `/` |
 | **Mô tả chung** | Trang chủ hiển thị tên sản phẩm, mô tả ngắn về kiểm thử no-code và nút **Đăng nhập**. Không gọi API backend |
-| **Luồng sự kiện** | 1. Người dùng mở URL `/`. 2. Hệ thống hiển thị trang giới thiệu. 3. Người dùng nhấn **Đăng nhập**. 4. Hệ thống chuyển hướng sang `/login` |
+| **Luồng sự kiện** | 1. Người dùng mở trang **Giới thiệu hệ thống**. 2. Hệ thống hiển thị nội dung giới thiệu. 3. Người dùng nhấn **Đăng nhập**. 4. Hệ thống chuyển sang trang **Đăng nhập** |
 | **Ngoại lệ** | Không có ngoại lệ nghiệp vụ; lỗi mạng khi tải trang do lỗi hạ tầng frontend |
 | **Các yêu cầu đặc biệt** | Giao diện responsive; không yêu cầu xác thực; layout không dùng AppShell sidebar |
 
@@ -136,7 +136,7 @@ flowchart TD
 | **Mục đích** | Xác thực danh tính và cấp quyền truy cập theo vai trò |
 | **Điều kiện tiên quyết** | Tài khoản đã tồn tại; API có cấu hình `JWT_SECRET`; email/mật khẩu hợp lệ |
 | **Mô tả chung** | Người dùng nhập email và mật khẩu. Backend kiểm tra hash bcrypt, sinh JWT (8 giờ), trả token và profile. Frontend lưu `authToken`, `authUser` vào localStorage |
-| **Luồng sự kiện** | 1. Mở `/login`. 2. Nhập email, mật khẩu. 3. Nhấn **Đăng nhập** → `POST /auth/login`. 4. API validate (Zod), tìm user, so sánh mật khẩu. 5. Sinh JWT gồm `sub`, `email`, `role`. 6. Frontend lưu token và thông tin user. 7. Chuyển hướng `/dashboard` |
+| **Luồng sự kiện** | 1. Người dùng mở trang **Đăng nhập**. 2. Nhập email, mật khẩu. 3. Nhấn **Đăng nhập** → `POST /auth/login`. 4. API validate (Zod), tìm user, so sánh mật khẩu. 5. Sinh JWT gồm `sub`, `email`, `role`. 6. Frontend lưu token và thông tin user. 7. Chuyển sang trang **Dashboard** |
 | **Ngoại lệ** | E1: Sai email/mật khẩu → 401, tăng bộ đếm thất bại. E2: Sau 5 lần sai trong 10 phút → 429, tạm khóa đăng nhập. E3: Thiếu `JWT_SECRET` → 500. E4: Không kết nối API → thông báo lỗi trên UI |
 | **Các yêu cầu đặc biệt** | Khóa theo cặp email + IP; không tiết lộ user tồn tại hay không khi sai MK; mật khẩu không lưu plain text phía client |
 
@@ -205,7 +205,7 @@ flowchart TD
 | **Mục đích** | Tạo tài khoản TESTER hoặc VIEWER để sử dụng hệ thống |
 | **Điều kiện tiên quyết** | Email chưa được đăng ký; mật khẩu đáp ứng quy tắc độ mạnh |
 | **Mô tả chung** | Form đăng ký gồm họ tên, email, mật khẩu, vai trò (TESTER/VIEWER). API hash mật khẩu bcrypt và tạo bản ghi User |
-| **Luồng sự kiện** | 1. Mở `/register`. 2. Nhập họ tên, email, mật khẩu, chọn role. 3. Submit → `POST /auth/register`. 4. API validate: email hợp lệ, MK ≥8 ký tự, có hoa/thường/số. 5. Kiểm tra email trùng. 6. Tạo user, trả 201. 7. UI thông báo thành công, chuyển `/login` sau ~800ms |
+| **Luồng sự kiện** | 1. Người dùng mở trang **Đăng ký tài khoản**. 2. Nhập họ tên, email, mật khẩu, chọn role. 3. Submit → `POST /auth/register`. 4. API validate: email hợp lệ, MK ≥8 ký tự, có hoa/thường/số. 5. Kiểm tra email trùng. 6. Tạo user, trả 201. 7. UI thông báo thành công, chuyển sang trang **Đăng nhập** sau ~800ms |
 | **Ngoại lệ** | E1: Email đã tồn tại → 409. E2: Dữ liệu không hợp lệ → 400 kèm chi tiết Zod. E3: Không kết nối API → hướng dẫn bật server |
 | **Các yêu cầu đặc biệt** | Không cho đăng ký role ADMIN qua form công khai; mật khẩu lưu dạng hash trên server |
 
@@ -271,7 +271,7 @@ flowchart TD
 | **Mục đích** | Khởi tạo quy trình đặt lại mật khẩu an toàn |
 | **Điều kiện tiên quyết** | Người dùng biết email đã đăng ký; API đang hoạt động |
 | **Mô tả chung** | Người dùng nhập email. Hệ thống tạo reset token (TTL 15 phút) lưu in-memory. Phản hồi không tiết lộ email có tồn tại (ngoại trừ MVP trả token trong response để demo) |
-| **Luồng sự kiện** | 1. Mở `/forgot-password`. 2. Nhập email. 3. Submit → `POST /auth/forgot-password`. 4. API validate email. 5. Nếu user tồn tại: sinh token ngẫu nhiên, lưu map token→userId. 6. Trả message thành công (+ `resetToken` trong MVP). 7. Người dùng chuyển sang `/reset-password` với token |
+| **Luồng sự kiện** | 1. Người dùng mở trang **Quên mật khẩu**. 2. Nhập email. 3. Submit → `POST /auth/forgot-password`. 4. API validate email. 5. Nếu user tồn tại: sinh token ngẫu nhiên, lưu map token→userId. 6. Trả message thành công (+ `resetToken` trong MVP). 7. Người dùng chuyển sang trang **Đặt lại mật khẩu** với token |
 | **Ngoại lệ** | E1: Email không hợp lệ → 400. E2: Email không tồn tại → vẫn 200 với message chung (bảo mật) |
 | **Các yêu cầu đặc biệt** | Token một lần, hết hạn 15 phút; production nên gửi token qua email thay vì trả trong JSON |
 
@@ -328,7 +328,7 @@ flowchart TD
 | **Mục đích** | Gán mật khẩu mới sau khi quên mật khẩu |
 | **Điều kiện tiên quyết** | Có reset token còn hiệu lực; mật khẩu mới đáp ứng quy tắc độ mạnh |
 | **Mô tả chung** | Form nhận token và mật khẩu mới. API xác minh token, hash và cập nhật user, xóa token |
-| **Luồng sự kiện** | 1. Mở `/reset-password`. 2. Nhập token, mật khẩu mới (và xác nhận trên UI). 3. Submit → `POST /auth/reset-password`. 4. API kiểm tra token tồn tại và chưa hết hạn. 5. Hash MK mới, cập nhật DB. 6. Xóa token. 7. Thông báo thành công, chuyển login |
+| **Luồng sự kiện** | 1. Người dùng mở trang **Đặt lại mật khẩu**. 2. Nhập token, mật khẩu mới (và xác nhận trên UI). 3. Submit → `POST /auth/reset-password`. 4. API kiểm tra token tồn tại và chưa hết hạn. 5. Hash MK mới, cập nhật DB. 6. Xóa token. 7. Thông báo thành công, chuyển về trang **Đăng nhập** |
 | **Ngoại lệ** | E1: Token không hợp lệ/hết hạn → 400. E2: MK không đủ mạnh → 400. E3: Token đã dùng → 400 |
 | **Các yêu cầu đặc biệt** | Token dùng một lần; invalidate sau khi đặt lại thành công |
 
@@ -394,7 +394,7 @@ flowchart TD
 | **Mục đích** | Người dùng tự cập nhật mật khẩu khi đã đăng nhập |
 | **Điều kiện tiên quyết** | Đã đăng nhập (JWT hợp lệ); biết mật khẩu hiện tại |
 | **Mô tả chung** | Màn `/settings/account` cho phép đổi MK với xác nhận MK mới trùng khớp trên client |
-| **Luồng sự kiện** | 1. Đăng nhập, mở `/settings/account`. 2. Nhập MK hiện tại, MK mới, xác nhận. 3. UI kiểm tra xác nhận khớp. 4. Submit → `POST /auth/change-password` kèm Bearer token. 5. API so sánh MK cũ, validate MK mới, cập nhật hash. 6. Thông báo thành công, xóa form |
+| **Luồng sự kiện** | 1. Người dùng đã đăng nhập và mở trang **Cài đặt tài khoản**. 2. Nhập MK hiện tại, MK mới, xác nhận. 3. UI kiểm tra xác nhận khớp. 4. Submit → `POST /auth/change-password` kèm Bearer token. 5. API so sánh MK cũ, validate MK mới, cập nhật hash. 6. Thông báo thành công, xóa form |
 | **Ngoại lệ** | E1: MK hiện tại sai → 401. E2: MK mới trùng MK cũ → 400. E3: MK mới không đủ mạnh → 400. E4: Xác nhận không khớp → lỗi UI, không gọi API |
 | **Các yêu cầu đặc biệt** | MK tối thiểu 8 ký tự, có hoa/thường/số; giới hạn độ dài input 255 ký tự trên UI |
 
@@ -460,7 +460,7 @@ flowchart TD
 | **Mục đích** | Kết thúc phiên làm việc và xóa thông tin xác thực cục bộ |
 | **Điều kiện tiên quyết** | Đang đăng nhập (có token trong localStorage) |
 | **Mô tả chung** | Thao tác từ menu user trên AppShell; không gọi API revoke server-side (stateless JWT) |
-| **Luồng sự kiện** | 1. Người dùng mở menu avatar. 2. Chọn **Đăng xuất**. 3. Frontend xóa `authToken`, `authUser`. 4. Chuyển hướng `/login` |
+| **Luồng sự kiện** | 1. Người dùng mở menu tài khoản (avatar). 2. Chọn **Đăng xuất**. 3. Frontend xóa `authToken`, `authUser`. 4. Hệ thống chuyển về trang **Đăng nhập** |
 | **Ngoại lệ** | Không có ngoại lệ nghiệp vụ |
 | **Các yêu cầu đặc biệt** | JWT vẫn còn hiệu lực trên server đến khi hết hạn; có thể bổ sung blacklist token ở phiên bản sau |
 
@@ -525,7 +525,7 @@ flowchart TD
 | **Mục đích** | Tổng quan dự án, lần chạy và chỉ số Pass/Fail theo thời gian |
 | **Điều kiện tiên quyết** | Đã đăng nhập; user có quyền truy cập ít nhất một project (hoặc danh sách rỗng) |
 | **Mô tả chung** | Dashboard tải projects, runs, suites và gọi `GET /runs/analytics` với khoảng 7 hoặc 30 ngày, có thể lọc theo project/suite |
-| **Luồng sự kiện** | 1. Sau login vào `/dashboard`. 2. Gọi `GET /projects`, `GET /runs`. 3. Chọn project mặc định hoặc project khác. 4. Gọi `GET /projects/:id/suites`. 5. Chọn khoảng 7/30 ngày và/hoặc suite. 6. Gọi `GET /runs/analytics?days=&projectId=&suiteId=`. 7. Hiển thị tổng run, pass, fail, pass rate, lỗi phổ biến, time series |
+| **Luồng sự kiện** | 1. Sau đăng nhập, người dùng vào trang **Dashboard**. 2. Gọi `GET /projects`, `GET /runs`. 3. Chọn project mặc định hoặc project khác. 4. Gọi `GET /projects/:id/suites`. 5. Chọn khoảng 7/30 ngày và/hoặc suite. 6. Gọi `GET /runs/analytics?days=&projectId=&suiteId=`. 7. Hiển thị tổng run, pass, fail, pass rate, lỗi phổ biến, time series |
 | **Ngoại lệ** | E1: Token hết hạn → redirect login. E2: Lỗi API → hiển thị thông báo lỗi. E3: Không có dữ liệu → hiển thị 0 và biểu đồ rỗng |
 | **Các yêu cầu đặc biệt** | Viewer chỉ xem, không thao tác mutate; nút làm mới dữ liệu; Admin thấy link tới quản lý dự án |
 
@@ -617,7 +617,7 @@ flowchart TD
 | **Mục đích** | Xem các dự án user được phép truy cập (owner hoặc member) |
 | **Điều kiện tiên quyết** | Đăng nhập role ADMIN; có JWT hợp lệ |
 | **Mô tả chung** | Trang `/projects` gọi API lấy project kèm danh sách members và thông tin user |
-| **Luồng sự kiện** | 1. Admin mở `/projects`. 2. `GET /projects` với Bearer token. 3. Backend lọc theo `projectAccessibleWhere`. 4. Trả danh sách project + members. 5. UI hiển thị bảng, hỗ trợ tìm kiếm theo tên |
+| **Luồng sự kiện** | 1. Admin mở trang **Quản lý dự án**. 2. `GET /projects` với Bearer token. 3. Backend lọc theo `projectAccessibleWhere`. 4. Trả danh sách project + members. 5. UI hiển thị bảng, hỗ trợ tìm kiếm theo tên |
 | **Ngoại lệ** | E1: Không phải ADMIN → AppShell chuyển `/dashboard`. E2: 401 → login |
 | **Các yêu cầu đặc biệt** | Chỉ ADMIN thấy menu Dự án; hiển thị owner và danh sách thành viên |
 
@@ -668,7 +668,7 @@ flowchart TD
 | **Mục đích** | Tạo không gian làm việc chứa kịch bản, object, dataset |
 | **Điều kiện tiên quyết** | Role ADMIN; tên dự án không rỗng |
 | **Mô tả chung** | Form tạo project: tên, mô tả, chọn memberIds. Owner là admin đang đăng nhập |
-| **Luồng sự kiện** | 1. Admin mở form tạo trên `/projects`. 2. Nhập tên, mô tả, chọn thành viên. 3. Submit → `POST /projects`. 4. API tạo Project, `ownerId = req.user.id`. 5. Tạo ProjectMember cho memberIds (trừ owner trùng). 6. Trả project kèm members. 7. UI cập nhật danh sách |
+| **Luồng sự kiện** | 1. Admin mở form **Tạo dự án** tại trang Quản lý dự án. 2. Nhập tên, mô tả, chọn thành viên. 3. Submit → `POST /projects`. 4. API tạo Project, `ownerId = req.user.id`. 5. Tạo ProjectMember cho memberIds (trừ owner trùng). 6. Trả project kèm members. 7. UI cập nhật danh sách |
 | **Ngoại lệ** | E1: Tên rỗng → 400. E2: Không đủ quyền → 403 |
 | **Các yêu cầu đặc biệt** | Giới hạn tên 255 ký tự, mô tả 2000 ký tự trên UI |
 
@@ -857,7 +857,7 @@ flowchart TD
 | **Mục đích** | Tra cứu kịch bản thuộc project user được phép |
 | **Điều kiện tiên quyết** | Đã đăng nhập; có ít nhất một project accessible |
 | **Mô tả chung** | `/scripts` lọc theo projectId query, hiển thị tên, mô tả, project |
-| **Luồng sự kiện** | 1. Mở `/scripts`. 2. Chọn project (dropdown). 3. `GET /scripts?projectId=`. 4. Backend lọc script thuộc project accessible. 5. Hiển thị danh sách, link tới chi tiết |
+| **Luồng sự kiện** | 1. Người dùng mở trang **Quản lý kịch bản**. 2. Chọn project (dropdown). 3. `GET /scripts?projectId=`. 4. Backend lọc script thuộc project accessible. 5. Hiển thị danh sách, link tới chi tiết |
 | **Ngoại lệ** | E1: Project không accessible → danh sách rỗng hoặc 403 |
 | **Các yêu cầu đặc biệt** | Viewer chỉ xem, không nút tạo/xóa |
 
@@ -909,7 +909,7 @@ flowchart TD
 | **Mục đích** | Khởi tạo TestScript rỗng để thiết kế bước |
 | **Điều kiện tiên quyết** | Role ADMIN hoặc TESTER; projectId hợp lệ và accessible |
 | **Mô tả chung** | Tạo script với name, description, projectId, createdById |
-| **Luồng sự kiện** | 1. Trên `/scripts`, chọn project, nhập tên/mô tả. 2. Submit → `POST /scripts`. 3. API kiểm tra quyền project. 4. Tạo TestScript. 5. Trả 201. 6. UI refresh hoặc chuyển `/scripts/:id` |
+| **Luồng sự kiện** | 1. Tại trang **Quản lý kịch bản**, chọn project, nhập tên/mô tả. 2. Submit → `POST /scripts`. 3. API kiểm tra quyền project. 4. Tạo TestScript. 5. Trả 201. 6. UI refresh hoặc chuyển sang trang **Chi tiết kịch bản** |
 | **Ngoại lệ** | E1: Thiếu tên → 400. E2: Không quyền project → 403 |
 | **Các yêu cầu đặc biệt** | Viewer không được tạo |
 
@@ -1012,7 +1012,7 @@ flowchart TD
 | **Mục đích** | Xem metadata và danh sách bước kiểm thử |
 | **Điều kiện tiên quyết** | Script id hợp lệ; quyền truy cập project |
 | **Mô tả chung** | `/scripts/[id]` tải script + steps, datasets và ui objects của project |
-| **Luồng sự kiện** | 1. Mở `/scripts/:id`. 2. `GET /scripts/:id`. 3. `GET /datasets?projectId=`, `GET /objects?projectId=`. 4. Hiển thị timeline steps, form chạy test |
+| **Luồng sự kiện** | 1. Người dùng mở trang **Chi tiết kịch bản**. 2. `GET /scripts/:id`. 3. `GET /datasets?projectId=`, `GET /objects?projectId=`. 4. Hiển thị timeline steps, form chạy test |
 | **Ngoại lệ** | E1: 404 script. E2: 401/403 |
 | **Các yêu cầu đặc biệt** | Viewer ẩn nút sửa/lưu/chạy |
 
@@ -1311,7 +1311,7 @@ flowchart TD
 | **Mục đích** | Tra cứu object repository theo project |
 | **Điều kiện tiên quyết** | Đăng nhập; chọn project accessible |
 | **Mô tả chung** | `/objects` — `GET /objects?projectId=` |
-| **Luồng sự kiện** | 1. Mở `/objects`. 2. Chọn project. 3. Gọi API. 4. Hiển thị name, locator, mô tả |
+| **Luồng sự kiện** | 1. Người dùng mở trang **Quản lý đối tượng UI**. 2. Chọn project. 3. Gọi API. 4. Hiển thị name, locator, mô tả |
 | **Ngoại lệ** | E1: Project không accessible → 403 |
 | **Các yêu cầu đặc biệt** | Sắp xếp createdAt desc |
 
@@ -1359,7 +1359,7 @@ flowchart TD
 | **Mục đích** | Lưu locator tái sử dụng cho nhiều kịch bản |
 | **Điều kiện tiên quyết** | name và locator không rỗng |
 | **Mô tả chung** | `POST /objects` {projectId, name, description?, locator} |
-| **Luồng sự kiện** | 1. Nhập form trên `/objects`. 2. Submit → POST. 3. Kiểm tra quyền project. 4. Tạo UiObject. 5. Refresh danh sách |
+| **Luồng sự kiện** | 1. Tại trang Quản lý đối tượng UI, người dùng nhập form thêm mới. 2. Submit → POST. 3. Kiểm tra quyền project. 4. Tạo UiObject. 5. Refresh danh sách |
 | **Ngoại lệ** | E1: Locator rỗng → 400 |
 | **Các yêu cầu đặc biệt** | Locator thường là CSS selector hoặc text label |
 
@@ -1754,7 +1754,7 @@ flowchart TD
 | **Mục đích** | Theo dõi lịch sử thực thi kịch bản |
 | **Điều kiện tiên quyết** | Đăng nhập |
 | **Mô tả chung** | `/reports` — GET /runs (theo userId trên API hiện tại) |
-| **Luồng sự kiện** | 1. Mở `/reports`. 2. GET /runs. 3. Tính total/passed/failed cards. 4. Hiển thị bảng runs |
+| **Luồng sự kiện** | 1. Người dùng mở trang **Báo cáo**. 2. GET /runs. 3. Tính total/passed/failed cards. 4. Hiển thị bảng runs |
 | **Ngoại lệ** | E1: Không có run → 0 |
 | **Các yêu cầu đặc biệt** | Hiển thị tên script, thời gian, trạng thái tiếng Việt |
 
@@ -2424,7 +2424,7 @@ flowchart TD
 | **Mục đích** | Quản trị tài khoản hệ thống |
 | **Điều kiện tiên quyết** | Role ADMIN |
 | **Mô tả chung** | GET /auth/admin/users |
-| **Luồng sự kiện** | 1. Mở `/admin/users`. 2. GET users + GET projects (cho dropdown). 3. Hiển thị bảng, search local |
+| **Luồng sự kiện** | 1. Admin mở trang **Quản trị người dùng**. 2. GET users + GET projects (cho dropdown). 3. Hiển thị bảng, search local |
 | **Ngoại lệ** | E1: 403 → redirect dashboard |
 | **Các yêu cầu đặc biệt** | Sắp xếp role, fullName |
 
