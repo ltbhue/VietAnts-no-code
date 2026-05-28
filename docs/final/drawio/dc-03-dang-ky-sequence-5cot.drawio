@@ -1,0 +1,47 @@
+<mxfile host="app.diagrams.net" modified="2026-05-27T13:30:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="dc03-sequence-5" name="DC-03 Dang ky - Sequence 5 cot">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="frame" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="20" y="140" width="1540" height="720" as="geometry" />
+        </mxCell>
+        <mxCell id="frameTag" value="sd Đăng ký tài khoản (ĐC-03)" style="shape=umlFrame;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="20" y="140" width="230" height="36" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actor" value=": User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" vertex="1" parent="1"><mxGeometry x="120" y="45" width="40" height="80" as="geometry" /></mxCell>
+        <mxCell id="home" value=": Trang giới thiệu&#xa;VietAnts Testing" style="shape=umlBoundary;html=1;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1"><mxGeometry x="420" y="45" width="56" height="56" as="geometry" /></mxCell>
+        <mxCell id="signup" value=": Trang Đăng ký&#xa;tài khoản" style="shape=umlBoundary;html=1;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1"><mxGeometry x="700" y="45" width="56" height="56" as="geometry" /></mxCell>
+        <mxCell id="auth" value=": Dịch vụ xác thực" style="shape=umlControl;html=1;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1"><mxGeometry x="980" y="45" width="56" height="56" as="geometry" /></mxCell>
+        <mxCell id="db" value=": CSDL Người dùng" style="shape=umlEntity;html=1;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1"><mxGeometry x="1260" y="45" width="56" height="56" as="geometry" /></mxCell>
+
+        <mxCell id="l1" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;dashed=1;" vertex="1" parent="1"><mxGeometry x="140" y="128" width="2" height="740" as="geometry" /></mxCell>
+        <mxCell id="l2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;dashed=1;" vertex="1" parent="1"><mxGeometry x="448" y="128" width="2" height="740" as="geometry" /></mxCell>
+        <mxCell id="l3" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;dashed=1;" vertex="1" parent="1"><mxGeometry x="728" y="128" width="2" height="740" as="geometry" /></mxCell>
+        <mxCell id="l4" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;dashed=1;" vertex="1" parent="1"><mxGeometry x="1008" y="128" width="2" height="740" as="geometry" /></mxCell>
+        <mxCell id="l5" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;dashed=1;" vertex="1" parent="1"><mxGeometry x="1288" y="128" width="2" height="740" as="geometry" /></mxCell>
+
+        <mxCell id="a2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="442" y="220" width="12" height="52" as="geometry" /></mxCell>
+        <mxCell id="a3" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="722" y="290" width="12" height="340" as="geometry" /></mxCell>
+        <mxCell id="a4" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="1002" y="430" width="12" height="220" as="geometry" /></mxCell>
+        <mxCell id="a5" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1"><mxGeometry x="1282" y="470" width="12" height="240" as="geometry" /></mxCell>
+
+        <mxCell id="m1" value="1 : Chọn Login tại Trang giới thiệu" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="142" y="228" as="sourcePoint" /><mxPoint x="442" y="228" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m2" value="2 : Hiển thị form đăng ký tài khoản" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="454" y="258" as="sourcePoint" /><mxPoint x="722" y="258" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m3" value="3 : Nhập thông tin đăng ký" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="142" y="380" as="sourcePoint" /><mxPoint x="722" y="380" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m4" value="4 : Gửi yêu cầu đăng ký" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="734" y="440" as="sourcePoint" /><mxPoint x="1002" y="440" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m5" value="5 : Kiểm tra dữ liệu trong CSDL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1014" y="480" as="sourcePoint" /><mxPoint x="1282" y="480" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m6" value="6 : Trả kết quả từ CSDL (không hợp lệ)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1282" y="540" as="sourcePoint" /><mxPoint x="1014" y="540" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m7" value="7 : Trả lỗi về Trang Đăng ký" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1002" y="570" as="sourcePoint" /><mxPoint x="734" y="570" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m8" value="8 : User nhập lại thông tin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="142" y="600" as="sourcePoint" /><mxPoint x="722" y="600" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m9" value="9 : Trả kết quả từ CSDL (hợp lệ)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1282" y="650" as="sourcePoint" /><mxPoint x="1014" y="650" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m10" value="10 : Tạo tài khoản mới trong CSDL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1014" y="690" as="sourcePoint" /><mxPoint x="1282" y="690" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m11" value="11 : CSDL trả thành công về Dịch vụ xác thực" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1282" y="740" as="sourcePoint" /><mxPoint x="1014" y="740" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m12" value="12 : Dịch vụ xác thực trả về Trang Đăng ký" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="1002" y="780" as="sourcePoint" /><mxPoint x="734" y="780" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="m13" value="13 : Trang Đăng ký thông báo thành công cho User" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="722" y="820" as="sourcePoint" /><mxPoint x="142" y="820" as="targetPoint" /></mxGeometry></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
