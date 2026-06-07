@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { getApiBase, getUserRole } from "@/lib/api";
+import { MultiSelectSearch } from "@/components/MultiSelectSearch";
 import { PageHeader } from "@/components/PageHeader";
 import { ui } from "@/lib/ui";
 import { FiEye, FiTrash2 } from "react-icons/fi";
@@ -30,6 +31,12 @@ interface UserOption {
 const PROJECT_NAME_MAX_LENGTH = 255;
 const PROJECT_DESCRIPTION_MAX_LENGTH = 2000;
 const DEFAULT_TEXTBOX_MAX_LENGTH = 255;
+
+const roleLabels: Record<UserOption["role"], string> = {
+  ADMIN: "Quản trị",
+  TESTER: "Kiểm thử",
+  VIEWER: "Xem",
+};
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -112,6 +119,16 @@ export default function ProjectsPage() {
 
   const canCreateOrEditProject = role === "ADMIN";
   const canAssignMembers = role === "ADMIN";
+
+  const memberSelectOptions = useMemo(
+    () =>
+      users.map((u) => ({
+        value: u.id,
+        label: u.fullName,
+        description: `${u.email} · ${roleLabels[u.role]}`,
+      })),
+    [users],
+  );
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -357,21 +374,19 @@ export default function ProjectsPage() {
                 />
               </div>
               {canAssignMembers && (
-              <div>
-                <label className={ui.label}>Gán Tester/Viewer</label>
-                <select
-                  multiple
-                  className={ui.select}
-                  value={editMemberIds}
-                  onChange={(e) => setEditMemberIds(Array.from(e.target.selectedOptions).map((o) => o.value))}
-                >
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.fullName} ({u.role})
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div>
+                  <label className={ui.label} htmlFor="edit-project-members">
+                    Gán Tester/Viewer
+                  </label>
+                  <MultiSelectSearch
+                    id="edit-project-members"
+                    options={memberSelectOptions}
+                    value={editMemberIds}
+                    onChange={setEditMemberIds}
+                    searchPlaceholder="Tìm theo tên, email hoặc vai trò…"
+                    emptyMessage="Không tìm thấy Tester/Viewer phù hợp."
+                  />
+                </div>
               )}
               <div className="flex gap-2 justify-end pt-2">
                 <button type="button" onClick={() => setEditing(null)} className={ui.btnSecondary}>
@@ -414,21 +429,19 @@ export default function ProjectsPage() {
                 />
               </div>
               {canAssignMembers && (
-              <div>
-                <label className={ui.label}>Gán Tester/Viewer</label>
-                <select
-                  multiple
-                  className={ui.select}
-                  value={memberIds}
-                  onChange={(e) => setMemberIds(Array.from(e.target.selectedOptions).map((o) => o.value))}
-                >
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.fullName} ({u.role})
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div>
+                  <label className={ui.label} htmlFor="create-project-members">
+                    Gán Tester/Viewer
+                  </label>
+                  <MultiSelectSearch
+                    id="create-project-members"
+                    options={memberSelectOptions}
+                    value={memberIds}
+                    onChange={setMemberIds}
+                    searchPlaceholder="Tìm theo tên, email hoặc vai trò…"
+                    emptyMessage="Không tìm thấy Tester/Viewer phù hợp."
+                  />
+                </div>
               )}
               <div className="flex gap-2 justify-end pt-2">
                 <button type="button" onClick={() => setShowCreateForm(false)} className={ui.btnSecondary}>

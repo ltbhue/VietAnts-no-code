@@ -47,6 +47,107 @@ export default function testsRouter(prisma: PrismaClient) {
     res.json(cases);
   });
 
+  router.get("/:projectId/tests/:testCaseId", async (req, res) => {
+    const projectId = req.params.projectId as string;
+    const testCaseId = req.params.testCaseId as string;
+
+    const project = await prisma.project.findFirst({
+      where: projectAccessibleWhere(req.user!.id, projectId),
+    });
+    if (!project) {
+      return res.status(404).json({ error: "Không tìm thấy project" });
+    }
+
+    const tc = await prisma.testCase.findFirst({
+      where: { id: testCaseId, projectId },
+      include: { versions: { orderBy: { version: "desc" }, take: 1 } },
+    });
+    if (!tc) {
+      return res.status(404).json({ error: "Không tìm thấy test case" });
+    }
+
+    const latest = tc.versions[0];
+    if (!latest) {
+      return res.status(404).json({ error: "Test case chưa có phiên bản" });
+    }
+
+    return res.json({
+      id: tc.id,
+      title: tc.title,
+      projectId: tc.projectId,
+      updatedAt: tc.updatedAt,
+      version: latest.version,
+      content: latest.content,
+    });
+  });
+
+  router.put("/:projectId/tests/:testCaseId", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
+    const parsed = createRecordedTestSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Dữ liệu không hợp lệ", details: parsed.error.flatten() });
+    }
+
+    const projectId = req.params.projectId as string;
+    const testCaseId = req.params.testCaseId as string;
+
+    const project = await prisma.project.findFirst({
+      where: projectAccessibleWhere(req.user!.id, projectId),
+    });
+    if (!project) {
+      return res.status(404).json({ error: "Không tìm thấy project" });
+    }
+
+    const tc = await prisma.testCase.findFirst({
+      where: { id: testCaseId, projectId },
+      include: { versions: { orderBy: { version: "desc" }, take: 1 } },
+    });
+    if (!tc) {
+      return res.status(404).json({ error: "Không tìm thấy test case" });
+    }
+
+    const latest = tc.versions[0];
+    if (!latest) {
+      return res.status(404).json({ error: "Test case chưa có phiên bản" });
+    }
+
+    const raw = latest.content as Record<string, unknown>;
+    if (raw.lifecycle === "Published") {
+      return res.status(400).json({ error: "Không thể chỉnh sửa test case đã Published" });
+    }
+
+    let validatedSteps: ReturnType<typeof parseStep>[];
+    try {
+      validatedSteps = parsed.data.steps.map((s) => parseStep(s));
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Bước test không hợp lệ";
+      return res.status(400).json({ error: message });
+    }
+
+    const content = {
+      lifecycle: "Draft" as const,
+      platform: parsed.data.platform ?? "desktop-web",
+      steps: validatedSteps,
+    };
+
+    await prisma.$transaction([
+      prisma.testCase.update({
+        where: { id: testCaseId },
+        data: { title: parsed.data.name },
+      }),
+      prisma.testCaseVersion.update({
+        where: { id: latest.id },
+        data: { content },
+      }),
+    ]);
+
+    return res.json({
+      id: tc.id,
+      lifecycle: "Draft",
+      version: latest.version,
+      name: parsed.data.name,
+    });
+  });
+
   router.post("/:projectId/tests", requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parsed = createRecordedTestSchema.safeParse(req.body);
     if (!parsed.success) {

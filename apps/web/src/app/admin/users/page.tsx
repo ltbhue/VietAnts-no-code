@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { FiEdit2, FiRefreshCw, FiSearch, FiTrash2, FiUserPlus, FiX } from "react-icons/fi";
 import { getApiBase, getUserRole } from "@/lib/api";
 import { PageHeader } from "@/components/PageHeader";
+import { PasswordInput } from "@/components/PasswordInput";
 import { ui } from "@/lib/ui";
 
 type UserRow = {
@@ -318,9 +319,8 @@ export default function AdminUsersPage() {
                   <label className={ui.label} htmlFor="au-password">
                     Mật khẩu
                   </label>
-                  <input
+                  <PasswordInput
                     id="au-password"
-                    type="password"
                     className={ui.input}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -452,9 +452,8 @@ export default function AdminUsersPage() {
                   <label className={ui.label} htmlFor="edit-password">
                     Mật khẩu mới (tuỳ chọn)
                   </label>
-                  <input
+                  <PasswordInput
                     id="edit-password"
-                    type="password"
                     className={ui.input}
                     value={editPassword}
                     onChange={(e) => setEditPassword(e.target.value)}

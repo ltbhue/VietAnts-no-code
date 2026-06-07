@@ -50,6 +50,46 @@ test("parseStep throws for whitespace-only selector", () => {
   }, /Step selector is required/);
 });
 
+test("parseStep accepts keyword.navigate step kind", () => {
+  const parsed = parseStep({
+    kind: "keyword.navigate",
+    url: "https://example.com/login",
+  });
+
+  assert.equal(parsed.kind, "keyword.navigate");
+  if (parsed.kind === "keyword.navigate") {
+    assert.equal(parsed.url, "https://example.com/login");
+  }
+});
+
+test("parseStep accepts keyword.fill step kind", () => {
+  const parsed = parseStep({
+    kind: "keyword.fill",
+    selector: "input[name='email']",
+    value: "tester@vietants.com",
+  });
+
+  assert.equal(parsed.kind, "keyword.fill");
+  if (parsed.kind === "keyword.fill") {
+    assert.equal(parsed.selector, "input[name='email']");
+    assert.equal(parsed.value, "tester@vietants.com");
+  }
+});
+
+test("parseStep accepts keyword.assertText step kind", () => {
+  const parsed = parseStep({
+    kind: "keyword.assertText",
+    selector: "body",
+    expected: "Dashboard",
+  });
+
+  assert.equal(parsed.kind, "keyword.assertText");
+  if (parsed.kind === "keyword.assertText") {
+    assert.equal(parsed.selector, "body");
+    assert.equal(parsed.expected, "Dashboard");
+  }
+});
+
 test("canTransition blocks Draft->Published direct, allows Draft->Validated", () => {
   assert.equal(
     canTransition(LifecycleState.Draft, LifecycleState.Published),

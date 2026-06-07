@@ -1,16 +1,28 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { getApiBase, authJsonHeaders } from "@/lib/api";
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { ui } from "@/lib/ui";
 import { FiSend } from "react-icons/fi";
 
-export default function EditorPage() {
+function EditorPageInner() {
+  const searchParams = useSearchParams();
   const [projectId, setProjectId] = useState("");
   const [testCaseId, setTestCaseId] = useState("");
   const [result, setResult] = useState<string | null>(null);
+
+  useEffect(() => {
+    const qp = searchParams.get("projectId");
+    const qt = searchParams.get("testCaseId");
+    queueMicrotask(() => {
+      if (qp) setProjectId(qp);
+      if (qt) setTestCaseId(qt);
+    });
+  }, [searchParams]);
 
   async function publish() {
     setResult(null);
@@ -28,6 +40,11 @@ export default function EditorPage() {
         <PageHeader
           title="Biên tập & publish"
           subtitle="Nhập project ID và test case ID để gọi API publish (kiểm tra nghiệp vụ trước khi Published)."
+          actions={
+            <Link href="/recorder" className={ui.btnSecondary}>
+              ← Danh sách ghi thao tác
+            </Link>
+          }
         />
 
         <section className={`${ui.card} space-y-4`}>
@@ -64,5 +81,13 @@ export default function EditorPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function EditorPage() {
+  return (
+    <Suspense fallback={<main className="p-8 text-slate-400">Đang tải…</main>}>
+      <EditorPageInner />
+    </Suspense>
   );
 }

@@ -14,6 +14,35 @@ const startRunSchema = z.object({
 export default function suiteRunsRouter(prisma: PrismaClient) {
   const router = Router();
 
+  router.get("/runs", authMiddleware, async (req, res) => {
+    const status = (req.query.status as string | undefined)?.trim();
+    const suiteId = (req.query.suiteId as string | undefined)?.trim();
+    const projectId = (req.query.projectId as string | undefined)?.trim();
+
+    const runs = await prisma.suiteRun.findMany({
+      where: {
+        ...(status ? { status } : {}),
+        ...(suiteId ? { suiteId } : {}),
+        suite: {
+          project: projectAccessibleWhere(req.user!.id, projectId || undefined),
+        },
+      },
+      orderBy: { startedAt: "desc" },
+      include: {
+        suite: {
+          select: {
+            id: true,
+            name: true,
+            projectId: true,
+            project: { select: { id: true, name: true } },
+          },
+        },
+      },
+    });
+
+    res.json(runs);
+  });
+
   router.post("/:suiteId/runs", authMiddleware, requireRole(["ADMIN", "TESTER"]), async (req, res) => {
     const parsed = startRunSchema.safeParse(req.body ?? {});
     if (!parsed.success) {
